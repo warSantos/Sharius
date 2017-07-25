@@ -1,0 +1,13 @@
+CC=gcc
+CFLAGS=-c -Wall -O3
+HDRS=headers/
+SRC=source/
+SU=/src/usuario/
+OBJ=obj/
+
+sharius:	$(OBJ)*.o
+	mv *.o $(OBJ)
+	gcc $(OBJ) -o sharius
+
+usuario.o:	$(SU)$(HDRS)usuario.h	$(SU)$(SRC)usuario.c
+	$(CC) $(CFLAGS) $(SU)$(SRC)usuario.C	

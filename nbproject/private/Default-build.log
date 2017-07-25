@@ -1,0 +1,20 @@
+gcc -c -Wall -O3 src/usuarios/source/usuario.c && mv *.o obj/
+gcc -c -Wall -O3 src/teste/main.c && mv *.o obj/
+src/teste/main.c: In function ‘main’:
+src/teste/main.c:18:19: error: too few arguments to function ‘inserirUsuario’
+         int rep = inserirUsuario();
+                   ^~~~~~~~~~~~~~
+In file included from src/teste/main.c:7:0:
+src/teste/../usuarios/headers/usuario.h:39:5: note: declared here
+ int inserirUsuario(Descritor *listaLogin);
+     ^~~~~~~~~~~~~~
+src/teste/main.c:18:13: warning: unused variable ‘rep’ [-Wunused-variable]
+         int rep = inserirUsuario();
+             ^~~
+src/teste/main.c:21:11: error: expected expression before ‘)’ token
+     while(){}
+           ^
+src/teste/main.c:13:16: warning: unused variable ‘listaLogin’ [-Wunused-variable]
+     Descritor *listaLogin = iniciarLista();
+                ^~~~~~~~~~
+make: *** [Makefile:17: main.o] Error 1
