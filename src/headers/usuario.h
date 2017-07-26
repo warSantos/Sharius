@@ -28,6 +28,10 @@ typedef struct descritor {
     int tamanho;
 } Descritor;
 
+// Lista global de usuários
+// Necessária para trabalho com threads.
+Descritor *listaLogin;
+
 // Verifica se a lista de logins esta vazia.
 int listaVazia();
 

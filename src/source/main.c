@@ -19,16 +19,12 @@
  *      help (Mostra comandos disponíveis).
  */
 
-// Ajuda para esclarecimento de envio de mensagens, contém
-// exemplos de todas as opções de envio e comandos extras.
-void ajudaMenssagem();
-
-// Ajuda para esclarecimento no uso de comandos e parâmetros.
-void ajudaComando();
+// Função para recember os comandos inseridos pelo usuário no modo "Comando". 
+void menuComando(char *buffer);
 
 int main(void){
     
-    Descritor *listaLogin = iniciarLista();
+    listaLogin = iniciarLista();
     char *buffer = calloc(sizeof(char),251);
     char *alteraModo = calloc(sizeof(char),3);
     alteraModo[0] = '!';
@@ -49,24 +45,21 @@ int main(void){
         __fpurge(stdin);
                         
         // Identifica o princípio de um possível comando de alteração de modo.
-        if(buffer[0] == '!'){ 
+        if (buffer[0] == '!' && buffer[1] == 'c') {
             
             // Altera pro modo de comando.
-            if(buffer[1] == 'c'){
-                
-                system("clear");
-                printf("\n\nModo de comando.\n\n");
-                alteraModo[0] = '!';
-                alteraModo[1] = 'c';
+            system("clear");
+            printf("\n\nModo de comando.\n\n");
+            alteraModo[0] = '!';
+            alteraModo[1] = 'c';
             // Altera para o modo de mensagem.    
-            }else if(buffer[1] == 'm'){
-                
-                system("clear");
-                printf("\n\nModo de mensagem.\n\n");
-                alteraModo[0] = '!';
-                alteraModo[1] = 'm';
-            }
-        }
+        } else if (buffer[0] == '!' && buffer[1] == 'm') {
+
+            system("clear");
+            printf("\n\nModo de mensagem.\n\n");
+            alteraModo[0] = '!';
+            alteraModo[1] = 'm';
+        }        
         
         // Se estiver no mode de comandos...
         if(alteraModo[0] == '!' && alteraModo[1] == 'c'){ // chama o menu de comados.
@@ -74,15 +67,15 @@ int main(void){
             // Se o último comando utilizado nao foi o de alterar para o modo de comando...
             if(buffer[0] != '!' && buffer[1] != 'c') {
                 
-                printf("\n\nUtilizei um comando.\n\n");
+                menuComando(buffer);
             }            
             
         }else{ // Modo de envio de menssagem...
             
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
-            if(buffer[0] != '!' && buffer[1] != 'c') {
+            if(buffer[0] != '!' && buffer[1] != 'm') {
                 
-                
+                /*
                 if(strncmp()){
                 
                 }else{
@@ -94,7 +87,8 @@ int main(void){
 
                         printf("\n\nEnviei uma mensagem.\n\n");
                     }
-                }                                
+                } 
+                */                               
             }
         }
     }
@@ -114,6 +108,16 @@ void ajudaMenssagem(){
     printf("\n\n\t> @FULANO MENSSAGEM...\n\n");    
 }
 
+void ajudaComando(){
+
+    printf("\n\tAjuda.\n\n");
+    printf("\n\tadd - adiciona logins a sala.");
+    printf("\n\tlist - imprimi lista de usuários ativos.");
+    printf("\n\thelp - consulta ajuda.");
+    printf("\n\tquit - encerra conexão com logins e deleta sala.");
+    printf("\n\tremove - remove um usuário.\n\n");    
+}
+
 /*
  * Lista de comandos.
  *      
@@ -124,12 +128,33 @@ void ajudaMenssagem(){
  *      help (Mostra comandos disponíveis).
  */
 
-void ajudaComando(){
 
-    printf("\n\tAjuda.\n\n");
-    printf("\n\t--add - adiciona logins a sala.");
-    printf("\n\t--list - imprimi lista de usuários ativos.");
-    printf("\n\t--help - consulta ajuda.");
-    printf("\n\t--quit - encerra conexão com logins e deleta sala.");
-    printf("\n\t--remove - remove um usuário.\n\n");    
+
+void menuComando(char *buffer){
+    
+    Comando *bloco = split(buffer);
+    if(!strncmp(bloco->comando, "add", 4)){
+        
+        printf("Nick add com sucesso.\n\n");
+    }else if(!strncmp(bloco->comando, "remove", 7)){
+        
+        printf("Nick removido com sucesso.\n\n");
+    }else if(!strncmp(bloco->comando, "list", 5)){
+        
+        imprimirLista(listaLogin);
+    }else if(!strncmp(bloco->comando, "quit", 5)){
+        
+        printf("Fechando conexões...\n");
+        printf("Have a nice day....\n");
+        exit(0);
+    }else if(!strncmp(bloco->comando, "help", 5)){
+        
+        ajudaComando();
+    }else if(!strncmp(bloco->comando, "clear", 6)){
+        
+        system("clear");
+    }else{
+        
+        printf("\nComando não identificado.\n\n");
+    }
 }

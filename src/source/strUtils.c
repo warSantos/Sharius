@@ -50,3 +50,45 @@ int verificaIp(char *ip){
     return 0;
 }
 
+Comando *split(char *buffer){
+    
+    Comando *bloco = calloc(sizeof(Comando),1);
+    
+    // Procurando por espaço "lixo antes de digitar o comando.
+    int i = 0, j;
+    while(buffer[i] == ' '){ ++i;}
+    
+    j = 0;
+    bloco->comando = malloc(sizeof(char) * 7);
+    
+    // Copiando o comando do buffer para a string de comando.
+    while(buffer[i + j] != ' ' && buffer[i + j] != '\0'){
+        
+        bloco->comando[j] = buffer[i + j];
+        ++j;
+    }
+    // Atribuindo tamanho do comando.
+    bloco->comando[j + 1] = '\0';
+    bloco->lenghtComando = j;
+    i += j;
+    bloco->parametro = calloc(sizeof(char), 243);
+    // Detecta a inexistência de parâmetro.
+    if(buffer[i] == '\0'){
+        
+        bloco->parametro[0] = '!';
+        bloco->parametro[1] = '\0';
+        bloco->lenghtParametro = 2;
+    }else{
+        j = 0;
+        while(buffer[i] != '\0'){
+            
+            bloco->parametro[j] = buffer[i];
+            ++i;
+            ++j;
+        }
+        // Atribuindo tamanho do parâmetro.
+        bloco->lenghtParametro = j;
+        bloco->parametro[j] = '\0';
+    }
+    return bloco;
+}
