@@ -23,6 +23,9 @@
 // exemplos de todas as opções de envio e comandos extras.
 void ajudaMenssagem();
 
+// Ajuda para esclarecimento no uso de comandos e parâmetros.
+void ajudaComando();
+
 int main(void){
     
     Descritor *listaLogin = iniciarLista();
@@ -72,15 +75,15 @@ int main(void){
             if(buffer[0] != '!' && buffer[1] != 'c') {
                 
                 printf("\n\nUtilizei um comando.\n\n");
-            }
+            }            
             
         }else{ // Modo de envio de menssagem...
             
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!' && buffer[1] != 'c') {
                 
-                /*
-                if(strncmp(bu)){
+                
+                if(strncmp()){
                 
                 }else{
                     
@@ -91,9 +94,7 @@ int main(void){
 
                         printf("\n\nEnviei uma mensagem.\n\n");
                     }
-                }
-                */
-                ajudaMenssagem();
+                }                                
             }
         }
     }
@@ -104,11 +105,31 @@ int main(void){
 
 void ajudaMenssagem(){
     
+    printf("\n\t> !c altera para o modo de comando.\n\n");    
     printf("\n\tAjuda.\n\n");
     printf("\n\tPor padrão ao se conectar a uma sala suas mensagens são enviadas");
     printf("\n\tpara todos usuários onlines na sala.");
     printf("\n\n\tPara enviar mensagens em particular adicione @ antes do nick\n");
     printf("\tdo receptor.");
-    printf("\n\n\t> @FULANO MENSSAGEM...\n\n");
-    printf("\t> !c altera para o modo de comando.\n\n");    
+    printf("\n\n\t> @FULANO MENSSAGEM...\n\n");    
+}
+
+/*
+ * Lista de comandos.
+ *      
+ *      add (adiciona usuário).
+ *      remove (remove usuário).
+ *      list (lista usuários).      
+ *      quit (sai do server)
+ *      help (Mostra comandos disponíveis).
+ */
+
+void ajudaComando(){
+
+    printf("\n\tAjuda.\n\n");
+    printf("\n\t--add - adiciona logins a sala.");
+    printf("\n\t--list - imprimi lista de usuários ativos.");
+    printf("\n\t--help - consulta ajuda.");
+    printf("\n\t--quit - encerra conexão com logins e deleta sala.");
+    printf("\n\t--remove - remove um usuário.\n\n");    
 }
