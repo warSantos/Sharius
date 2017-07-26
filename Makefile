@@ -12,6 +12,9 @@ sharius: $(OBJ)
 main.o: $(SRC)main.c
 	$(CC) $(CFLAGS) $(SRC)main.c
 	
+menu.o:	$(SRC)menu.c	$(HDRS)menu.h
+	$(CC) $(CFLAGS) $(SRC)menu.c
+
 usuario.o: $(HDRS)usuario.h $(SRC)usuario.c
 	$(CC) $(CFLAGS) $(SRC)usuario.c
 
