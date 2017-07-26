@@ -3,6 +3,7 @@
 
 #include <stdio_ext.h>
 #include "../headers/usuario.h"
+#include <pthread.h>
 
 /*
  *

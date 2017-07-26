@@ -7,7 +7,7 @@ FILES = $(wildcard src/source/*)
 OBJ = $(FILES:. c=*.o)
 
 sharius: $(OBJ)
-	$(CC) $(OBJ) -o sharius
+	$(CC) $(OBJ) -o sharius -lpthread
 
 main.o: $(SRC)main.c
 	$(CC) $(CFLAGS) $(SRC)main.c

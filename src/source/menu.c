@@ -9,8 +9,10 @@ void ajudaMenssagem(){
     printf("\n\n\tPara enviar mensagens em particular adicione @ antes do nick\n");
     printf("\tdo receptor.");
     printf("\n\n\t> @FULANO MENSSAGEM...\n\n");    
-    printf("TODA menssagem iniciada por @ será comprendido como uma mensagem privada.\n");
-    printf("Então evite iniciar menssagens com @ com destino para broadcast (todos na sala).\n");
+    printf("\tTODA menssagem iniciada por @ será comprendido como uma mensagem privada.\n");
+    printf("\tEntão evite iniciar menssagens com @ com destino para broadcast (todos na sala).\n");
+    printf("\n\t-clear - limpa o bufferscreen (tela).");
+    printf("\n\t-list - imprimi lista de usuários ativos.");    
 }
 
 void ajudaComando(){
@@ -18,9 +20,11 @@ void ajudaComando(){
     printf("\n\tAjuda.\n\n");
     printf("\n\t!m altera para o modo de mensagem.\n\n");    
     printf("\n\tadd - adiciona logins a sala.");
+    printf("\n\tclear - limpa o bufferscreen (tela).");
     printf("\n\tlist - imprimi lista de usuários ativos.");
     printf("\n\thelp - consulta ajuda.");
     printf("\n\tquit - encerra conexão com logins e deleta sala.");
+    
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
@@ -62,8 +66,19 @@ void menuMenssagem(char *buffer){
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
     Comando *bloco = extraiMenssagem(buffer);
     
-    printf("Usuário: %s , %d.\n", bloco->comando, bloco->lenghtComando);
-    printf("-: %s , %d.\n", bloco->parametro, bloco->lenghtParametro);
+    //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
+    if(!strncmp(bloco->parametro, "-help", 6)){
+        
+        ajudaMenssagem();
+    }else if(!strncmp(bloco->parametro, "-clear", 7)){
+        
+        system("clear");
+    }else if(!strncmp(bloco->parametro, "-list", 6)){
+        
+        imprimirLista(listaLogin);
+    }
+    //printf("Usuário: %s , %d.\n", bloco->comando, bloco->lenghtComando);
+    //printf("-: %s , %d.\n", bloco->parametro, bloco->lenghtParametro);
 }
 
 void menuOperacao( ){
@@ -109,15 +124,15 @@ void menuOperacao( ){
         if(alteraModo[0] == '!' && alteraModo[1] == 'c'){ // chama o menu de comados.
             
             // Se o último comando utilizado nao foi o de alterar para o modo de comando...
-            if(buffer[0] != '!') {
-                
+            if(buffer[0] != '!' || buffer[1] != 'c') {
+                                
                 menuComando(buffer);
             }            
             
         }else{ // Modo de envio de menssagem...
             
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
-            if(buffer[0] != '!') {
+            if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
                 menuMenssagem(buffer);                                                               
             }
@@ -126,4 +141,9 @@ void menuOperacao( ){
     }
     free(buffer);
     free(alteraModo);    
+}
+
+void servidorMenssagem(){
+    
+    printf("\nthread criada com sucesso.\n");
 }
