@@ -82,13 +82,63 @@ Comando *split(char *buffer){
         j = 0;
         while(buffer[i] != '\0'){
             
-            bloco->parametro[j] = buffer[i];
+            // Excluindo espaços do parâmetro.
+            if(buffer[i] != ' '){
+                
+                bloco->parametro[j] = buffer[i];                
+                ++j;
+            }
             ++i;
-            ++j;
         }
         // Atribuindo tamanho do parâmetro.
         bloco->lenghtParametro = j;
         bloco->parametro[j] = '\0';
     }
+    return bloco;
+}
+
+Comando *extraiMenssagem(char *buffer){
+
+    Comando *bloco = calloc(sizeof(Comando),1);
+    
+    // Removendo espaços em branco da mensagem.
+    int i = 0, j;        
+    while(buffer[i] == ' ' && buffer[i] != '\0'){++i;}
+    
+    // identificando possível mensagem privada.
+    if(buffer[i] == '@'){
+                
+        // Atribuindo o valor posterior a @ a string comando que será utilizada
+        // para receber nomes de usuários em menssagem privadas.
+        j = 0;
+        i++;
+        bloco->comando = calloc(sizeof(char),16);
+        while(buffer[i + j] != ' ' && buffer[i + j] != '\0' && j < 15){
+            
+            bloco->comando[j] = buffer[i + j];
+            ++j;
+        }
+        // Salvando lenght do nome do usuário.
+        bloco->lenghtComando = j + 1;        
+        bloco->comando[j] = '\0';
+        i = i + j;
+    }else{ // Menssagem para broadcast...
+        
+        bloco->comando = "all";
+        bloco->lenghtComando = 4;
+        j = 4;
+    }
+    bloco->parametro = calloc(sizeof (char), 250);    
+    j = 0;
+    
+    // Realizando atribuição da menssagem.
+    while (buffer[i] != '\0') {
+
+        bloco->parametro[j] = buffer[i];
+        ++j;
+        ++i;
+    }
+    bloco->lenghtParametro = j + 1;
+    bloco->parametro[j] = '\0';
     return bloco;
 }

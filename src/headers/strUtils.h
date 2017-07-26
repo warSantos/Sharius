@@ -24,5 +24,8 @@ int verificaIp(char *ip);
 // Procura primeiro espaço depois de um caracter e identifica comando.
 Comando *split(char *buffer);
 
-#endif
+// Trabalha os dados do buffer identificando os tipos de mensagem (privada)
+// ou broacast.
+Comando *extraiMenssagem(char *buffer);
 
+#endif
