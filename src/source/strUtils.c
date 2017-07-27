@@ -75,9 +75,8 @@ Comando *split(char *buffer){
     // Detecta a inexistência de parâmetro.
     if(buffer[i] == '\0'){
         
-        bloco->parametro[0] = '!';
-        bloco->parametro[1] = '\0';
-        bloco->lenghtParametro = 2;
+        bloco->parametro[0] = '\0';        
+        bloco->lenghtParametro = 0;
     }else{
         j = 0;
         while(buffer[i] != '\0'){

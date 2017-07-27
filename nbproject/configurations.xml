@@ -5,6 +5,7 @@
       <df name="src">
         <df name="source">
           <in>main.c</in>
+          <in>menu.c</in>
           <in>strUtils.c</in>
           <in>usuario.c</in>
         </df>
@@ -62,6 +63,8 @@
         </preBuild>
       </makefileType>
       <item path="src/source/main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/source/menu.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/source/strUtils.c" ex="false" tool="0" flavor2="0">
       </item>

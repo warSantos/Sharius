@@ -1,28 +1,15 @@
 #ifndef menu_H
 #define menu_H
 
+#include <pthread.h>
 #include <stdio_ext.h>
 #include "../headers/usuario.h"
-#include <pthread.h>
 
 /*
  *
  * Menu de comandos do Servidor.
  * Modulo de gerenciamento de conexões.
  * 
- */
-
-
-
-/*
- * Lista de comandos.
- *      
- *      add (adiciona usuário).
- *      remove (remove usuário).
- *      list (lista usuários).
- *      send (envia mensagem para broadcast) OBS* modo padrão.
- *      quit (sai do server)
- *      help (Mostra comandos disponíveis).
  */
 
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 
@@ -42,5 +29,8 @@ void menuOperacao();
 // Receber solicitações de login.
 // Gerenciamento de conexões externas.
 void servidorMenssagem();
+
+// cria thread para envio da mensagem através da função entregaMenssagem.
+void enviarMenssagem();
 
 #endif

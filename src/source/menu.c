@@ -36,11 +36,15 @@ void menuComando(char *buffer){
         return;
     }
     if(!strncmp(bloco->comando, "add", 4)){
-        
-        printf("Nick add com sucesso.\n\n");
+               
+        inserirUsuario(listaLogin);
     }else if(!strncmp(bloco->comando, "remove", 7)){
-        
-        printf("Nick removido com sucesso.\n\n");
+        if(bloco->lenghtParametro){        
+            removerUsuario(listaLogin, bloco->parametro);
+        }else{
+            
+            printf("Erro na exlusão.\nSintaxe $ remove NICK.\n\n");
+        }    
     }else if(!strncmp(bloco->comando, "list", 5)){
         
         imprimirLista(listaLogin);
@@ -70,15 +74,42 @@ void menuMenssagem(char *buffer){
     if(!strncmp(bloco->parametro, "-help", 6)){
         
         ajudaMenssagem();
+        return;
     }else if(!strncmp(bloco->parametro, "-clear", 7)){
         
         system("clear");
+        return;
     }else if(!strncmp(bloco->parametro, "-list", 6)){
         
         imprimirLista(listaLogin);
+        return;
     }
-    //printf("Usuário: %s , %d.\n", bloco->comando, bloco->lenghtComando);
-    //printf("-: %s , %d.\n", bloco->parametro, bloco->lenghtParametro);
+    
+    // Enviando a menssagem.
+    // se for uma mensagem para broadcast.
+    if(!strncmp(bloco->comando, "all", 4)){ 
+        
+        Link aux = listaLogin->primeiro;
+        while(aux != NULL){
+            
+            pthread_t t;
+            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL /*aux*/);            
+            pthread_join(t, NULL);
+            aux = aux->prox;
+        }
+    }else{ // Enviando mensagem unicast.
+        
+        // passando o nick específico para pesquisa.
+        Link aux = pesquisarNick(listaLogin, bloco->comando);
+        if(aux != NULL){
+            
+            pthread_t t;
+            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL /*aux*/);            
+            pthread_join(t, NULL);
+            return;
+        }
+        printf("Usuário inexistente.\n");
+    }   
 }
 
 void menuOperacao( ){
@@ -146,4 +177,9 @@ void menuOperacao( ){
 void servidorMenssagem(){
     
     printf("\nthread criada com sucesso.\n");
+}
+
+void enviarMenssagem(){
+
+    printf("Mensagem enviada.\n");
 }

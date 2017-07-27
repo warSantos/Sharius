@@ -152,7 +152,7 @@ void imprimirLista(Descritor *listaLogin){
     }
 }
 
-void removeUsuario(Descritor *listaLogin, char *nick){
+void removerUsuario(Descritor *listaLogin, char *nick){
     
     if(listaVazia(listaLogin)){
         
@@ -191,3 +191,4 @@ void removeUsuario(Descritor *listaLogin, char *nick){
     printf("Usuários online: %d.\n\n", listaLogin->tamanho);
     printf("\n\nEste usuário não esta na lista.\n\n");
 }
+

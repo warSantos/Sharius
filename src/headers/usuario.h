@@ -32,6 +32,17 @@ typedef struct descritor {
 // Necessária para trabalho com threads.
 Descritor *listaLogin;
 
+/*
+ * Lista de comandos.
+ *      
+ *      add (adiciona usuário).
+ *      remove (remove usuário).
+ *      list (lista usuários).
+ *      send (envia mensagem para broadcast) OBS* modo padrão.
+ *      quit (sai do server)
+ *      help (Mostra comandos disponíveis).
+ */
+
 // Verifica se a lista de logins esta vazia.
 int listaVazia();
 
@@ -60,6 +71,6 @@ int pesquisarNickIp(Descritor *listaLogin, char *nick, char *ip);
 void imprimirLista(Descritor *listaLogin);
 
 // Remove usuário da lista do server.
-void removeUsuario(Descritor *listaLogin, char *nick);
+void removerUsuario(Descritor *listaLogin, char *nick);
 
 #endif
