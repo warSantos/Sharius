@@ -13,8 +13,8 @@ void ajudaMenssagem(){
     printf("\n\n\tPara enviar mensagens em particular adicione @ antes do nick\n");
     printf("\tdo receptor.");
     printf("\n\n\t> @FULANO MENSSAGEM...\n\n");    
-    printf("\tTODA menssagem iniciada por @ será comprendido como uma mensagem privada.\n");
-    printf("\tEntão evite iniciar menssagens com @ com destino para broadcast (todos na sala).\n");
+    printf("\tTODA mesagem iniciada por @ será comprendido como uma mensagem privada.\n");
+    printf("\tEntão evite iniciar mesagens com @ com destino para broadcast (todos na sala).\n");
     printf("\n\t-clear - limpa o bufferscreen (tela).");
     printf("\n\t-list - imprimi lista de usuários ativos.");    
 }
@@ -70,54 +70,38 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMenssagem(char *buffer){
+void menuMenssagem(char *buffer, int socket) {
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
     Comando *bloco = extraiMenssagem(buffer);
     
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
-    if(!strncmp(bloco->parametro, "-help", 6)){
-        
+    if (!strncmp(bloco->parametro, "-help", 6)) {
+
         ajudaMenssagem();
         return;
-    }else if(!strncmp(bloco->parametro, "-clear", 7)){
-        
+    } else if (!strncmp(bloco->parametro, "-clear", 7)) {
+
         system("clear");
         return;
-    }else if(!strncmp(bloco->parametro, "-list", 6)){
-        
+    } else if (!strncmp(bloco->parametro, "-list", 6)) {
+
         imprimirLista(listaLogin);
         return;
-    }
-    
-    // Enviando a menssagem.
-    // se for uma mensagem para broadcast.
-    if(!strncmp(bloco->comando, "all", 4)){ 
-        
-        Link aux = listaLogin->primeiro;
-        while(aux != NULL){
-            
-            pthread_t t;
-            pthread_create(&t, NULL, (void *) repassarMenssagem, NULL /*aux*/);            
-            pthread_join(t, NULL);
-            aux = aux->prox;
-        }
-    }else{ // Enviando mensagem unicast.
-        
-        // passando o nick específico para pesquisa.
-        Link aux = pesquisarNick(listaLogin, bloco->comando);
-        if(aux != NULL){
-            
-            pthread_t t;
-            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL /*aux*/);            
-            pthread_join(t, NULL);
-            return;
-        }
-        printf("Usuário inexistente.\n");
     }   
+    
+    /* Aqui entrara a função de envio de mensagem...
+    //Envia menssagem...
+    if (send(socket, message, strlen(message), 0) < 0) {
+
+        puts("Send failed");
+        return;
+    }   
+    // close(sock);        
+     */
 }
 
-void menuOperacao( ){
+void menuOperacao(int socket){
     
     listaLogin = iniciarLista();
     char *buffer;// = calloc(sizeof(char),251);
@@ -168,12 +152,12 @@ void menuOperacao( ){
                     exit(0);
                 }                
             }                        
-        }else{ // Modo de envio de menssagem...
+        }else{ // Modo de envio de mesagem...
             
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMenssagem(buffer);                                                               
+                menuMenssagem(buffer, socket);                                                               
             }
         }
         free(buffer);
@@ -200,16 +184,15 @@ void servidorMenssagem(){
     
     if(socketLocal == -1){
         
-        printf("Erro ao abrir conexão.\n");
+        printf("Erro ao criar socket local.\n");
         return;
     }
         
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
     servidor.sin_addr.s_addr = INADDR_ANY; // Setando IP local.
-    servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.
+    servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.       
     
-    
-    // Criano link entre a estrutura servidor ao ID do socketLocal.
+    // Criando link entre a estrutura servidor ao ID do socketLocal.
     if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
         
         printf("Erro no bind.\n");
@@ -222,12 +205,12 @@ void servidorMenssagem(){
     sizeSockaddr = sizeof(struct sockaddr_in);
     
     // Esperando por conexões.
-    // Faça enquanto existir conexões. (socklen_t*)&c)
-    while(socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr) < 0){
+    // Faça enquanto existir conexões.
+    while((socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr)) < 0){
         
         // Criando uma thread para um cliente.
         // A nova thread ficara responsável por enviar as mensagens do cliente
-        // mantendo a conexão até o término da execução.
+        // mantendo a conexão até o término da execução.        
         pthread_t threadCliente;
         novoSocket = malloc(1);
         *novoSocket = socketCliente;
@@ -278,9 +261,41 @@ void *repassarMenssagem(void *idSocket){
     free(idSocket);
      
     return 0;
+    
+    /* Função deve ser movida para a função servidor de mensagem...
+     *  Ou para a função de repassar mensagem...
+     *  Atenção para os parametros na criação das threads.
+    
+    
+    // Enviando a mesagem.
+    // se for uma mensagem para broadcast.
+    if(!strncmp(bloco->comando, "all", 4)){ 
+        
+        Link aux = listaLogin->primeiro;
+        while(aux != NULL){
+            
+            pthread_t t;
+            pthread_create(&t, NULL, (void *) repassarMenssagem, NULL);            
+            pthread_join(t, NULL);
+            aux = aux->prox;
+        }
+    }else{ // Enviando mensagem unicast.
+        
+        // passando o nick específico para pesquisa.
+        Link aux = pesquisarNick(listaLogin, bloco->comando);
+        if(aux != NULL){
+            
+            pthread_t t;
+            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL);            
+            pthread_join(t, NULL);
+            return;
+        }
+        printf("Usuário inexistente.\n");
+    } 
+    */
 }
 
-void cliente(){
+int abreConexao(){
     
     int sock;
     struct sockaddr_in servidor;
@@ -291,11 +306,11 @@ void cliente(){
     if (sock == -1){
         
         printf("Erro ao criar socket cliente...\n");
-        return;
+        return sock;
     }    
      
     // Definindo IP do servidor...
-    servidor.sin_addr.s_addr = inet_addr("192.168.1.111");
+    servidor.sin_addr.s_addr = inet_addr("127.0.0.1");
     
     // Definindo o tipo de protocolo...
     servidor.sin_family = AF_INET;
@@ -307,33 +322,8 @@ void cliente(){
     if (connect(sock , (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
         
         perror("Erro. conexão não estabelecida...");
-        return 1;
+        return sock;
     }
-    printf("Conexão realizada...\n");
-     
-    //Mantém a conexão com o servidor...
-    while(1){
-        
-        printf("Enter message : ");
-        scanf("%s" , message);
-         
-        //Send some data
-        if(send(sock , message , strlen(message) , 0) < 0){
-            
-            puts("Send failed");
-            return 1;
-        }
-         
-        //Receive a reply from the servidor
-        if( recv(sock , servidor_reply , 2000 , 0) < 0){
-            
-            puts("recv failed");
-            break;
-        }
-         
-        puts("Server reply :");
-        puts(servidor_reply);
-    }     
-    close(sock);
-    return 0;
+    printf("Conexão realizada...\n");    
+    return sock;
 }

@@ -11,9 +11,17 @@ int main(){
         
         printf("Erro na inicialiazação do servidor de mensagem...\n");
         return 1;
-    }    
+    }
+    
+    // Abrindo conexão local...
+    int socket = abreConexao(); 
+    if(socket == -1){
+        
+        printf("Erro ao abrir conexão com servidor local...\n");
+        return 1;
+    }
     // menu de administração do servidor.
-    menuOperacao();
+    menuOperacao(socket);
     pthread_join(t, NULL);
     
     // Falta melhorar a função de fechar conexões...

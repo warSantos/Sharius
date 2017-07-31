@@ -108,7 +108,7 @@ Comando *extraiMenssagem(char *buffer){
     if(buffer[i] == '@'){
                 
         // Atribuindo o valor posterior a @ a string comando que será utilizada
-        // para receber nomes de usuários em menssagem privadas.
+        // para receber nomes de usuários em mesagem privadas.
         j = 0;
         i++;
         bloco->comando = calloc(sizeof(char),16);
@@ -130,7 +130,7 @@ Comando *extraiMenssagem(char *buffer){
     bloco->parametro = calloc(sizeof (char), 250);    
     j = 0;
     
-    // Realizando atribuição da menssagem.
+    // Realizando atribuição da mesagem.
     while (buffer[i] != '\0') {
 
         bloco->parametro[j] = buffer[i];

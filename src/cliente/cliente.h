@@ -27,15 +27,21 @@ void ajudaComando();
 int menuComando(char *buffer);
 
 // Função para delegar o buffer a função de estraiMenssagem para processamento
-// e delegação dos dados processados para a função de enviar menssagem.
-void menuMenssagem(char *buffer);
+// e delegação dos dados processados para a função de enviar mesagem.
+void menuMenssagem(char *buffer, int socket);
 
 // Menu de interação do usuário hospede do servidor.
 // Nesta função estão reunidas as funções de gerenciamento de 
-// usuário e também o menssageiro para o hospede do server.
-void menuOperacao();
+// usuário e também o mesageiro para o hospede do server.
+void menuOperacao(int socket);
 
-// Função para gerenciar o envio de menssagens do cliente.
-void cliente();
+// Abre conexão inicial com o servidor...
+int abreConexao();
+
+// Fica escutando as conexões na porta do serviço e
+// recebe as mensagem do cliente e as imprimi na tela.
+// parecido com o servidor de mensagem no módulo servidor
+// porém nao redireciona mensagens...
+void *recebeMensagem();
 
 #endif

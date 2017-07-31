@@ -8,6 +8,8 @@ SRC-H = src/servidor/
 FILES = $(wildcard src/source/*)
 OBJ = $(FILES:. c=*.o)
 
+all: sharius-servidor sharius-cliente
+
 sharius-servidor: $(OBJ)	main-s.o	servidor.o
 	$(CC) $(OBJ) main-s.o servidor.o -o sharius-servidor -lpthread
 
