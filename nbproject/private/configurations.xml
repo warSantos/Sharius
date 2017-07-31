@@ -18,6 +18,7 @@
         <df name="source">
           <in>main.c</in>
           <in>menu.c</in>
+          <in>newfile.c</in>
           <in>strUtils.c</in>
           <in>usuario.c</in>
         </df>

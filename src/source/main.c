@@ -7,8 +7,11 @@ int main(){
     
     // Liberando uma thread para função específica de escuta de conexões.
     pthread_t t;
-    pthread_create(&t, NULL, (void *) servidorMenssagem, NULL);    
+    if(pthread_create(&t, NULL, (void *) servidorMenssagem, NULL)){    
         
+        printf("Erro na inicialiazação do servidor de mensagem...\n");
+        return 1;
+    }    
     // menu de administração do servidor.
     menuOperacao();
     pthread_join(t, NULL);

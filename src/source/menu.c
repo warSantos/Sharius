@@ -166,10 +166,8 @@ void menuOperacao( ){
                 if(!menuComando(buffer)){
                     
                     exit(0);
-                }
-                
-            }            
-            
+                }                
+            }                        
         }else{ // Modo de envio de menssagem...
             
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
@@ -184,8 +182,10 @@ void menuOperacao( ){
     free(alteraModo);    
 }
 
+// Versão para uso real
 void servidorMenssagem(){
     
+    printf("Iniciando servidor de mensagem...\n\n");
     // enquanto o main estiver ativo.
     // pensando em possivelmente passar um parâmetro que indica termino
     // para esta função.
@@ -232,7 +232,7 @@ void servidorMenssagem(){
         novoSocket = malloc(1);
         *novoSocket = socketCliente;
         
-        if(pthread_create(&threadCliente, NULL, enviarMenssagem, (void *) novoSocket)){
+        if(pthread_create(&threadCliente, NULL, repassarMenssagem, (void *) novoSocket)){
             
             printf("Erro ao criar a thread.\n");
             return;
@@ -245,8 +245,95 @@ void servidorMenssagem(){
     }
 }
 
-void *enviarMenssagem(){
+void *repassarMenssagem(void *idSocket){
     
+    //Id de ientificação so softtware.
+    int sock = *(int*)idSocket;
+    int read_size;
+    char *message , client_message[2000];
+     
+    //Menssagem de boas vindas
+    message = "Acesso permitido...\n";
+    write(sock , message , strlen(message));
+     
+    message = "Seja bem vindo ao chat... \n";
+    write(sock , message , strlen(message));
+     
+    //Receive a message from client
+    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 ){
+        //Send the message back to client
+        write(sock , client_message , strlen(client_message));
+    }
+     
+    if(read_size == 0){
+        
+        puts("Client disconnected");
+        fflush(stdout);        
+    }else if(read_size == -1){
+        
+        perror("recv failed");
+    }
+         
+    //Free the socket pointer
+    free(idSocket);
+     
+    return 0;
+}
+
+void cliente(){
     
-    printf("Mensagem enviada.\n");
+    int sock;
+    struct sockaddr_in servidor;
+    char message[1000] , servidor_reply[2000];
+     
+    //Create socket
+    sock = socket(AF_INET , SOCK_STREAM , 0);
+    if (sock == -1){
+        
+        printf("Erro ao criar socket cliente...\n");
+        return;
+    }    
+     
+    // Definindo IP do servidor...
+    servidor.sin_addr.s_addr = inet_addr("192.168.1.111");
+    
+    // Definindo o tipo de protocolo...
+    servidor.sin_family = AF_INET;
+    
+    // Define a porta em que esta ativo o serviço no servidor...
+    servidor.sin_port = htons(7772);
+ 
+    //Busca conexão com o servidor...
+    if (connect(sock , (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+        
+        perror("Erro. conexão não estabelecida...");
+        return 1;
+    }
+    printf("Conexão realizada...\n");
+     
+    //Mantém a conexão com o servidor...
+    while(1){
+        
+        printf("Enter message : ");
+        scanf("%s" , message);
+         
+        //Send some data
+        if(send(sock , message , strlen(message) , 0) < 0){
+            
+            puts("Send failed");
+            return 1;
+        }
+         
+        //Receive a reply from the servidor
+        if( recv(sock , servidor_reply , 2000 , 0) < 0){
+            
+            puts("recv failed");
+            break;
+        }
+         
+        puts("Server reply :");
+        puts(servidor_reply);
+    }     
+    close(sock);
+    return 0;
 }

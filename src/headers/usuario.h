@@ -16,7 +16,7 @@ typedef struct login *Link;
 typedef struct login {
     
     char *nick;
-    char *ip;    
+    char *ip; 
     Link prox;
 } Login;
 
