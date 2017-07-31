@@ -4,9 +4,11 @@
     <df root="." name="0">
       <df name="src">
         <df name="headers">
+          <in>cliente.h</in>
           <in>temp.c</in>
         </df>
         <df name="source">
+          <in>cliente.c</in>
           <in>main.c</in>
           <in>menu.c</in>
           <in>newfile.c</in>
@@ -66,7 +68,11 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="src/headers/cliente.h" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/headers/temp.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/source/cliente.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/source/main.c" ex="false" tool="0" flavor2="0">
       </item>

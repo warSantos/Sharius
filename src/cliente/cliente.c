@@ -1,4 +1,4 @@
-#include "../headers/menu.h"
+#include "../headers/cliente.h"
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr
 #include <netinet/in.h> //inet_addr
@@ -22,14 +22,11 @@ void ajudaMenssagem(){
 void ajudaComando(){
 
     printf("\n\tAjuda.\n\n");
-    printf("\n\t!m altera para o modo de mensagem.\n\n");    
-    printf("\n\tadd - adiciona logins a sala.");
+    printf("\n\t!m altera para o modo de mensagem.\n\n");        
     printf("\n\tclear - limpa o bufferscreen (tela).");
     printf("\n\tlist - imprimi lista de usuários ativos.");
     printf("\n\thelp - consulta ajuda.");
-    printf("\n\tquit - encerra conexão com logins e deleta sala.");
-    
-    printf("\n\tremove - remove um usuário.\n\n");    
+    printf("\n\tquit - encerra conexão com logins e deleta sala.");        
 }
 
 int menuComando(char *buffer){
@@ -39,17 +36,7 @@ int menuComando(char *buffer){
         
         return 1;
     }
-    if(!strncmp(bloco->comando, "add", 4)){
-               
-        inserirUsuario(listaLogin);
-    }else if(!strncmp(bloco->comando, "remove", 7)){
-        if(bloco->lenghtParametro){        
-            removerUsuario(listaLogin, bloco->parametro);
-        }else{
-            
-            printf("Erro na exlusão.\nSintaxe $ remove NICK.\n\n");
-        }    
-    }else if(!strncmp(bloco->comando, "list", 5)){
+    if(!strncmp(bloco->comando, "list", 5)){
         
         imprimirLista(listaLogin);
     }else if(!strncmp(bloco->comando, "quit", 5)){
@@ -90,37 +77,15 @@ void menuMenssagem(char *buffer){
         return;
     }
     
-    // Enviando a menssagem.
-    // se for uma mensagem para broadcast.
-    if(!strncmp(bloco->comando, "all", 4)){ 
-        
-        Link aux = listaLogin->primeiro;
-        while(aux != NULL){
-            
-            pthread_t t;
-            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL /*aux*/);            
-            pthread_join(t, NULL);
-            aux = aux->prox;
-        }
-    }else{ // Enviando mensagem unicast.
-        
-        // passando o nick específico para pesquisa.
-        Link aux = pesquisarNick(listaLogin, bloco->comando);
-        if(aux != NULL){
-            
-            pthread_t t;
-            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL /*aux*/);            
-            pthread_join(t, NULL);
-            return;
-        }
-        printf("Usuário inexistente.\n");
-    }   
+    /* 
+     * Falta criar conexão e mandar mensagem... 
+     */
 }
 
 void menuOperacao( ){
     
     listaLogin = iniciarLista();
-    char *buffer;// = calloc(sizeof(char),251);
+    char *buffer;
     char *alteraModo = calloc(sizeof(char),3);
     alteraModo[0] = '!';
     alteraModo[1] = 'c';
@@ -180,104 +145,6 @@ void menuOperacao( ){
     }
     free(buffer);
     free(alteraModo);    
-}
-
-// Versão para uso real
-void servidorMenssagem(){
-    
-    printf("Iniciando servidor de mensagem...\n\n");
-    // enquanto o main estiver ativo.
-    // pensando em possivelmente passar um parâmetro que indica termino
-    // para esta função.
-    int socketLocal, socketCliente, sizeSockaddr, *novoSocket;
-    struct sockaddr_in servidor, cliente;
-    
-    // Criando um socket para tcp no sistema.
-    // AF_INET tipo de conexão sobre IP para redes.
-    // SOCK_STREAM protocolo com controle de erros.
-    // 0 seleção do protocolo TCP
-    socketLocal = socket(AF_INET, SOCK_STREAM, 0);
-    
-    if(socketLocal == -1){
-        
-        printf("Erro ao abrir conexão.\n");
-        return;
-    }
-        
-    servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
-    servidor.sin_addr.s_addr = INADDR_ANY; // Setando IP local.
-    servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.
-    
-    
-    // Criano link entre a estrutura servidor ao ID do socketLocal.
-    if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
-        
-        printf("Erro no bind.\n");
-        return;
-    }
-    
-    // Limitando o número de conexões que o socket local vai ouvir para 15.
-    listen(socketLocal, 15);
-    
-    sizeSockaddr = sizeof(struct sockaddr_in);
-    
-    // Esperando por conexões.
-    // Faça enquanto existir conexões. (socklen_t*)&c)
-    while(socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr) < 0){
-        
-        // Criando uma thread para um cliente.
-        // A nova thread ficara responsável por enviar as mensagens do cliente
-        // mantendo a conexão até o término da execução.
-        pthread_t threadCliente;
-        novoSocket = malloc(1);
-        *novoSocket = socketCliente;
-        
-        if(pthread_create(&threadCliente, NULL, repassarMenssagem, (void *) novoSocket)){
-            
-            printf("Erro ao criar a thread.\n");
-            return;
-        }        
-        printf("thread cliente criada.\n");
-    }
-    if(socketCliente < 0){
-        
-        printf("Falha na função accpet.\n");
-    }
-}
-
-void *repassarMenssagem(void *idSocket){
-    
-    //Id de ientificação so softtware.
-    int sock = *(int*)idSocket;
-    int read_size;
-    char *message , client_message[2000];
-     
-    //Menssagem de boas vindas
-    message = "Acesso permitido...\n";
-    write(sock , message , strlen(message));
-     
-    message = "Seja bem vindo ao chat... \n";
-    write(sock , message , strlen(message));
-     
-    //Receive a message from client
-    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 ){
-        //Send the message back to client
-        write(sock , client_message , strlen(client_message));
-    }
-     
-    if(read_size == 0){
-        
-        puts("Client disconnected");
-        fflush(stdout);        
-    }else if(read_size == -1){
-        
-        perror("recv failed");
-    }
-         
-    //Free the socket pointer
-    free(idSocket);
-     
-    return 0;
 }
 
 void cliente(){

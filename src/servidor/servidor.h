@@ -30,7 +30,11 @@ void menuOperacao();
 // Gerenciamento de conexões externas.
 void servidorMenssagem();
 
-// cria conexão para envio da mensagem.
-void *enviarMenssagem();
+// repassa as menssagens recebidas para os clientes do chat.
+void *repassarMenssagem(void *idSocket);
+
+// Função cliente similar a do módulo cliente utilizada para realizar conexão local
+// para que o adm do servidor também possa enviar e receber menssagens.
+void cliente();
 
 #endif

@@ -5,17 +5,20 @@
       <df name="arquivos-teste">
         <in>main-menus.c</in>
         <in>main-teste-usuarios.c</in>
+        <in>temp.c</in>
       </df>
       <df name="obj">
       </df>
       <df name="src">
         <df name="headers">
+          <in>cliente.h</in>
           <in>menu.h</in>
           <in>strUtils.h</in>
           <in>temp.c</in>
           <in>usuario.h</in>
         </df>
         <df name="source">
+          <in>cliente.c</in>
           <in>main.c</in>
           <in>menu.c</in>
           <in>newfile.c</in>
