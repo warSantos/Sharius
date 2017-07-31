@@ -1,4 +1,8 @@
 #include "../headers/menu.h"
+#include<sys/socket.h>
+#include<arpa/inet.h> //inet_addr
+#include <netinet/in.h> //inet_addr
+#include<unistd.h>    //write
 
 void ajudaMenssagem(){
         
@@ -28,12 +32,12 @@ void ajudaComando(){
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
-void menuComando(char *buffer){
+int menuComando(char *buffer){
     
     Comando *bloco = split(buffer);
     if(!bloco->lenghtComando){
         
-        return;
+        return 1;
     }
     if(!strncmp(bloco->comando, "add", 4)){
                
@@ -52,7 +56,7 @@ void menuComando(char *buffer){
         
         printf("Fechando conexões...\n");
         printf("Have a nice day....\n");
-        exit(0);
+        return 0;
     }else if(!strncmp(bloco->comando, "help", 5)){
         
         ajudaComando();
@@ -63,6 +67,7 @@ void menuComando(char *buffer){
         
         printf("\nComando não identificado.\n\n");
     }
+    return 1;
 }
 
 void menuMenssagem(char *buffer){
@@ -121,7 +126,8 @@ void menuOperacao( ){
     alteraModo[1] = 'c';
     printf("\n\n\tCarregando configurações...\n\n");
     // Menu de comandos.
-    while(1){
+    int loop = 1;
+    while(loop){
         
         if(alteraModo[0] == '!' && alteraModo[1] == 'c'){
             
@@ -157,7 +163,11 @@ void menuOperacao( ){
             // Se o último comando utilizado nao foi o de alterar para o modo de comando...
             if(buffer[0] != '!' || buffer[1] != 'c') {
                                 
-                menuComando(buffer);
+                if(!menuComando(buffer)){
+                    
+                    exit(0);
+                }
+                
             }            
             
         }else{ // Modo de envio de menssagem...
@@ -176,10 +186,67 @@ void menuOperacao( ){
 
 void servidorMenssagem(){
     
-    printf("\nthread criada com sucesso.\n");
+    // enquanto o main estiver ativo.
+    // pensando em possivelmente passar um parâmetro que indica termino
+    // para esta função.
+    int socketLocal, socketCliente, sizeSockaddr, *novoSocket;
+    struct sockaddr_in servidor, cliente;
+    
+    // Criando um socket para tcp no sistema.
+    // AF_INET tipo de conexão sobre IP para redes.
+    // SOCK_STREAM protocolo com controle de erros.
+    // 0 seleção do protocolo TCP
+    socketLocal = socket(AF_INET, SOCK_STREAM, 0);
+    
+    if(socketLocal == -1){
+        
+        printf("Erro ao abrir conexão.\n");
+        return;
+    }
+        
+    servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
+    servidor.sin_addr.s_addr = INADDR_ANY; // Setando IP local.
+    servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.
+    
+    
+    // Criano link entre a estrutura servidor ao ID do socketLocal.
+    if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
+        
+        printf("Erro no bind.\n");
+        return;
+    }
+    
+    // Limitando o número de conexões que o socket local vai ouvir para 15.
+    listen(socketLocal, 15);
+    
+    sizeSockaddr = sizeof(struct sockaddr_in);
+    
+    // Esperando por conexões.
+    // Faça enquanto existir conexões. (socklen_t*)&c)
+    while(socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr) < 0){
+        
+        // Criando uma thread para um cliente.
+        // A nova thread ficara responsável por enviar as mensagens do cliente
+        // mantendo a conexão até o término da execução.
+        pthread_t threadCliente;
+        novoSocket = malloc(1);
+        *novoSocket = socketCliente;
+        
+        if(pthread_create(&threadCliente, NULL, enviarMenssagem, (void *) novoSocket)){
+            
+            printf("Erro ao criar a thread.\n");
+            return;
+        }        
+        printf("thread cliente criada.\n");
+    }
+    if(socketCliente < 0){
+        
+        printf("Falha na função accpet.\n");
+    }
 }
 
-void enviarMenssagem(){
-
+void *enviarMenssagem(){
+    
+    
     printf("Mensagem enviada.\n");
 }

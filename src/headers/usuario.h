@@ -32,6 +32,10 @@ typedef struct descritor {
 // Necessária para trabalho com threads.
 Descritor *listaLogin;
 
+// Variável utilizada para indicar término para a função servidorMenssagem
+// devido a estar em uma thread separada.
+int signal;
+
 /*
  * Lista de comandos.
  *      

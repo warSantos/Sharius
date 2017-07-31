@@ -13,7 +13,7 @@
  */
 
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 
-void menuComando(char *buffer);
+int menuComando(char *buffer);
 
 // Função para delegar o buffer a função de estraiMenssagem para processamento
 // e delegação dos dados processados para a função de enviar menssagem.
@@ -30,7 +30,7 @@ void menuOperacao();
 // Gerenciamento de conexões externas.
 void servidorMenssagem();
 
-// cria thread para envio da mensagem através da função entregaMenssagem.
-void enviarMenssagem();
+// cria conexão para envio da mensagem.
+void *enviarMenssagem();
 
 #endif

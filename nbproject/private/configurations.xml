@@ -12,6 +12,7 @@
         <df name="headers">
           <in>menu.h</in>
           <in>strUtils.h</in>
+          <in>temp.c</in>
           <in>usuario.h</in>
         </df>
         <df name="source">

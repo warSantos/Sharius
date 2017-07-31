@@ -8,10 +8,10 @@ int main(){
     // Liberando uma thread para função específica de escuta de conexões.
     pthread_t t;
     pthread_create(&t, NULL, (void *) servidorMenssagem, NULL);    
-    pthread_join(t, NULL);
-    
+        
     // menu de administração do servidor.
     menuOperacao();
+    pthread_join(t, NULL);
     
     // Falta melhorar a função de fechar conexões...
     pthread_exit(&t);
