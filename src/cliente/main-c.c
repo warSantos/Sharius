@@ -4,7 +4,7 @@ int main(){
     
     // Iniciando servidor para recebimento de mensagem.
     pthread_t t;
-    if(pthread_create(&t, NULL, recebeMensagem, NULL)){    
+    if(pthread_create(&t, NULL, (void *) recebeMensagem, NULL)){    
         
         printf("Erro na inicialiazação do servidor de escuta...\n");
         return 1;

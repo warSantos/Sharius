@@ -10,12 +10,21 @@
       <df name="obj">
       </df>
       <df name="src">
+        <df name="cliente">
+          <in>cliente.c</in>
+          <in>cliente.h</in>
+          <in>main-c.c</in>
+        </df>
         <df name="headers">
           <in>cliente.h</in>
-          <in>menu.h</in>
           <in>strUtils.h</in>
           <in>temp.c</in>
           <in>usuario.h</in>
+        </df>
+        <df name="servidor">
+          <in>main-s.c</in>
+          <in>servidor.c</in>
+          <in>servidor.h</in>
         </df>
         <df name="source">
           <in>cliente.c</in>

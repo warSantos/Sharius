@@ -42,6 +42,6 @@ int abreConexao();
 // recebe as mensagem do cliente e as imprimi na tela.
 // parecido com o servidor de mensagem no módulo servidor
 // porém nao redireciona mensagens...
-void *recebeMensagem();
+void recebeMensagem();
 
 #endif

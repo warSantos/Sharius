@@ -7,6 +7,7 @@
 #ifndef usuario_H
 #define usuario_H
 
+#include <unistd.h>
 #include "strUtils.h"
 
 // Ponterio para célula de login.

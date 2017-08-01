@@ -159,9 +159,21 @@ int abreConexao(){
         printf("Erro ao criar socket cliente...\n");
         return sock;
     }    
-     
+    
+    char *ip = malloc(sizeof(char)*16);
+    while(1){
+        
+        printf("Digite o ip do servidor: ");
+        scanf("%15[^\n]s", ip);
+        __fpurge(stdin);
+        if(!verificaIp(ip)){
+            
+            break;
+        }
+    }
+    
     // Definindo IP do servidor...
-    servidor.sin_addr.s_addr = inet_addr("192.168.0.102");
+    servidor.sin_addr.s_addr = inet_addr(ip);
     
     // Definindo o tipo de protocolo...
     servidor.sin_family = AF_INET;
@@ -179,6 +191,7 @@ int abreConexao(){
     return sock;
 }
 
-void *recebeMensagem(){
-
+void recebeMensagem(){
+    
+    //printf("falta acabar.\n\n");
 }

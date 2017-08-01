@@ -41,7 +41,7 @@ int verificaIp(char *ip){
                 }                
             }
             
-        }else if(ip[i] < 49 || ip[i] > 57){
+        }else if(ip[i] < 48 || ip[i] > 57){
             
             printf("Caracter %c inválido, posição %d.\n", ip[i], i);
             return 1;

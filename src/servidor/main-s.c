@@ -13,13 +13,18 @@ int main(){
         return 1;
     }
     
+    // Esperando a thread de escuta iniciar...
+    usleep(500);
+    
     // Abrindo conexão local...
     int socket = abreConexao(); 
+    printf("Socket: %d\n", socket);
     if(socket == -1){
         
         printf("Erro ao abrir conexão com servidor local...\n");
         return 1;
     }
+    
     // menu de administração do servidor.
     menuOperacao(socket);
     pthread_join(t, NULL);

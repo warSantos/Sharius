@@ -189,8 +189,10 @@ void servidorMenssagem(){
     }
         
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
-    servidor.sin_addr.s_addr = INADDR_ANY; // Setando IP local.
+    servidor.sin_addr.s_addr = inet_addr("127.0.0.1"); // Setando IP local.
     servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.       
+    
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
     
     // Criando link entre a estrutura servidor ao ID do socketLocal.
     if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
@@ -214,7 +216,7 @@ void servidorMenssagem(){
         pthread_t threadCliente;
         novoSocket = malloc(1);
         *novoSocket = socketCliente;
-        
+        printf("entrou aqui....\n\n\n");
         if(pthread_create(&threadCliente, NULL, repassarMenssagem, (void *) novoSocket)){
             
             printf("Erro ao criar a thread.\n");
@@ -298,8 +300,7 @@ void *repassarMenssagem(void *idSocket){
 int abreConexao(){
     
     int sock;
-    struct sockaddr_in servidor;
-    char message[1000] , servidor_reply[2000];
+    struct sockaddr_in servidor;    
      
     //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
@@ -317,12 +318,15 @@ int abreConexao(){
     
     // Define a porta em que esta ativo o serviço no servidor...
     servidor.sin_port = htons(7772);
- 
+    
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
+    
     //Busca conexão com o servidor...
-    if (connect(sock , (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
-        
+    int newConnect;
+    if ((newConnect = connect(sock , (struct sockaddr *)&servidor , sizeof(servidor))) < 0){
+                
         perror("Erro. conexão não estabelecida...");
-        return sock;
+        return newConnect;
     }
     printf("Conexão realizada...\n");    
     return sock;
