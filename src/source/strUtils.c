@@ -18,35 +18,39 @@ int charInvalido(char *nick, char *caracteresInvalidos){
 
 int verificaIp(char *ip){
 
-    int i, qtdePontos = 0;    
-    for(i = 0; ip[i] != '\0'; ++i){
-        
-        if(ip[i] == '.'){
-            
+    int i, qtdePontos = 0;
+    for (i = 0; ip[i] != '\0'; ++i) {
+       
+        if (ip[i] == '.') {
+                     
             ++qtdePontos;
-            if(i == 0){
-                
+            if (i == 0) {
+
                 printf("IP inválido.\nPrimeiro octeto vazio!\n");
                 return 1;
-            }else if(ip[i + 1] == '\0'){
-                
-                if(qtdePontos <= 3){
-                    
+            } else if (ip[i + 1] == '\0') {
+
+                if (qtdePontos <= 3) {
+
                     printf("Endereço imcompleto.\n");
                     return 1;
-                }else{
-                    
+                } else {
+
                     printf("Endereço com octetos a mais.\n");
                     return 1;
-                }                
+                }
             }
-            
-        }else if(ip[i] < 48 || ip[i] > 57){
-            
+        } else if (ip[i] < 48 || ip[i] > 57) {
+
             printf("Caracter %c inválido, posição %d.\n", ip[i], i);
             return 1;
-        } 
+        }                        
     }
+    if (qtdePontos != 3) {
+            
+            printf("Endereço IP inválido %d.\n\n", qtdePontos);
+            return 1;
+        }
     return 0;
 }
 

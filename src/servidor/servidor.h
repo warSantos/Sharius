@@ -1,7 +1,6 @@
 #ifndef menu_H
 #define menu_H
 
-#include <pthread.h>
 #include <stdio_ext.h>
 #include "../headers/usuario.h"
 
@@ -25,7 +24,7 @@ void menuMenssagem(char *buffer, int socket);
 void menuOperacao(int socket);
 
 // Insere os dados dos usuários via socket.
-void addUserRemoto(Descritor *listaLogin, char *nick, char *ip);
+void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock);
 
 // Fica aguardando conexões e envio de mesagens.
 // Responsável por repassar as mesagens para os demais usuários,

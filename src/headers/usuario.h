@@ -8,7 +8,11 @@
 #define usuario_H
 
 #include <unistd.h>
+#include <pthread.h>
 #include "strUtils.h"
+
+// Mutex para trancar acesso a lista.
+pthread_mutex_t lista;
 
 // Ponterio para célula de login.
 typedef struct login *Link;
@@ -16,6 +20,7 @@ typedef struct login *Link;
 // Armazena o nome (apelido de usuario e seu endereço IP).
 typedef struct login {
     
+    int *socket;
     char *nick;
     char *ip; 
     Link prox;

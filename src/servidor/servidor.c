@@ -158,11 +158,12 @@ void menuOperacao(int socket){
     free(alteraModo);    
 }
 
-void addUserRemoto(Descritor *listaLogin, char *nick, char *ip){
+void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock){
     
     Link aux = malloc(sizeof(Login));
     aux->nick = malloc(sizeof(char) * 16);    
     aux->ip = malloc(sizeof(char) * 16);        
+    aux->socket = sock;
     strncpy(aux->nick, nick, 16);
     strncpy(aux->ip, ip, 16);        
     free(nick);
@@ -186,7 +187,9 @@ void addUserRemoto(Descritor *listaLogin, char *nick, char *ip){
 void escutaSolicitacao(void *password){
     
     char *senha = (char *)password;
-    printf("Iniciando servidor de mensagem...\n\n");
+    usleep(500);
+    printf("Iniciando servidor de mensagem...\n");
+    
     // enquanto o main estiver ativo.
     // pensando em possivelmente passar um parâmetro que indica termino
     // para esta função.
@@ -204,6 +207,7 @@ void escutaSolicitacao(void *password){
         printf("Erro ao criar socket local.\n");
         return;
     }
+    
     printf("Socket Local aberto.\n\n");    
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
     servidor.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr("127.0.0.1"); // Setando IP local.
@@ -215,6 +219,7 @@ void escutaSolicitacao(void *password){
     if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
         
         printf("Erro no bind.\n");
+        close(socketLocal);
         return;
     }
     printf("Linkagem com bind realizada.\n\n");
@@ -234,19 +239,18 @@ void escutaSolicitacao(void *password){
         }
         // Criando uma thread para um cliente.
         // A nova thread ficara responsável por enviar as mensagens do cliente
-        // mantendo a conexão até o término da execução.        
-        printf("CONEXÃO ACEITA....\n\n");
+        // mantendo a conexão até o término da execução.                
         
         // Capturando senha do cliente.
         int tentativas = 0; 
         char *senhaTemp = malloc(sizeof(char)*16);
         while(tentativas < 3){
         
-            recv(socketCliente, senhaTemp, 16, 0);
+            recv(socketCliente, senhaTemp, strlen(senhaTemp), 0);
             printf("SENHA TEMP: %s.\n\n", senhaTemp);
             tentativas++;
             char ok;
-            if(!strncmp(senhaTemp, senha, 16)){
+            if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
                 
                 ok = 'S';
                 write(socketCliente, &ok, 1);
@@ -261,7 +265,8 @@ void escutaSolicitacao(void *password){
         Link aux;
         while(1){
 
-            recv(socketCliente, nick, 16, 0);
+            recv(socketCliente, nick, strlen(nick), 0);
+            
             aux = pesquisarNick(listaLogin, nick);
             char ok;
             if (aux == NULL) { // se login nao existir
@@ -276,7 +281,7 @@ void escutaSolicitacao(void *password){
         char *ip = malloc(sizeof(char)*16);
         while(1){
 
-            recv(socketCliente, ip, 16, 0);
+            recv(socketCliente, ip, strlen(ip), 0);            
             aux = pesquisarIp(listaLogin, ip);
             char ok;
             if (aux == NULL) { // se login nao existir
@@ -288,14 +293,15 @@ void escutaSolicitacao(void *password){
             ok = 'N';
             write(socketCliente, &ok, 1);
         }
-        
-        
+                
         pthread_t threadCliente;
         novoSocket = malloc(1);
         *novoSocket = socketCliente;     
         
+        pthread_mutex_lock(&lista);
         // Possível local para implantação de mutex.
-        addUserRemoto(listaLogin, nick, ip);
+        addUserRemoto(listaLogin, nick, ip, novoSocket);
+        pthread_mutex_unlock(&lista);
         
         if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
             
@@ -317,8 +323,7 @@ void *escutaCliente(void *idSocket){
     // Logo o idSocket de cada chamada da função escutaCliente 
     // é diferente é um socket diferente.
     
-    int socket = *(int*)idSocket;
-    printf("SOCK: %d\n\n", socket);
+    int socket = *(int*)idSocket;    
     int read_size;
     char *buffer = malloc(sizeof(char) * 251);
     

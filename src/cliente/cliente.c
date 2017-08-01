@@ -211,7 +211,7 @@ int abreConexao(){
         __fpurge(stdin);
         
         // Devolvendo senha.
-        write(sock, resposta, sizeof (resposta));        
+        write(sock, resposta, strlen(resposta));        
         
         // Recebendo confiramção.
         recv(sock, &ok, sizeof (char), 0);
@@ -238,11 +238,12 @@ int abreConexao(){
     while(1){
                 
         nick = criaNick();
+        printf("strlen: %ld\n", strlen(nick));
         // enviando login para aprovação...
-        write(sock, nick, sizeof(nick));
+        write(sock, nick, strlen(nick));
         
         // recebendo confirmação...
-        recv(sock, &ok, sizeof(char), 0);
+        recv(sock, &ok, 1, 0);
         if(ok == 'S'){
             
             break;
@@ -252,16 +253,16 @@ int abreConexao(){
     
     while(1){
         
-        ip = criaIp();
-        // enviando ip para aprovação...
-        write(sock, ip, sizeof(ip));
+        ip = criaIp();        
+        // enviando ip para aprovação...        
+        write(sock, ip, strlen(ip));
         
         // recebendo confirmação....
-        recv(sock, &ok, sizeof(char), 0);
+        recv(sock, &ok, 1, 0);
         if(ok == 'S'){
             
             break;
-        }
+        }        
         printf("Este ip já está em uso.\n\n");
     }
     
