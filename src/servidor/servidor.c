@@ -242,11 +242,17 @@ void escutaSolicitacao(void *password){
         // mantendo a conexão até o término da execução.                
         
         // Capturando senha do cliente.
-        int tentativas = 0; 
-        char *senhaTemp = malloc(sizeof(char)*16);
+        int tentativas = 0, len; 
+        char *senhaTemp, lenght;
         while(tentativas < 3){
-        
-            recv(socketCliente, senhaTemp, strlen(senhaTemp), 0);
+            
+            // Recebendo o tamanho da senha.
+            recv(socketCliente, &lenght, 1);
+            len = (int)lenght;
+            senha = malloc(sizeof(char)*len);
+            
+            // Recebendo a senha.
+            recv(socketCliente, senhaTemp, len, 0);                        
             printf("SENHA TEMP: %s.\n\n", senhaTemp);
             tentativas++;
             char ok;
@@ -261,12 +267,18 @@ void escutaSolicitacao(void *password){
         }
         free(senhaTemp);
         
-        char *nick = malloc(sizeof(char)*16);
+        char *nick;
         Link aux;
         while(1){
-
-            recv(socketCliente, nick, strlen(nick), 0);
             
+            // Recebendo o tamanho do nick.
+            recv(socketCliente, &lenght, 1);
+            len = (int)lenght;            
+            nick = malloc(sizeof(char)*len);
+            
+            // Recebendo o nick
+            recv(socketCliente, nick, len, 0);
+            printf("NICK: %s\n", nick);
             aux = pesquisarNick(listaLogin, nick);
             char ok;
             if (aux == NULL) { // se login nao existir
@@ -278,10 +290,14 @@ void escutaSolicitacao(void *password){
             ok = 'N';
             write(socketCliente, &ok, 1);
         }
-        char *ip = malloc(sizeof(char)*16);
+        char *ip;
         while(1){
-
-            recv(socketCliente, ip, strlen(ip), 0);            
+            
+            recv(socketCliente, &lenght, 1);
+            len = (int)lenght;
+            ip = malloc(sizeof(char)*len);
+            
+            recv(socketCliente, ip, len, 0);            
             aux = pesquisarIp(listaLogin, ip);
             char ok;
             if (aux == NULL) { // se login nao existir
