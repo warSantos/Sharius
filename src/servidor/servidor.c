@@ -113,7 +113,7 @@ void menuOperacao(int socket){
             printf("> ");
         }
         buffer = calloc(sizeof(char),251);
-        scanf("%250[^\n]s", buffer);
+        scanf("%250[^\n]s", buffer);        
         __fpurge(stdin);
                         
         // Identifica o princípio de um possível comando de alteração de modo.
@@ -158,9 +158,34 @@ void menuOperacao(int socket){
     free(alteraModo);    
 }
 
-// Versão para uso real
-void escutaSolicitacao(){
+void addUserRemoto(Descritor *listaLogin, char *nick, char *ip){
     
+    Link aux = malloc(sizeof(Login));
+    aux->nick = malloc(sizeof(char) * 16);    
+    aux->ip = malloc(sizeof(char) * 16);        
+    strncpy(aux->nick, nick, 16);
+    strncpy(aux->ip, ip, 16);        
+    free(nick);
+    free(ip);
+    
+    // Caso seja a primeira inserção de um usuário na lista.
+    if(listaVazia(listaLogin)){
+        
+        listaLogin->primeiro = aux;
+        listaLogin->ultimo = aux;
+        aux->prox = NULL;      
+    }else{
+    
+        listaLogin->ultimo->prox = aux;
+        listaLogin->ultimo = aux;        
+    }    
+    listaLogin->tamanho++;    
+}
+
+// Versão para uso real
+void escutaSolicitacao(void *password){
+    
+    char *senha = (char *)password;
     printf("Iniciando servidor de mensagem...\n\n");
     // enquanto o main estiver ativo.
     // pensando em possivelmente passar um parâmetro que indica termino
@@ -199,11 +224,11 @@ void escutaSolicitacao(){
     sizeSockaddr = sizeof(struct sockaddr_in);
     
     // Esperando por conexões.
-    // Faça enquanto existir conexões.
+    // Faça enquanto conexões forem solicitadas.
     while(1){
         
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
-        if(!socketCliente){
+        if(socketCliente < 0){
             
             break;
         }
@@ -211,9 +236,67 @@ void escutaSolicitacao(){
         // A nova thread ficara responsável por enviar as mensagens do cliente
         // mantendo a conexão até o término da execução.        
         printf("CONEXÃO ACEITA....\n\n");
+        
+        // Capturando senha do cliente.
+        int tentativas = 0; 
+        char *senhaTemp = malloc(sizeof(char)*16);
+        while(tentativas < 3){
+        
+            recv(socketCliente, senhaTemp, 16, 0);
+            printf("SENHA TEMP: %s.\n\n", senhaTemp);
+            tentativas++;
+            char ok;
+            if(!strncmp(senhaTemp, senha, 16)){
+                
+                ok = 'S';
+                write(socketCliente, &ok, 1);
+                break;
+            }
+            ok = 'N';
+            write(socketCliente, &ok, 1);
+        }
+        free(senhaTemp);
+        
+        char *nick = malloc(sizeof(char)*16);
+        Link aux;
+        while(1){
+
+            recv(socketCliente, nick, 16, 0);
+            aux = pesquisarNick(listaLogin, nick);
+            char ok;
+            if (aux == NULL) { // se login nao existir
+                
+                ok = 'S';
+                write(socketCliente, &ok, 1);
+                break;
+            }                    
+            ok = 'N';
+            write(socketCliente, &ok, 1);
+        }
+        char *ip = malloc(sizeof(char)*16);
+        while(1){
+
+            recv(socketCliente, ip, 16, 0);
+            aux = pesquisarIp(listaLogin, ip);
+            char ok;
+            if (aux == NULL) { // se login nao existir
+                
+                ok = 'S';
+                write(socketCliente, &ok, 1);
+                break;
+            }                    
+            ok = 'N';
+            write(socketCliente, &ok, 1);
+        }
+        
+        
         pthread_t threadCliente;
         novoSocket = malloc(1);
-        *novoSocket = socketCliente;        
+        *novoSocket = socketCliente;     
+        
+        // Possível local para implantação de mutex.
+        addUserRemoto(listaLogin, nick, ip);
+        
         if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
             
             printf("Erro ao criar a thread.\n");
@@ -296,7 +379,7 @@ void enviarMensagem(char *buffer, int socket){
 }
 
 int abreConexao(){
-    
+/*    
     int sock;
     struct sockaddr_in servidor;    
      
@@ -367,4 +450,6 @@ int abreConexao(){
     printf("Conexão realizada...\n");            
     
     return sock;
+ */
+    return 0;
 }

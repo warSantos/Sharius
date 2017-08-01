@@ -24,6 +24,9 @@ void menuMenssagem(char *buffer, int socket);
 // usuário e também o mesageiro para o hospede do server.
 void menuOperacao(int socket);
 
+// Insere os dados dos usuários via socket.
+void addUserRemoto(Descritor *listaLogin, char *nick, char *ip);
+
 // Fica aguardando conexões e envio de mesagens.
 // Responsável por repassar as mesagens para os demais usuários,
 // Receber solicitações de login.

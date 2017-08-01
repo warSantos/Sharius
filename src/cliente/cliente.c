@@ -159,7 +159,9 @@ int abreConexao(){
         printf("Erro ao criar socket cliente...\n");
         return sock;
     }    
-     
+    
+    printf("Socket cliente criado...\n\n");
+    
     char *ip = malloc(sizeof(char)*16);
     while(1){
         
@@ -171,6 +173,8 @@ int abreConexao(){
             break;
         }
     }
+    
+    printf("\n\nip fornecido...\n\n");
     
     // Definindo IP do servidor...
     servidor.sin_addr.s_addr = inet_addr(ip);
@@ -184,39 +188,39 @@ int abreConexao(){
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
     
     //Busca conexão com o servidor...
-    int newConnect;
-    if ((newConnect = connect(sock, (struct sockaddr *)&servidor , sizeof(servidor))) < 0){
+    
+    if (connect(sock, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
-        return newConnect;
+        return -1;
     }            
+    
+    printf("Conexão estabelecida...\n\n");
     
     // Cria usuário.
     // Recebe mensagem de autenticação.
     int tentativas = 0;
+    char ok;
     while(tentativas < 3){
         
-        char *mensagemServer = "Senha de acesso: \n";
-        char *resposta = malloc(sizeof (char) * 16);
-        recv(sock, mensagemServer, strlen(mensagemServer), 0);
-        printf("%s", mensagemServer);
+        printf("Senha de acesso: ");
 
-        // Recebendo senha.
-        scanf("%15[\n]s", resposta);
+        // Recebendo senha do teclado.
+        char *resposta = malloc(sizeof(char)*16);
+        scanf("%15[^\n]s", resposta);
         __fpurge(stdin);
         
         // Devolvendo senha.
-        write(sock, resposta, sizeof (resposta));
-        char ok;
+        write(sock, resposta, sizeof (resposta));        
         
         // Recebendo confiramção.
-        recv(sock, &ok, sizeof (char));
+        recv(sock, &ok, sizeof (char), 0);
 
         if (ok == 'S') { // se receber acesso autorizado.
                          // sai do loop e vai para criação de usuário.
             break;
-        }
-        printf("Senha errada.\n")
+        }        
+        printf("Senha errada.\n");
         tentativas++;
     }
     if(tentativas == 3){
@@ -225,11 +229,43 @@ int abreConexao(){
         close(sock);
         return sock = -1;
     }
+    printf("\n\n");
+    // criando usuário.
     
-    // Falta criar a função de criação de usuário.
+    char *nick;// = malloc(sizeof(char)*16);
+    free(ip);// = malloc(sizeof(char)*16);
     
-    printf("Conexão realizada...\n");            
+    while(1){
+                
+        nick = criaNick();
+        // enviando login para aprovação...
+        write(sock, nick, sizeof(nick));
+        
+        // recebendo confirmação...
+        recv(sock, &ok, sizeof(char), 0);
+        if(ok == 'S'){
+            
+            break;
+        }
+        printf("Este login já esta em uso.\n\n");
+    }
     
+    while(1){
+        
+        ip = criaIp();
+        // enviando ip para aprovação...
+        write(sock, ip, sizeof(ip));
+        
+        // recebendo confirmação....
+        recv(sock, &ok, sizeof(char), 0);
+        if(ok == 'S'){
+            
+            break;
+        }
+        printf("Este ip já está em uso.\n\n");
+    }
+    
+    printf("Conexão realizada...\n");                
     return sock;
 }
 

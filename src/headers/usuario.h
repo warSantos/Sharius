@@ -72,6 +72,18 @@ Link pesquisarIp(Descritor *listaLogin, char *ip);
 // Zero se ip e nick não forem iguais.
 int pesquisarNickIp(Descritor *listaLogin, char *nick, char *ip);
 
+// Retorna string "nick" de acordo com os padrões de nick exigidos.
+char *criaNick();
+
+// Retorna string "ip" no formato exigido pelo padrão do endereço.
+char *criaIp();
+
+// Utiliza a função de pesquisar nick para retorna o nick como string.
+char *retornaNick(Descritor *listaLogin, char *nick);
+
+// Utiliza a função de pesquisar ip para retornar o ip como string.
+char *retornaIp(Descritor *listaLogin, char *ip);   
+
 // Imprimi a lista de usuários ativos no servidor.
 void imprimirLista(Descritor *listaLogin);
 

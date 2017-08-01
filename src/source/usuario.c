@@ -22,17 +22,16 @@ Descritor *iniciarLista(){
     return aux;
 }
 
-int inserirUsuario(Descritor *listaLogin){
-        
-    char *nick = (char *) malloc(sizeof(char) * 16);    
-    char *ip = (char *) malloc(sizeof(char) * 16);    
+char *criaNick(){
+    
+    char *nick = (char *) malloc(sizeof(char) * 16);        
     
     // Verificação se o Login é válido.
     while(1) {
         
         printf("Atenção o nick não devem possuir caracteres\nespeciais como: !, # , $, &, *, (, ), ^, e espaço...\n");    
-        printf("Limite máximo de caracteres 15.\n");    
         printf("Sendo permitido somente o letras, numeros e _.\n");
+        printf("Limite máximo de caracteres 15.\n");        
         printf("Digite um nick: ");
         scanf("%15[^\n]s", nick);
         __fpurge(stdin);
@@ -41,15 +40,101 @@ int inserirUsuario(Descritor *listaLogin){
         char *invalidos = "!$%¨&*().,;^~][{}+º°?ª<>/|\\";
         if(!charInvalido(nick, invalidos)){
             
+            return nick;
+        }else{
+        
+            printf("Nick inválido!\n");
+        }
+        
+        char op;
+        while(1){
+            
+            printf("Tentar novo nick (S/n): ");
+            scanf("%c", &op);
+            __fpurge(stdin);
+            if(op == 'S' || op == 's'){
+                
+                break;
+            }else if(op == 'N' || op == 'n'){
+                
+                return NULL;
+            }
+        }                
+    }
+}
+
+char *criaIp(){
+    
+    char *ip = (char *) malloc(sizeof(char) * 16);    
+    
+    while (1) {
+
+        printf("Endereços IP devem estar da seguinte forma: 192.168.0.100 .\n");
+        printf("Digite o endereço: ");
+        scanf("%15[^\n]s", ip);
+        __fpurge(stdin);
+        if (!verificaIp(ip)) {
+
+            return ip;            
+        }
+
+        char op;
+        while (1) {
+
+            printf("Deseja reinserir o ip (S/n): ");
+            scanf("%c", &op);
+            __fpurge(stdin);
+            if (op == 'S' || op == 's') {
+
+                break;
+            } else if (op == 'N' || op == 'n') {
+
+                return NULL;
+            }
+        }                
+    }
+}
+
+char *retornaNick(Descritor *listaLogin, char *nick){
+    
+    Link aux = pesquisarNick(listaLogin ,nick);
+    if(aux != NULL){ // Existe usuário e seu nick
+                     // esta sendo retornado.
+        return aux->nick;
+    }
+    // Não existe usuário então retornamos NULL.
+    return NULL;
+}
+
+char *retornaIp(Descritor *listaLogin, char *ip){
+    
+    Link aux = pesquisarIp(listaLogin, ip);
+    if(aux != NULL){ // Já existe esse ip
+                     // então ele esta sendo retornado.
+        return aux->ip;
+    }
+    // Não existe colisão de ip então esta NULL esta sendo retorando.
+    return NULL;
+}
+
+int inserirUsuario(Descritor *listaLogin){
+        
+    char *nick;// = (char *) malloc(sizeof(char) * 16);    
+    char *ip;// = (char *) malloc(sizeof(char) * 16);    
+    
+    // Verificação se o Login é válido.
+    while(1) {
+        
+        // Se o nick for válido.
+        if((nick = criaNick()) != NULL){
+            
             // Se o nick não for existente na lista de login.
             if(pesquisarNick(listaLogin, nick) == NULL){
                 
-                printf("Endereços IP devem estar da seguinte forma: 192.168.0.100 .\n");
-                printf("Digite o endereço: ");
-                scanf("%15[^\n]s", ip);
-                __fpurge(stdin);
-                if(!verificaIp(ip)){
+                
+                if((ip = criaIp()) != NULL){
                     
+                    // Se o ip não estiver em uso.
                     if(pesquisarIp(listaLogin, ip) == NULL){
                         
                         break;
@@ -63,8 +148,7 @@ int inserirUsuario(Descritor *listaLogin){
         }else{
         
             printf("Nick inválido!\n");
-        }
-        
+        }        
         char op;
         while(1){
             
@@ -191,4 +275,3 @@ void removerUsuario(Descritor *listaLogin, char *nick){
     printf("Usuários online: %d.\n\n", listaLogin->tamanho);
     printf("\n\nEste usuário não esta na lista.\n\n");
 }
-
