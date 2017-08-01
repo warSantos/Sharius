@@ -325,18 +325,46 @@ int abreConexao(){
                 
         perror("Erro. conexão não estabelecida...");
         return newConnect;
+    }            
+    
+    // Cria usuário.
+    // Recebe mensagem de autenticação.
+    int tentativas = 0;
+    while(tentativas < 3){
+        
+        char *mensagemServer = "Senha de acesso: \n";
+        char *resposta = malloc(sizeof (char) * 16);
+        recv(sock, mensagemServer, strlen(mensagemServer), 0);
+        printf("%s", mensagemServer);
+
+        // Recebendo senha.
+        scanf("%15[\n]s", resposta);
+        __fpurge(stdin);
+        
+        // Devolvendo senha.
+        write(sock, resposta, sizeof (resposta));
+        char ok;
+        
+        // Recebendo confiramção.
+        recv(sock, &ok, sizeof (char));
+
+        if (ok == 'S') { // se receber acesso autorizado.
+                         // sai do loop e vai para criação de usuário.
+            break;
+        }
+        printf("Senha errada.\n")
+        tentativas++;
     }
-    printf("Conexão realizada...\n");    
+    if(tentativas == 3){
+        
+        printf("Conexão perdida.\n\n");
+        close(sock);
+        return sock = -1;
+    }
     
-    /*
-    char *message;
+    // Falta criar a função de criação de usuário.
     
-    message = "Acesso permitido malandragem...\n";
-    write(sock, message , strlen(message));
-     
-    message = "Seja bem vindo ao chat... \n";
-    write(sock, message , strlen(message));
-    */
+    printf("Conexão realizada...\n");            
     
     return sock;
 }

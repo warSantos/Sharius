@@ -152,14 +152,14 @@ int abreConexao(){
     int sock;
     struct sockaddr_in servidor;    
      
-    //Cria socket inicial
+    //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
     if (sock == -1){
         
         printf("Erro ao criar socket cliente...\n");
         return sock;
     }    
-    
+     
     char *ip = malloc(sizeof(char)*16);
     while(1){
         
@@ -180,14 +180,56 @@ int abreConexao(){
     
     // Define a porta em que esta ativo o serviço no servidor...
     servidor.sin_port = htons(7772);
- 
+    
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
+    
     //Busca conexão com o servidor...
-    if (connect(sock , (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
-        
+    int newConnect;
+    if ((newConnect = connect(sock, (struct sockaddr *)&servidor , sizeof(servidor))) < 0){
+                
         perror("Erro. conexão não estabelecida...");
-        return sock;
+        return newConnect;
+    }            
+    
+    // Cria usuário.
+    // Recebe mensagem de autenticação.
+    int tentativas = 0;
+    while(tentativas < 3){
+        
+        char *mensagemServer = "Senha de acesso: \n";
+        char *resposta = malloc(sizeof (char) * 16);
+        recv(sock, mensagemServer, strlen(mensagemServer), 0);
+        printf("%s", mensagemServer);
+
+        // Recebendo senha.
+        scanf("%15[\n]s", resposta);
+        __fpurge(stdin);
+        
+        // Devolvendo senha.
+        write(sock, resposta, sizeof (resposta));
+        char ok;
+        
+        // Recebendo confiramção.
+        recv(sock, &ok, sizeof (char));
+
+        if (ok == 'S') { // se receber acesso autorizado.
+                         // sai do loop e vai para criação de usuário.
+            break;
+        }
+        printf("Senha errada.\n")
+        tentativas++;
     }
-    printf("Conexão realizada...\n");    
+    if(tentativas == 3){
+        
+        printf("Conexão perdida.\n\n");
+        close(sock);
+        return sock = -1;
+    }
+    
+    // Falta criar a função de criação de usuário.
+    
+    printf("Conexão realizada...\n");            
+    
     return sock;
 }
 
