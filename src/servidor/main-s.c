@@ -5,9 +5,10 @@ int main(){
     // Iniciando o ponterio descritor com lista de usuários no server.
     listaLogin = iniciarLista();
     
-    // Liberando uma thread para função específica de escuta de conexões.
+    // Cria conexão inicial com clientes e fornece uma thread de
+    // recebimento de menagem para o cliente.
     pthread_t t;
-    if(pthread_create(&t, NULL, (void *) servidorMenssagem, NULL)){    
+    if(pthread_create(&t, NULL, (void *) escutaSolicitacao, NULL)){    
         
         printf("Erro na inicialiazação do servidor de mensagem...\n");
         return 1;

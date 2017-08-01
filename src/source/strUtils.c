@@ -96,7 +96,7 @@ Comando *split(char *buffer){
     return bloco;
 }
 
-Comando *extraiMenssagem(char *buffer){
+Comando *extraiMensagem(char *buffer){
 
     Comando *bloco = calloc(sizeof(Comando),1);
     

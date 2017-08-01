@@ -4,7 +4,7 @@
 #include <netinet/in.h> //inet_addr
 #include<unistd.h>    //write
 
-void ajudaMenssagem(){
+void ajudaMensagem(){
         
     printf("\n\tAjuda.\n\n");
     printf("\n\t!c altera para o modo de comando.\n\n");    
@@ -57,15 +57,15 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMenssagem(char *buffer, int socket){
+void menuMensagem(char *buffer, int socket){
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
-    Comando *bloco = extraiMenssagem(buffer);
+    Comando *bloco = extraiMensagem(buffer);
     
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
     if(!strncmp(bloco->parametro, "-help", 6)){
         
-        ajudaMenssagem();
+        ajudaMensagem();
         return;
     }else if(!strncmp(bloco->parametro, "-clear", 7)){
         
@@ -138,7 +138,7 @@ void menuOperacao(int socket){
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMenssagem(buffer, socket);                                                               
+                menuMensagem(buffer, socket);                                                               
             }
         }
         free(buffer);

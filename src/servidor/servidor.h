@@ -28,10 +28,11 @@ void menuOperacao(int socket);
 // Responsável por repassar as mesagens para os demais usuários,
 // Receber solicitações de login.
 // Gerenciamento de conexões externas.
-void servidorMenssagem();
+void escutaSolicitacao();
 
-// repassa as mesagens recebidas para os clientes do chat.
-void *repassarMenssagem(void *idSocket);
+// Recebe as mensagens de um cliente e repassa elas aos demais 
+// logados no chat.
+void *escutaCliente(void *idSocket);
 
 // Função cliente similar a do módulo cliente utilizada para realizar conexão local
 // para que o adm do servidor também possa enviar e receber mesagens.
@@ -39,4 +40,8 @@ void cliente();
 
 // Abre conexão local com o servidor...
 int abreConexao();
+
+// envia mensagem através de um socket aberto.
+void enviarMensagem(char *buffer, int socket);
+
 #endif

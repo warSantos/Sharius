@@ -3,9 +3,17 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
       <df name="src">
+        <df name="cliente">
+          <in>cliente.c</in>
+          <in>main-c.c</in>
+        </df>
         <df name="headers">
           <in>cliente.h</in>
           <in>temp.c</in>
+        </df>
+        <df name="servidor">
+          <in>main-s.c</in>
+          <in>servidor.c</in>
         </df>
         <df name="source">
           <in>cliente.c</in>
@@ -68,17 +76,33 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="src/headers/cliente.h" ex="false" tool="0" flavor2="0">
+      <item path="src/cliente/cliente.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
       </item>
-      <item path="src/headers/temp.c" ex="false" tool="0" flavor2="0">
+      <item path="src/cliente/main-c.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
       </item>
-      <item path="src/source/cliente.c" ex="false" tool="0" flavor2="0">
+      <item path="src/headers/cliente.h" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="src/source/main.c" ex="false" tool="0" flavor2="0">
+      <item path="src/headers/temp.c" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="src/source/menu.c" ex="false" tool="0" flavor2="0">
+      <item path="src/servidor/main-s.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
       </item>
-      <item path="src/source/newfile.c" ex="false" tool="0" flavor2="0">
+      <item path="src/servidor/servidor.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="src/source/cliente.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="src/source/main.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="src/source/menu.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="src/source/newfile.c" ex="false" tool="0" flavor2="2">
       </item>
       <item path="src/source/strUtils.c" ex="false" tool="0" flavor2="0">
       </item>

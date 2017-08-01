@@ -26,6 +26,6 @@ Comando *split(char *buffer);
 
 // Trabalha os dados do buffer identificando os tipos de mensagem (privada)
 // ou broacast.
-Comando *extraiMenssagem(char *buffer);
+Comando *extraiMensagem(char *buffer);
 
 #endif

@@ -4,7 +4,7 @@
 #include <netinet/in.h> //inet_addr
 #include<unistd.h>    //write
 
-void ajudaMenssagem(){
+void ajudaMensagem(){
         
     printf("\n\tAjuda.\n\n");
     printf("\n\t!c altera para o modo de comando.\n\n");    
@@ -70,15 +70,15 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMenssagem(char *buffer, int socket) {
+void menuMensagem(char *buffer, int socket) {
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
-    Comando *bloco = extraiMenssagem(buffer);
+    Comando *bloco = extraiMensagem(buffer);
     
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
     if (!strncmp(bloco->parametro, "-help", 6)) {
 
-        ajudaMenssagem();
+        ajudaMensagem();
         return;
     } else if (!strncmp(bloco->parametro, "-clear", 7)) {
 
@@ -90,15 +90,7 @@ void menuMenssagem(char *buffer, int socket) {
         return;
     }   
     
-    /* Aqui entrara a função de envio de mensagem...
-    //Envia menssagem...
-    if (send(socket, message, strlen(message), 0) < 0) {
-
-        puts("Send failed");
-        return;
-    }   
-    // close(sock);        
-     */
+    
 }
 
 void menuOperacao(int socket){
@@ -157,7 +149,7 @@ void menuOperacao(int socket){
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMenssagem(buffer, socket);                                                               
+                menuMensagem(buffer, socket);                                                               
             }
         }
         free(buffer);
@@ -167,7 +159,7 @@ void menuOperacao(int socket){
 }
 
 // Versão para uso real
-void servidorMenssagem(){
+void escutaSolicitacao(){
     
     printf("Iniciando servidor de mensagem...\n\n");
     // enquanto o main estiver ativo.
@@ -187,9 +179,9 @@ void servidorMenssagem(){
         printf("Erro ao criar socket local.\n");
         return;
     }
-        
+    printf("Socket Local aberto.\n\n");    
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
-    servidor.sin_addr.s_addr = inet_addr("127.0.0.1"); // Setando IP local.
+    servidor.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr("127.0.0.1"); // Setando IP local.
     servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.       
     
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
@@ -200,7 +192,7 @@ void servidorMenssagem(){
         printf("Erro no bind.\n");
         return;
     }
-    
+    printf("Linkagem com bind realizada.\n\n");
     // Limitando o número de conexões que o socket local vai ouvir para 15.
     listen(socketLocal, 15);
     
@@ -208,16 +200,21 @@ void servidorMenssagem(){
     
     // Esperando por conexões.
     // Faça enquanto existir conexões.
-    while((socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr)) < 0){
+    while(1){
         
+        socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
+        if(!socketCliente){
+            
+            break;
+        }
         // Criando uma thread para um cliente.
         // A nova thread ficara responsável por enviar as mensagens do cliente
         // mantendo a conexão até o término da execução.        
+        printf("CONEXÃO ACEITA....\n\n");
         pthread_t threadCliente;
         novoSocket = malloc(1);
-        *novoSocket = socketCliente;
-        printf("entrou aqui....\n\n\n");
-        if(pthread_create(&threadCliente, NULL, repassarMenssagem, (void *) novoSocket)){
+        *novoSocket = socketCliente;        
+        if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
             
             printf("Erro ao criar a thread.\n");
             return;
@@ -230,26 +227,54 @@ void servidorMenssagem(){
     }
 }
 
-void *repassarMenssagem(void *idSocket){
+void *escutaCliente(void *idSocket){
     
-    //Id de ientificação so softtware.
-    int sock = *(int*)idSocket;
+    //Id de ientificação do cliente que utiliza a função
+    // Podem ser várias threads desta liberadas
+    // Logo o idSocket de cada chamada da função escutaCliente 
+    // é diferente é um socket diferente.
+    
+    int socket = *(int*)idSocket;
+    printf("SOCK: %d\n\n", socket);
     int read_size;
-    char *message , client_message[2000];
-     
-    //Menssagem de boas vindas
-    message = "Acesso permitido...\n";
-    write(sock , message , strlen(message));
-     
-    message = "Seja bem vindo ao chat... \n";
-    write(sock , message , strlen(message));
-     
-    //Receive a message from client
-    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 ){
-        //Send the message back to client
-        write(sock , client_message , strlen(client_message));
-    }
-     
+    char *buffer = malloc(sizeof(char) * 251);
+    
+    // recebe mensagens do cliente.
+    while( (read_size = recv(socket, buffer, 251 , 0)) > 0 ){
+        
+        printf("MENSAGEM NO SERVIDOR: %s \n", buffer);        
+        
+        // extraindo cliente para envio.
+        Comando *bloco = extraiMensagem(buffer);
+        
+        // Repassa para broadcast.
+        if (!strncmp(bloco->comando, "all", 4)) {
+
+            Link aux = listaLogin->primeiro;
+            while (aux != NULL) {
+
+                pthread_t t;
+                pthread_create(&t, NULL, (void *) enviarMensagem, NULL);
+                pthread_join(t, NULL);
+                aux = aux->prox;
+            }            
+        } else { // Enviando mensagem unicast.
+
+            // passando o nick específico para pesquisa.
+            Link aux = pesquisarNick(listaLogin, bloco->comando);
+            if (aux != NULL) {
+                
+                // enviando a mensagem.
+                //enviarMensagem(buffer, socket);
+                
+            }else{
+                
+                // Retorna mesagem de erro.
+                char *userNotExist = "Usuário inexistente.\n";
+                write(socket , userNotExist , strlen(userNotExist));
+            }
+        }
+    }            
     if(read_size == 0){
         
         puts("Client disconnected");
@@ -262,39 +287,12 @@ void *repassarMenssagem(void *idSocket){
     //Free the socket pointer
     free(idSocket);
      
-    return 0;
+    return 0;        
+}
+
+void enviarMensagem(char *buffer, int socket){
     
-    /* Função deve ser movida para a função servidor de mensagem...
-     *  Ou para a função de repassar mensagem...
-     *  Atenção para os parametros na criação das threads.
-    
-    
-    // Enviando a mesagem.
-    // se for uma mensagem para broadcast.
-    if(!strncmp(bloco->comando, "all", 4)){ 
-        
-        Link aux = listaLogin->primeiro;
-        while(aux != NULL){
-            
-            pthread_t t;
-            pthread_create(&t, NULL, (void *) repassarMenssagem, NULL);            
-            pthread_join(t, NULL);
-            aux = aux->prox;
-        }
-    }else{ // Enviando mensagem unicast.
-        
-        // passando o nick específico para pesquisa.
-        Link aux = pesquisarNick(listaLogin, bloco->comando);
-        if(aux != NULL){
-            
-            pthread_t t;
-            pthread_create(&t, NULL, (void *) enviarMenssagem, NULL);            
-            pthread_join(t, NULL);
-            return;
-        }
-        printf("Usuário inexistente.\n");
-    } 
-    */
+    write(socket , buffer , strlen(buffer));
 }
 
 int abreConexao(){
@@ -323,11 +321,22 @@ int abreConexao(){
     
     //Busca conexão com o servidor...
     int newConnect;
-    if ((newConnect = connect(sock , (struct sockaddr *)&servidor , sizeof(servidor))) < 0){
+    if ((newConnect = connect(sock, (struct sockaddr *)&servidor , sizeof(servidor))) < 0){
                 
         perror("Erro. conexão não estabelecida...");
         return newConnect;
     }
     printf("Conexão realizada...\n");    
+    
+    /*
+    char *message;
+    
+    message = "Acesso permitido malandragem...\n";
+    write(sock, message , strlen(message));
+     
+    message = "Seja bem vindo ao chat... \n";
+    write(sock, message , strlen(message));
+    */
+    
     return sock;
 }
