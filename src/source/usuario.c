@@ -37,7 +37,7 @@ char *criaNick(){
         __fpurge(stdin);
         
         // verificando se o nick é válido.
-        char *invalidos = "!$%¨&*().,;^~][{}+º°?ª<>/|\\";
+        char *invalidos = " !$%¨&*().,;^~][{}+º°?ª<>/|\\";
         if(!charInvalido(nick, invalidos)){
             
             return nick;

@@ -1,5 +1,18 @@
 #include "../headers/strUtils.h"
 
+char retChar(size_t t){
+
+    int temp = (int) t;
+    char ret = (char) temp;
+    return ret;
+}
+
+int retInt(char t){
+    
+    int ret = (char) t;
+    return ret;
+}
+
 int charInvalido(char *nick, char *caracteresInvalidos){
     
     int i,j;
@@ -18,7 +31,7 @@ int charInvalido(char *nick, char *caracteresInvalidos){
 
 int verificaIp(char *ip){
 
-    int i, qtdePontos = 0;
+    int i, qtdePontos = 0, octeto = 0, cont = 1, nOcteto = 1;
     for (i = 0; ip[i] != '\0'; ++i) {
        
         if (ip[i] == '.') {
@@ -40,17 +53,36 @@ int verificaIp(char *ip){
                     return 1;
                 }
             }
+            // identificando os octetos.
+            cont = 0;
         } else if (ip[i] < 48 || ip[i] > 57) {
 
             printf("Caracter %c inválido, posição %d.\n", ip[i], i);
             return 1;
+        }                    
+        
+        // ja passou por um ponto.
+        if (!cont) {
+            
+            if (octeto > 163) {
+
+                printf("Valor inválido no octeto: %d.\npor favor digite valores menores que 255.\n\n", nOcteto);
+                return 1;
+            }
+            cont = 1;
+            octeto = 0;
+            nOcteto++;                        
+        }else{
+            
+            octeto = octeto + retInt(ip[i]); 
+            printf("valor do octeto %d \n", octeto);
         }                        
     }
     if (qtdePontos != 3) {
-            
-            printf("Endereço IP inválido %d.\n\n", qtdePontos);
-            return 1;
-        }
+
+        printf("Endereço IP inválido.\n\n");
+        return 1;
+    }
     return 0;
 }
 

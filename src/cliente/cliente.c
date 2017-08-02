@@ -207,11 +207,18 @@ int abreConexao(){
 
         // Recebendo senha do teclado.
         char *resposta = malloc(sizeof(char)*16);
+        
         scanf("%15[^\n]s", resposta);
-        __fpurge(stdin);
+        __fpurge(stdin);        
+        
+        size_t len = strlen(resposta) + 1;
+        char lenght = retChar(len);
+        
+        // Enviando o tamanho da senha.
+        write(sock, &lenght, 1);       
         
         // Devolvendo senha.
-        write(sock, resposta, strlen(resposta));        
+        write(sock, resposta, len);        
         
         // Recebendo confiramção.
         recv(sock, &ok, sizeof (char), 0);
@@ -238,9 +245,14 @@ int abreConexao(){
     while(1){
                 
         nick = criaNick();
-        printf("strlen: %ld\n", strlen(nick));
+        size_t len = strlen(nick) + 1;
+        char lenght = retChar(len);
+        
+        // Enviando o tamanho do nick.
+        write(sock, &lenght, 1);       
+        
         // enviando login para aprovação...
-        write(sock, nick, strlen(nick));
+        write(sock, nick, len);
         
         // recebendo confirmação...
         recv(sock, &ok, 1, 0);
@@ -254,8 +266,15 @@ int abreConexao(){
     while(1){
         
         ip = criaIp();        
+        
+        size_t len = strlen(ip) + 1;
+        char lenght = retChar(len);
+        
+        // Enviando o tamanho da senha.
+        write(sock, &lenght, 1);       
+        
         // enviando ip para aprovação...        
-        write(sock, ip, strlen(ip));
+        write(sock, ip, len);
         
         // recebendo confirmação....
         recv(sock, &ok, 1, 0);

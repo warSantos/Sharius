@@ -164,6 +164,7 @@ void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock){
     aux->nick = malloc(sizeof(char) * 16);    
     aux->ip = malloc(sizeof(char) * 16);        
     aux->socket = sock;
+    printf("user: %s aux->sock: %d\n", nick, *aux->socket);
     strncpy(aux->nick, nick, 16);
     strncpy(aux->ip, ip, 16);        
     free(nick);
@@ -186,13 +187,11 @@ void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock){
 // Versão para uso real
 void escutaSolicitacao(void *password){
     
-    char *senha = (char *)password;
-    usleep(500);
-    printf("Iniciando servidor de mensagem...\n");
-    
+    char *senha = (char *)password;            
     // enquanto o main estiver ativo.
     // pensando em possivelmente passar um parâmetro que indica termino
     // para esta função.
+    
     int socketLocal, socketCliente, sizeSockaddr, *novoSocket;
     struct sockaddr_in servidor, cliente;
     
@@ -207,8 +206,7 @@ void escutaSolicitacao(void *password){
         printf("Erro ao criar socket local.\n");
         return;
     }
-    
-    printf("Socket Local aberto.\n\n");    
+        
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
     servidor.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr("127.0.0.1"); // Setando IP local.
     servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.       
@@ -216,13 +214,12 @@ void escutaSolicitacao(void *password){
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
     
     // Criando link entre a estrutura servidor ao ID do socketLocal.
-    if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
+    while(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
         
         printf("Erro no bind.\n");
         close(socketLocal);
-        return;
-    }
-    printf("Linkagem com bind realizada.\n\n");
+        //return;
+    }    
     // Limitando o número de conexões que o socket local vai ouvir para 15.
     listen(socketLocal, 15);
     
@@ -247,9 +244,9 @@ void escutaSolicitacao(void *password){
         while(tentativas < 3){
             
             // Recebendo o tamanho da senha.
-            recv(socketCliente, &lenght, 1);
-            len = (int)lenght;
-            senha = malloc(sizeof(char)*len);
+            recv(socketCliente, &lenght, 1, 0);
+            len = retInt(lenght);
+            senhaTemp = malloc(sizeof(char)*len);
             
             // Recebendo a senha.
             recv(socketCliente, senhaTemp, len, 0);                        
@@ -272,13 +269,12 @@ void escutaSolicitacao(void *password){
         while(1){
             
             // Recebendo o tamanho do nick.
-            recv(socketCliente, &lenght, 1);
-            len = (int)lenght;            
+            recv(socketCliente, &lenght, 1, 0);
+            len = retInt(lenght);            
             nick = malloc(sizeof(char)*len);
             
             // Recebendo o nick
-            recv(socketCliente, nick, len, 0);
-            printf("NICK: %s\n", nick);
+            recv(socketCliente, nick, len, 0);            
             aux = pesquisarNick(listaLogin, nick);
             char ok;
             if (aux == NULL) { // se login nao existir
@@ -293,8 +289,8 @@ void escutaSolicitacao(void *password){
         char *ip;
         while(1){
             
-            recv(socketCliente, &lenght, 1);
-            len = (int)lenght;
+            recv(socketCliente, &lenght, 1, 0);
+            len = retInt(lenght);
             ip = malloc(sizeof(char)*len);
             
             recv(socketCliente, ip, len, 0);            
@@ -323,8 +319,7 @@ void escutaSolicitacao(void *password){
             
             printf("Erro ao criar a thread.\n");
             return;
-        }        
-        printf("thread cliente criada.\n");
+        }                
     }
     if(socketCliente < 0){
         
