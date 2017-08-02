@@ -265,31 +265,9 @@ int abreConexao(){
             break;
         }
         printf("Este login já esta em uso.\n\n");
-    }
+    }        
     
-    while(1){
-        
-        ip = criaIp();        
-        
-        size_t len = strlen(ip) + 1;
-        char lenght = retChar(len);
-        
-        // Enviando o tamanho da senha.
-        write(sock, &lenght, 1);       
-        
-        // enviando ip para aprovação...        
-        write(sock, ip, len);
-        
-        // recebendo confirmação....
-        recv(sock, &ok, 1, 0);
-        if(ok == 'S'){
-            
-            break;
-        }        
-        printf("Este ip já está em uso.\n\n");
-    }
-    
-    printf("Conexão realizada...\n");                
+    printf("Login cadastrado...\n");                
     return sock;
 }
 

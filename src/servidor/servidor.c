@@ -161,16 +161,13 @@ void menuOperacao(int socket){
     free(alteraModo);    
 }
 
-void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock){
+void addUserRemoto(Descritor *listaLogin, char *nick, int *sock){
     
     Link aux = malloc(sizeof(Login));
-    aux->nick = malloc(sizeof(char) * 16);    
-    aux->ip = malloc(sizeof(char) * 16);        
+    aux->nick = malloc(sizeof(char) * 16);        
     aux->socket = sock;    
-    strncpy(aux->nick, nick, 16);
-    strncpy(aux->ip, ip, 16);        
-    free(nick);
-    free(ip);
+    strncpy(aux->nick, nick, 16);    
+    free(nick);    
     
     // Caso seja a primeira inserção de um usuário na lista.
     if(listaVazia(listaLogin)){
@@ -287,26 +284,7 @@ void escutaSolicitacao(void *password){
             }                    
             ok = 'N';
             write(socketCliente, &ok, 1);
-        }
-        char *ip;
-        while(1){
-            
-            recv(socketCliente, &lenght, 1, 0);
-            len = retInt(lenght);
-            ip = malloc(sizeof(char)*len);
-            
-            recv(socketCliente, ip, len, 0);            
-            aux = pesquisarIp(listaLogin, ip);
-            char ok;
-            if (aux == NULL) { // se login nao existir
-                
-                ok = 'S';
-                write(socketCliente, &ok, 1);
-                break;
-            }                    
-            ok = 'N';
-            write(socketCliente, &ok, 1);
-        }
+        }        
                 
         pthread_t threadCliente;
         novoSocket = malloc(1);
@@ -314,7 +292,7 @@ void escutaSolicitacao(void *password){
         
         pthread_mutex_lock(&lista);
         // Possível local para implantação de mutex.
-        addUserRemoto(listaLogin, nick, ip, novoSocket);
+        addUserRemoto(listaLogin, nick, novoSocket);
         pthread_mutex_unlock(&lista);
         
         if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){

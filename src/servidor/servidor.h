@@ -1,8 +1,12 @@
 #ifndef menu_H
 #define menu_H
 
-#include <stdio_ext.h>
 #include "../headers/usuario.h"
+#include <stdio_ext.h>
+#include<sys/socket.h>
+#include<arpa/inet.h> //inet_addr
+#include <netinet/in.h> //inet_addr
+#include<unistd.h>    //write
 
 /*
  *
@@ -24,7 +28,7 @@ void menuMenssagem(char *buffer, int socket);
 void menuOperacao(int socket);
 
 // Insere os dados dos usuários via socket.
-void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock);
+void addUserRemoto(Descritor *listaLogin, char *nick, int *sock);
 
 // Fica aguardando conexões e envio de mesagens.
 // Responsável por repassar as mesagens para os demais usuários,
