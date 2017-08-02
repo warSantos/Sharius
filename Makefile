@@ -8,7 +8,7 @@ SRC-H = src/servidor/
 FILES = $(wildcard src/source/*)
 OBJ = $(FILES:. c=*.o)
 
-all: sharius-servidor sharius-cliente
+all: sharius-servidor sharius-cliente move
 
 sharius-servidor: $(OBJ)	main-s.o	servidor.o
 	$(CC) $(OBJ) main-s.o servidor.o -o sharius-servidor -lpthread
@@ -41,4 +41,6 @@ run-servidor:
 	./sharius-servidor
 
 clean:
-	rm -rf *.o
+	rm -rf obj/*.o
+move:
+	$(MOVE)
