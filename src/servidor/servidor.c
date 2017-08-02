@@ -90,7 +90,8 @@ void menuMensagem(char *buffer, int socket) {
         return;
     }   
     
-    
+    // enviando mensagem para o servidor.
+    enviarMensagem(buffer, socket);
 }
 
 void menuOperacao(int socket){
@@ -116,17 +117,19 @@ void menuOperacao(int socket){
         scanf("%250[^\n]s", buffer);        
         __fpurge(stdin);
                         
+        
         // Identifica o princípio de um possível comando de alteração de modo.
         if (buffer[0] == '!' && buffer[1] == 'c') {
             
-            // Altera pro modo de comando.
             system("clear");
+            // Altera pro modo de comando.            
             printf("\n\nModo de comando.\n\n");
             alteraModo[0] = '!';
             alteraModo[1] = 'c';
             // Altera para o modo de mensagem.    
+            
         } else if (buffer[0] == '!' && buffer[1] == 'm') {
-
+            
             system("clear");
             printf("\n\nModo de mensagem.\n\n");
             alteraModo[0] = '!';
@@ -163,8 +166,7 @@ void addUserRemoto(Descritor *listaLogin, char *nick, char *ip, int *sock){
     Link aux = malloc(sizeof(Login));
     aux->nick = malloc(sizeof(char) * 16);    
     aux->ip = malloc(sizeof(char) * 16);        
-    aux->socket = sock;
-    printf("user: %s aux->sock: %d\n", nick, *aux->socket);
+    aux->socket = sock;    
     strncpy(aux->nick, nick, 16);
     strncpy(aux->ip, ip, 16);        
     free(nick);
@@ -218,6 +220,7 @@ void escutaSolicitacao(void *password){
         
         printf("Erro no bind.\n");
         close(socketLocal);
+        usleep(1000000);
         //return;
     }    
     // Limitando o número de conexões que o socket local vai ouvir para 15.
@@ -249,8 +252,7 @@ void escutaSolicitacao(void *password){
             senhaTemp = malloc(sizeof(char)*len);
             
             // Recebendo a senha.
-            recv(socketCliente, senhaTemp, len, 0);                        
-            printf("SENHA TEMP: %s.\n\n", senhaTemp);
+            recv(socketCliente, senhaTemp, len, 0);            
             tentativas++;
             char ok;
             if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
@@ -341,8 +343,7 @@ void *escutaCliente(void *idSocket){
     // recebe mensagens do cliente.
     while( (read_size = recv(socket, buffer, 251 , 0)) > 0 ){
         
-        printf("MENSAGEM NO SERVIDOR: %s \n", buffer);        
-        
+        //printf("MENSAGEM NO SERVIDOR: %s \n", buffer);                
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);
         
@@ -351,10 +352,11 @@ void *escutaCliente(void *idSocket){
 
             Link aux = listaLogin->primeiro;
             while (aux != NULL) {
-
-                pthread_t t;
-                pthread_create(&t, NULL, (void *) enviarMensagem, NULL);
-                pthread_join(t, NULL);
+                                
+                //pthread_t t;
+                //pthread_create(&t, NULL, (void *) enviarMensagem, (void *) &aux->socket);
+                //pthread_join(t, NULL);
+                enviarMensagem(buffer, *aux->socket);
                 aux = aux->prox;
             }            
         } else { // Enviando mensagem unicast.
@@ -364,19 +366,18 @@ void *escutaCliente(void *idSocket){
             if (aux != NULL) {
                 
                 // enviando a mensagem.
-                //enviarMensagem(buffer, socket);
+                enviarMensagem(buffer, *aux->socket);
                 
             }else{
                 
                 // Retorna mesagem de erro.
-                char *userNotExist = "Usuário inexistente.\n";
-                write(socket , userNotExist , strlen(userNotExist));
+                //char *userNotExist = "Usuário inexistente.\n";
+                //write(socket , userNotExist , strlen(userNotExist)+1);
             }
         }
     }            
     if(read_size == 0){
-        
-        puts("Client disconnected");
+                
         fflush(stdout);        
     }else if(read_size == -1){
         
@@ -391,7 +392,14 @@ void *escutaCliente(void *idSocket){
 
 void enviarMensagem(char *buffer, int socket){
     
-    write(socket , buffer , strlen(buffer));
+    /*
+    // enviando o tamanho da mensagem.
+    int lenght = retChar(sizeof(buffer) + 1);
+    write(socket, &lenght, 1);
+    */
+    
+    // enviando a mensagem para o cliente.
+    write(socket , buffer , strlen(buffer) + 1);
 }
 
 int abreConexao(){

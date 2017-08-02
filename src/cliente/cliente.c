@@ -75,11 +75,20 @@ void menuMensagem(char *buffer, int socket){
         
         imprimirLista(listaLogin);
         return;
-    }
+    }      
+    enviarMensagem(buffer, socket);
+}
+
+void enviarMensagem(char *buffer, int socket){
     
-    /* 
-     * Falta criar conexão e mandar mensagem... 
-     */
+    /*
+    // enviando o tamanho da mensagem.
+    int lenght = retChar(sizeof(buffer) + 1);
+    write(socket, &lenght, 1);
+    */
+    
+    // enviando a mensagem para o cliente.
+    write(socket , buffer , strlen(buffer) + 1);
 }
 
 void menuOperacao(int socket){
@@ -104,18 +113,19 @@ void menuOperacao(int socket){
         buffer = calloc(sizeof(char),251);
         scanf("%250[^\n]s", buffer);
         __fpurge(stdin);
-                        
+                                
         // Identifica o princípio de um possível comando de alteração de modo.
         if (buffer[0] == '!' && buffer[1] == 'c') {
             
-            // Altera pro modo de comando.
             system("clear");
+            // Altera pro modo de comando.            
             printf("\n\nModo de comando.\n\n");
             alteraModo[0] = '!';
             alteraModo[1] = 'c';
+            
             // Altera para o modo de mensagem.    
         } else if (buffer[0] == '!' && buffer[1] == 'm') {
-
+            
             system("clear");
             printf("\n\nModo de mensagem.\n\n");
             alteraModo[0] = '!';
@@ -158,9 +168,7 @@ int abreConexao(){
         
         printf("Erro ao criar socket cliente...\n");
         return sock;
-    }    
-    
-    printf("Socket cliente criado...\n\n");
+    }          
     
     char *ip = malloc(sizeof(char)*16);
     while(1){
@@ -172,9 +180,7 @@ int abreConexao(){
             
             break;
         }
-    }
-    
-    printf("\n\nip fornecido...\n\n");
+    }        
     
     // Definindo IP do servidor...
     servidor.sin_addr.s_addr = inet_addr(ip);
@@ -193,9 +199,7 @@ int abreConexao(){
                 
         perror("Erro. conexão não estabelecida...");
         return -1;
-    }            
-    
-    printf("Conexão estabelecida...\n\n");
+    }                    
     
     // Cria usuário.
     // Recebe mensagem de autenticação.
@@ -289,7 +293,42 @@ int abreConexao(){
     return sock;
 }
 
-void recebeMensagem(){
+void recebeMensagem(void *idSocket){
     
-    //printf("falta acabar.\n\n");
+    //Id de ientificação do cliente que utiliza a função
+    // Podem ser várias threads desta liberadas
+    // Logo o idSocket de cada chamada da função escutaCliente 
+    // é diferente é um socket diferente.
+    printf("Servidor de mensagens pronto...\n\n");
+    
+    int read_size;    
+    int socket = *(int*) idSocket;
+    char *buffer = malloc(sizeof(char)*251);
+    
+    // recebe mensagens do cliente.
+    while( (read_size = recv(socket, buffer, 251 , 0)) > 0 ){
+                
+        // extraindo mensagem do buffer recebido.
+        Comando *bloco = extraiMensagem(buffer);
+        
+        // Identifica quem enviou.
+        if (!strncmp(bloco->comando, "all", 4)) {
+
+           printf("%s-:> %s\n",bloco->comando, bloco->parametro);             
+        } else { // Enviando mensagem unicast.
+
+            printf("%s-:> %s\n",bloco->comando, bloco->parametro);
+        }
+    }            
+    if(read_size == 0){
+        
+        puts("Client disconnected");
+        fflush(stdout);        
+    }else if(read_size == -1){
+        
+        perror("recv failed");
+    }
+         
+    //Free the socket pointer
+    free(idSocket);
 }

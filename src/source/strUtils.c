@@ -60,13 +60,13 @@ int verificaIp(char *ip){
             printf("Caracter %c inválido, posição %d.\n", ip[i], i);
             return 1;
         }                    
-        
+         
         // ja passou por um ponto.
         if (!cont) {
             
-            if (octeto > 163) {
+            if (!octeto || octeto > 163) {
 
-                printf("Valor inválido no octeto: %d.\npor favor digite valores menores que 255.\n\n", nOcteto);
+                printf("Valor inválido no octeto: %d.\npor favor digite valores maiores que 0 e menores que 255.\n\n", nOcteto);
                 return 1;
             }
             cont = 1;
@@ -74,8 +74,7 @@ int verificaIp(char *ip){
             nOcteto++;                        
         }else{
             
-            octeto = octeto + retInt(ip[i]); 
-            printf("valor do octeto %d \n", octeto);
+            octeto = octeto + retInt(ip[i]);            
         }                        
     }
     if (qtdePontos != 3) {
