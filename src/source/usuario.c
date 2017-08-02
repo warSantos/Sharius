@@ -106,42 +106,18 @@ char *retornaNick(Descritor *listaLogin, char *nick){
     return NULL;
 }
 
-char *retornaIp(Descritor *listaLogin, char *ip){
-    
-    Link aux = pesquisarIp(listaLogin, ip);
-    if(aux != NULL){ // Já existe esse ip
-                     // então ele esta sendo retornado.
-        return aux->ip;
-    }
-    // Não existe colisão de ip então esta NULL esta sendo retorando.
-    return NULL;
-}
-
 int inserirUsuario(Descritor *listaLogin){
         
-    char *nick;// = (char *) malloc(sizeof(char) * 16);    
-    char *ip;// = (char *) malloc(sizeof(char) * 16);    
+    char *nick;// = (char *) malloc(sizeof(char) * 16);        
     
     // Verificação se o Login é válido.
-    while(1) {
+    while(1){
         
         // Se o nick for válido.
         if((nick = criaNick()) != NULL){
             
             // Se o nick não for existente na lista de login.
-            if(pesquisarNick(listaLogin, nick) == NULL){
-                
-                
-                if((ip = criaIp()) != NULL){
-                    
-                    // Se o ip não estiver em uso.
-                    if(pesquisarIp(listaLogin, ip) == NULL){
-                        
-                        break;
-                    }
-                    printf("Este ip pertence a outro host.\nPor favor verifique seu IP.\n");
-                }
-            }else{
+            if(pesquisarNick(listaLogin, nick) != NULL){                                                            
                 
                 printf("Este login esta indisponível no momento.\n");
             }
@@ -167,12 +143,9 @@ int inserirUsuario(Descritor *listaLogin){
     // Fim de verificação.
     
     Link aux = malloc(sizeof(Login));
-    aux->nick = malloc(sizeof(char) * 16);    
-    aux->ip = malloc(sizeof(char) * 16);        
-    strncpy(aux->nick, nick, 16);
-    strncpy(aux->ip, ip, 16);        
-    free(nick);
-    free(ip);
+    aux->nick = malloc(sizeof(char) * 16);        
+    strncpy(aux->nick, nick, 16);    
+    free(nick);    
     
     // Caso seja a primeira inserção de um usuário na lista.
     if(listaVazia(listaLogin)){
@@ -197,20 +170,6 @@ Link pesquisarNick(Descritor *listaLogin, char *nick){
         
         if(!strcmp(aux->nick, nick)){
             
-            return aux;
-        }
-        aux = aux->prox;
-    }
-    return NULL;
-}
-
-Link pesquisarIp(Descritor *listaLogin, char *ip){
-    
-    Link aux = listaLogin->primeiro;
-    while(aux != NULL){
-        
-        if(!strncmp(aux->ip, ip, 16)){
-        
             return aux;
         }
         aux = aux->prox;

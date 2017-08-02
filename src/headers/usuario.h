@@ -21,8 +21,7 @@ typedef struct login *Link;
 typedef struct login {
     
     int *socket;
-    char *nick;
-    char *ip; 
+    char *nick;     
     Link prox;
 } Login;
 
@@ -66,25 +65,11 @@ int inserirUsuario(Descritor *listaLogin);
 // Caso o usuário requerido não exista na lista é retornada nulo.
 Link pesquisarNick(Descritor *listaLogin, char *nick);
 
-// Verifica se o IP a ser inserido já esta sendo utilizado por outro host.
-// Se sim é retornado o endereço de do login na lista.
-// se não é retornado o valor NULL.
-Link pesquisarIp(Descritor *listaLogin, char *ip);
-
-// Realiza comparação de Nick e Ip ao mesmo tempo.
-// Retorna 1 se encontrar nicks iguais.
-// Retorna 2 se encontrar ips iguais.
-// Zero se ip e nick não forem iguais.
-int pesquisarNickIp(Descritor *listaLogin, char *nick, char *ip);
-
 // Retorna string "nick" de acordo com os padrões de nick exigidos.
 char *criaNick();
 
 // Retorna string "ip" no formato exigido pelo padrão do endereço.
 char *criaIp();
-
-// Utiliza a função de pesquisar nick para retorna o nick como string.
-char *retornaNick(Descritor *listaLogin, char *nick);
 
 // Utiliza a função de pesquisar ip para retornar o ip como string.
 char *retornaIp(Descritor *listaLogin, char *ip);   
