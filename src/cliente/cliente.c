@@ -178,7 +178,7 @@ char *abreConexao(int *retSocket){
         return NULL;
     } 
     
-    char *ip = "127.0.0.1";
+    char *ip = "127.0.0.1", *userNick;
     /*
     char *ip = malloc(sizeof(char)*16), *userNick;
     
@@ -257,7 +257,7 @@ char *abreConexao(int *retSocket){
     // criando usuário.
     
     char *nick;// = malloc(sizeof(char)*16);
-    free(ip);// = malloc(sizeof(char)*16);
+   // free(ip);// = malloc(sizeof(char)*16);
     
     while(1){
                 
