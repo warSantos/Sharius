@@ -77,16 +77,7 @@ void menuMensagem(char *buffer, char *userNick, int socket){
         return;
     } 
     
-    enviarBloco(buffer, userNick, socket);
-    /*
-    // enviando o tamanho do size login do emissor.
-    char lenght = retChar(strlen(userNick) + 1);    
-    enviarMensagem(&lenght, socket);
-    // enviando o nick    
-    enviarMensagem(userNick, socket);
-    // enviando a mensagem.
-    enviarMensagem(buffer, socket);
-     */
+    enviarBloco(buffer, userNick, socket);    
 }
 
 void enviarMensagem(char *buffer, int socket){                
@@ -108,6 +99,7 @@ void enviarBloco(char *buffer, char *login, int sock){
     // enviando a mensagem.
     write(sock, buffer, 251);   
 }
+
 void menuOperacao(char *userNick, int socket){
     
     listaLogin = iniciarLista();
@@ -184,9 +176,12 @@ char *abreConexao(int *retSocket){
         
         printf("Erro ao criar socket cliente...\n");
         return NULL;
-    }          
+    } 
     
+    char *ip = "127.0.0.1";
+    /*
     char *ip = malloc(sizeof(char)*16), *userNick;
+    
     while(1){
         
         printf("Digite o ip do servidor: ");
@@ -197,7 +192,7 @@ char *abreConexao(int *retSocket){
             break;
         }
     }        
-    
+    */
     // Definindo IP do servidor...
     servidor.sin_addr.s_addr = inet_addr(ip);
     
@@ -223,6 +218,8 @@ char *abreConexao(int *retSocket){
     char ok;
     while(tentativas < 3){
         
+        char *resposta = "123";
+        /*
         printf("Senha de acesso: ");
 
         // Recebendo senha do teclado.
@@ -230,7 +227,7 @@ char *abreConexao(int *retSocket){
         
         scanf("%15[^\n]s", resposta);
         __fpurge(stdin);        
-        
+        */
         size_t len = strlen(resposta) + 1;
         char lenght = retChar(len);
         

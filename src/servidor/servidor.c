@@ -345,18 +345,7 @@ void *escutaCliente(void *idSocket){
 
             Link aux = listaLogin->primeiro;
             while (aux != NULL) {
-                                
-                //pthread_t t;
-                //pthread_create(&t, NULL, (void *) enviarMensagem, (void *) &aux->socket);
-                //pthread_join(t, NULL);
-                
-                // Enviando size do login, login do emissor e mensagem.
-                /*
-                enviarMensagem(&lenght, *aux->socket);
-                enviarMensagem(nickEmissor, *aux->socket);
-                enviarMensagem(buffer, *aux->socket);
-                
-                */
+                                                
                 enviarBloco(buffer, nickEmissor, *aux->socket);
                 aux = aux->prox;
             }            
@@ -365,13 +354,7 @@ void *escutaCliente(void *idSocket){
             // passando o nick específico para pesquisa.
             Link aux = pesquisarNick(listaLogin, bloco->comando);
             if (aux != NULL) {
-                
-                // enviando a mensagem.
-                /*
-                enviarMensagem(&lenght, *aux->socket);
-                enviarMensagem(nickEmissor, *aux->socket);
-                enviarMensagem(buffer, *aux->socket);
-                */
+                                
                 enviarBloco(buffer, nickEmissor, socket);
                 
             }else{
