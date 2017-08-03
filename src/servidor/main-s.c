@@ -21,7 +21,7 @@ int main(){
     
     // Esperando a thread de escuta iniciar...
     usleep(500);
-    
+    /*
     // Abrindo conexão local...
     int idSocket = abreConexao(); 
     
@@ -30,7 +30,8 @@ int main(){
         printf("Erro ao abrir conexão com servidor local...\n");
         return 1;
     }
-    
+    */
+    int idSocket = 0;
     // menu de administração do servidor.
     menuOperacao(idSocket);
     pthread_join(t, NULL);

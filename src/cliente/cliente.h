@@ -30,28 +30,15 @@ int menuComando(char *buffer);
 // e delegação dos dados processados para a função de enviar mesagem.
 void menuMenssagem(char *buffer, char *userNick, int idSocket);
 
-// Similar a enviar mensagem porem envia um bloco com size
-// do login, login e o buffer.
-void enviarBloco(char *buffer, char *login, int sock);
-
-// Utiliza socket da função escultaSolicitação para enviar mensagem.
-void enviarMensagem(char *buffer, int idSocket);
-
 // Menu de interação do usuário hospede do servidor.
 // Nesta função estão reunidas as funções de gerenciamento de 
 // usuário e também o mesageiro para o hospede do server.
 void menuOperacao(char *userNick, int idSocket);
-
-// Abre conexão inicial com o servidor...
-int abreConexao(char **userNick);
 
 // Fica escutando as conexões na porta do serviço e
 // recebe as mensagem do cliente e as imprimi na tela.
 // parecido com o servidor de mensagem no módulo servidor
 // porém nao redireciona mensagens...
 void recebeMensagem(void *idSocket);
-
-// recebe mensagens em blocos com size login, login e buffer.
-int recebeBloco(char **buffer, char **nickEmissor, int idSocket);
 
 #endif

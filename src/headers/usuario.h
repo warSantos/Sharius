@@ -7,7 +7,11 @@
 #ifndef usuario_H
 #define usuario_H
 
-#include <unistd.h>
+#include <stdio_ext.h>
+#include<sys/socket.h>
+#include<arpa/inet.h> //inet_addr
+#include <netinet/in.h> //inet_addr
+#include<unistd.h>    //write
 #include <pthread.h>
 #include "strUtils.h"
 
@@ -58,26 +62,39 @@ int listaVazia();
 // Inicia o descritor da lista.
 Descritor *iniciarLista();
 
-// Insere uma nova celula na tabela de logins com seu respectivo endereço IP.
-int inserirUsuario(Descritor *listaLogin);
-
-// Verifica se nick existe na tabela de usuários e retorna o endereço de sua posição na lista.
-// Caso o usuário requerido não exista na lista é retornada nulo.
-Link pesquisarNick(Descritor *listaLogin, char *nick);
-
 // Retorna string "nick" de acordo com os padrões de nick exigidos.
 char *criaNick();
 
 // Retorna string "ip" no formato exigido pelo padrão do endereço.
 char *criaIp();
 
+// Verifica se nick existe na tabela de usuários e retorna o endereço de sua posição na lista.
+// Caso o usuário requerido não exista na lista é retornada nulo.
+Link pesquisarNick(Descritor *listaLogin, char *nick);
+
 // Utiliza a função de pesquisar ip para retornar o ip como string.
 char *retornaIp(Descritor *listaLogin, char *ip);   
+
+// Insere uma nova celula na tabela de logins com seu respectivo endereço IP.
+int inserirUsuario(Descritor *listaLogin);
 
 // Imprimi a lista de usuários ativos no servidor.
 void imprimirLista(Descritor *listaLogin);
 
 // Remove usuário da lista do server.
 void removerUsuario(Descritor *listaLogin, char *nick);
+
+// Abre conexão inicial com o servidor...
+int abreConexao(char **userNick);
+
+// Utiliza socket da função escultaSolicitação para enviar mensagem.
+void enviarMensagem(char *buffer, int idSocket);
+
+// Similar a enviar mensagem porem envia um bloco com size
+// do login, login e o buffer.
+void enviarBloco(char *buffer, char *login, int sock);
+
+// recebe mensagens em blocos com size login, login e buffer.
+int recebeBloco(char **buffer, char **nickEmissor, int idSocket);
 
 #endif

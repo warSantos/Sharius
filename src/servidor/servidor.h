@@ -2,11 +2,6 @@
 #define menu_H
 
 #include "../headers/usuario.h"
-#include <stdio_ext.h>
-#include<sys/socket.h>
-#include<arpa/inet.h> //inet_addr
-#include <netinet/in.h> //inet_addr
-#include<unistd.h>    //write
 
 /*
  *
@@ -40,21 +35,11 @@ void escutaSolicitacao();
 // logados no chat.
 void *escutaCliente(void *idSocket);
 
-// Função cliente similar a do módulo cliente utilizada para realizar conexão local
-// para que o adm do servidor também possa enviar e receber mesagens.
-void cliente();
-
-// Abre conexão local com o servidor...
-int abreConexao();
-
 // Similar a enviar mensagem porem envia um bloco com size
 // do login, login e o buffer.
 void enviarBloco(char *buffer, char *login, int sock);
 
 // envia mensagem através de um socket aberto.
 void enviarMensagem(char *buffer, int socket);
-
-// recebe mensagens em blocos com size login, login e buffer.
-int recebeBloco(char **buffer, char **nickEmissor, int idSocket);
 
 #endif
