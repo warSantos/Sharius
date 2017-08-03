@@ -66,7 +66,7 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMensagem(char *buffer, int socket) {
+void menuMensagem(char *buffer, int idSocket) {
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
     Comando *bloco = extraiMensagem(buffer);
@@ -87,11 +87,11 @@ void menuMensagem(char *buffer, int socket) {
     }   
         
     // enviando mensagem para o servidor com o seu login.    
-    //enviarMensagem( , socket);
-    enviarMensagem(buffer, socket);
+    //enviarMensagem( , idSocket);
+    enviarMensagem(buffer, idSocket);
 }
 
-void menuOperacao(int socket){
+void menuOperacao(int idSocket){
     
     listaLogin = iniciarLista();
     char *buffer;// = calloc(sizeof(char),251);
@@ -149,7 +149,7 @@ void menuOperacao(int socket){
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMensagem(buffer, socket);                                                               
+                menuMensagem(buffer, idSocket);                                                               
             }
         }
         free(buffer);
@@ -304,7 +304,7 @@ void escutaSolicitacao(void *password){
     }
 }
 
-int recebeBloco(char** buffer, char** nickEmissor, int socket){
+int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
                 
     int read_size;
     *buffer = malloc(sizeof(char)*251);
@@ -313,7 +313,7 @@ int recebeBloco(char** buffer, char** nickEmissor, int socket){
     // Recebendo o size do login.
         
         char lenght;
-        read_size = recv(socket, &lenght, 1 , 0);        
+        read_size = recv(idSocket, &lenght, 1 , 0);        
         if(read_size < 0){
             
             return read_size;
@@ -324,27 +324,27 @@ int recebeBloco(char** buffer, char** nickEmissor, int socket){
         //nickEmissor = malloc(sizeof(char)*len);
         
         // Recebendo o login.
-        recv(socket, *nickEmissor, len , 0);
+        recv(idSocket, *nickEmissor, len , 0);
         
         // Recebendo a mensagem.
-        recv(socket, *buffer, 251 , 0);
+        recv(idSocket, *buffer, 251 , 0);
         
     return read_size;
 }
 
-void *escutaCliente(void *idSocket){
+void *escutaCliente(void *socketCliente){
     
     //Id de ientificação do cliente que utiliza a função
     // Podem ser várias threads desta liberadas
     // Logo o idSocket de cada chamada da função escutaCliente 
     // é diferente é um socket diferente.
     
-    int socket = *(int*)idSocket, read_size;    
+    int idSocket = *(int*)socketCliente, read_size;    
     //int read_size;
     char *buffer, *nickEmissor;// = malloc(sizeof(char) * 251), *nickEmissor;
     
     // recebe mensagens do cliente.
-    while((read_size = recebeBloco(&buffer, &nickEmissor, socket)) > 0){
+    while((read_size = recebeBloco(&buffer, &nickEmissor, idSocket)) > 0){
         
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);
@@ -368,13 +368,13 @@ void *escutaCliente(void *idSocket){
             Link aux = pesquisarNick(listaLogin, bloco->comando);
             if (aux != NULL) {
                                 
-                enviarBloco(buffer, nickEmissor, socket);
+                enviarBloco(buffer, nickEmissor, *aux->socket);
                 
             }else{
                 
                 // Retorna mesagem de erro.
                 //char *userNotExist = "Usuário inexistente.\n";
-                //write(socket , userNotExist , strlen(userNotExist)+1);
+                //write(idSocket , userNotExist , strlen(userNotExist)+1);
             }
         }
     }            
@@ -387,7 +387,7 @@ void *escutaCliente(void *idSocket){
     }
          
     //Free the socket pointer
-    free(idSocket);
+    free(socketCliente);
      
     return 0;        
 }
@@ -406,10 +406,10 @@ void enviarBloco(char *buffer, char *login, int sock){
     write(sock, buffer, 251);   
 }
 
-void enviarMensagem(char *buffer, int socket){        
+void enviarMensagem(char *buffer, int idSocket){        
     
     // enviando a mensagem para o cliente.
-    write(socket , buffer , strlen(buffer) + 1);
+    write(idSocket , buffer , strlen(buffer) + 1);
 }
 
 int abreConexao(){

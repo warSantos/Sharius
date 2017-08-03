@@ -23,16 +23,16 @@ int main(){
     usleep(500);
     
     // Abrindo conexão local...
-    int socket = abreConexao(); 
-    //printf("Socket: %d\n", socket);
-    if(socket == -1){
+    int idSocket = abreConexao(); 
+    
+    if(idSocket == -1){
         
         printf("Erro ao abrir conexão com servidor local...\n");
         return 1;
     }
     
     // menu de administração do servidor.
-    menuOperacao(socket);
+    menuOperacao(idSocket);
     pthread_join(t, NULL);
     
     // Falta melhorar a função de fechar conexões...

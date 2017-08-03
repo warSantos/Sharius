@@ -55,6 +55,6 @@ void enviarBloco(char *buffer, char *login, int sock);
 void enviarMensagem(char *buffer, int socket);
 
 // recebe mensagens em blocos com size login, login e buffer.
-int recebeBloco(char **buffer, char **nickEmissor, int socket);
+int recebeBloco(char **buffer, char **nickEmissor, int idSocket);
 
 #endif

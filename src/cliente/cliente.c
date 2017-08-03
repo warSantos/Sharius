@@ -57,7 +57,7 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMensagem(char *buffer, char *userNick, int socket){
+void menuMensagem(char *buffer, char *userNick, int idSocket){
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
     Comando *bloco = extraiMensagem(buffer);
@@ -77,13 +77,13 @@ void menuMensagem(char *buffer, char *userNick, int socket){
         return;
     } 
     
-    enviarBloco(buffer, userNick, socket);    
+    enviarBloco(buffer, userNick, idSocket);    
 }
 
-void enviarMensagem(char *buffer, int socket){                
+void enviarMensagem(char *buffer, int idSocket){                
     
     // enviando a mensagem para o cliente.    
-    write(socket , buffer , strlen(buffer) + 1);
+    write(idSocket , buffer , strlen(buffer) + 1);
 }
 
 void enviarBloco(char *buffer, char *login, int sock){
@@ -100,7 +100,7 @@ void enviarBloco(char *buffer, char *login, int sock){
     write(sock, buffer, 251);   
 }
 
-void menuOperacao(char *userNick, int socket){
+void menuOperacao(char *userNick, int idSocket){
     
     listaLogin = iniciarLista();
     char *buffer;
@@ -157,7 +157,7 @@ void menuOperacao(char *userNick, int socket){
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMensagem(buffer, userNick, socket);                                                               
+                menuMensagem(buffer, userNick, idSocket);                                                               
             }
         }
         free(buffer);
@@ -290,7 +290,7 @@ int abreConexao(char **userNick){
     return retSocket;
 }
 
-void recebeMensagem(void *idSocket){
+void recebeMensagem(void *socketServer){
     
     //Id de ientificação do cliente que utiliza a função
     // Podem ser várias threads desta liberadas
@@ -299,11 +299,11 @@ void recebeMensagem(void *idSocket){
     printf("Servidor de mensagens pronto...\n\n");
     
     int read_size;    
-    int socket = *(int*) idSocket;
+    int idSocket = *(int*) socketServer;
     char *buffer, *userNick;
     
     // recebe mensagens do cliente.
-    while((read_size = recebeBloco(&buffer, &userNick, socket)) > 0){
+    while((read_size = recebeBloco(&buffer, &userNick, idSocket)) > 0){
                         
         // extraindo mensagem do buffer recebido.
         Comando *bloco = extraiMensagem(buffer);        
@@ -319,10 +319,10 @@ void recebeMensagem(void *idSocket){
     }
          
     //Free the socket pointer
-    free(idSocket);
+    free(socketServer);
 }
 
-int recebeBloco(char** buffer, char** nickEmissor, int socket){
+int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
                 
     int read_size;
     *buffer = malloc(sizeof(char)*251);
@@ -331,7 +331,7 @@ int recebeBloco(char** buffer, char** nickEmissor, int socket){
     // Recebendo o size do login.
         
         char lenght;
-        read_size = recv(socket, &lenght, 1 , 0);        
+        read_size = recv(idSocket, &lenght, 1 , 0);        
         if(read_size < 0){
             
             return read_size;
@@ -342,10 +342,10 @@ int recebeBloco(char** buffer, char** nickEmissor, int socket){
         //nickEmissor = malloc(sizeof(char)*len);
         
         // Recebendo o login.
-        recv(socket, *nickEmissor, len , 0);
+        recv(idSocket, *nickEmissor, len , 0);
         
         // Recebendo a mensagem.
-        recv(socket, *buffer, 251 , 0);
+        recv(idSocket, *buffer, 251 , 0);
         
     return read_size;
 }
