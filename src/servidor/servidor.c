@@ -85,8 +85,9 @@ void menuMensagem(char *buffer, int socket) {
         imprimirLista(listaLogin);
         return;
     }   
-    
-    // enviando mensagem para o servidor.
+        
+    // enviando mensagem para o servidor com o seu login.    
+    //enviarMensagem( , socket);
     enviarMensagem(buffer, socket);
 }
 
@@ -312,14 +313,32 @@ void *escutaCliente(void *idSocket){
     
     int socket = *(int*)idSocket;    
     int read_size;
-    char *buffer = malloc(sizeof(char) * 251);
+    char *buffer = malloc(sizeof(char) * 251), *nickEmissor;
     
     // recebe mensagens do cliente.
-    while( (read_size = recv(socket, buffer, 251 , 0)) > 0 ){
+    while(1){
         
-        //printf("MENSAGEM NO SERVIDOR: %s \n", buffer);                
+        // Recebendo o size do login.
+        char lenght;
+        read_size = recv(socket, &lenght, 1 , 0);        
+        if(read_size < 0){
+            
+            break;
+        }
+        
+        int len = retInt(lenght);
+        nickEmissor = malloc(sizeof(char)*len);
+        
+        // Recebendo o login.
+        recv(socket, nickEmissor, len , 0);
+        
+        // Recebendo a mensagem.
+        recv(socket, buffer, 251 , 0);
+        
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);
+        
+        lenght = retChar(strlen(nickEmissor) + 1);        
         
         // Repassa para broadcast.
         if (!strncmp(bloco->comando, "all", 4)) {
@@ -330,7 +349,15 @@ void *escutaCliente(void *idSocket){
                 //pthread_t t;
                 //pthread_create(&t, NULL, (void *) enviarMensagem, (void *) &aux->socket);
                 //pthread_join(t, NULL);
+                
+                // Enviando size do login, login do emissor e mensagem.
+                /*
+                enviarMensagem(&lenght, *aux->socket);
+                enviarMensagem(nickEmissor, *aux->socket);
                 enviarMensagem(buffer, *aux->socket);
+                
+                */
+                enviarBloco(buffer, nickEmissor, *aux->socket);
                 aux = aux->prox;
             }            
         } else { // Enviando mensagem unicast.
@@ -340,7 +367,12 @@ void *escutaCliente(void *idSocket){
             if (aux != NULL) {
                 
                 // enviando a mensagem.
+                /*
+                enviarMensagem(&lenght, *aux->socket);
+                enviarMensagem(nickEmissor, *aux->socket);
                 enviarMensagem(buffer, *aux->socket);
+                */
+                enviarBloco(buffer, nickEmissor, socket);
                 
             }else{
                 
@@ -364,13 +396,21 @@ void *escutaCliente(void *idSocket){
     return 0;        
 }
 
-void enviarMensagem(char *buffer, int socket){
+void enviarBloco(char *buffer, char *login, int sock){
+
+    // enviando o tamanho do size login do emissor.
+    char lenght = retChar(strlen(login) + 1);    
+    int len = retInt(lenght);    
+    write(sock , &lenght , 1);
     
-    /*
-    // enviando o tamanho da mensagem.
-    int lenght = retChar(sizeof(buffer) + 1);
-    write(socket, &lenght, 1);
-    */
+    // enviando o nick    
+    write(sock, login, len);
+    
+    // enviando a mensagem.
+    write(sock, buffer, 251);   
+}
+
+void enviarMensagem(char *buffer, int socket){        
     
     // enviando a mensagem para o cliente.
     write(socket , buffer , strlen(buffer) + 1);

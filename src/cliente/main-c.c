@@ -2,8 +2,11 @@
 
 int main(){       
                
+    
+    
     // Abrindo conexão com o servidor...
-    int socket = abreConexao();
+    int socket;
+    char *userNick = abreConexao(&socket);        
     
     if(socket == -1){
         
@@ -20,7 +23,7 @@ int main(){
     }
     
     // menu de administração do servidor.
-    menuOperacao(socket);    
+    menuOperacao(userNick, socket);
     pthread_join(t, NULL);
     
     // Falta melhorar a função de fechar conexões...

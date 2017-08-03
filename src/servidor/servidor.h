@@ -47,6 +47,10 @@ void cliente();
 // Abre conexão local com o servidor...
 int abreConexao();
 
+// Similar a enviar mensagem porem envia um bloco com size
+// do login, login e o buffer.
+void enviarBloco(char *buffer, char *login, int sock);
+
 // envia mensagem através de um socket aberto.
 void enviarMensagem(char *buffer, int socket);
 

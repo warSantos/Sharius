@@ -28,7 +28,11 @@ int menuComando(char *buffer);
 
 // Função para delegar o buffer a função de estraiMenssagem para processamento
 // e delegação dos dados processados para a função de enviar mesagem.
-void menuMenssagem(char *buffer, int socket);
+void menuMenssagem(char *buffer, char *userNick, int socket);
+
+// Similar a enviar mensagem porem envia um bloco com size
+// do login, login e o buffer.
+void enviarBloco(char *buffer, char *login, int sock);
 
 // Utiliza socket da função escultaSolicitação para enviar mensagem.
 void enviarMensagem(char *buffer, int socket);
@@ -36,10 +40,10 @@ void enviarMensagem(char *buffer, int socket);
 // Menu de interação do usuário hospede do servidor.
 // Nesta função estão reunidas as funções de gerenciamento de 
 // usuário e também o mesageiro para o hospede do server.
-void menuOperacao(int socket);
+void menuOperacao(char *userNick, int socket);
 
 // Abre conexão inicial com o servidor...
-int abreConexao();
+char *abreConexao(int *retSocket);
 
 // Fica escutando as conexões na porta do serviço e
 // recebe as mensagem do cliente e as imprimi na tela.

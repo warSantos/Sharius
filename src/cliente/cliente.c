@@ -57,7 +57,7 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMensagem(char *buffer, int socket){
+void menuMensagem(char *buffer, char *userNick, int socket){
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
     Comando *bloco = extraiMensagem(buffer);
@@ -75,23 +75,40 @@ void menuMensagem(char *buffer, int socket){
         
         imprimirLista(listaLogin);
         return;
-    }      
+    } 
+    
+    enviarBloco(buffer, userNick, socket);
+    /*
+    // enviando o tamanho do size login do emissor.
+    char lenght = retChar(strlen(userNick) + 1);    
+    enviarMensagem(&lenght, socket);
+    // enviando o nick    
+    enviarMensagem(userNick, socket);
+    // enviando a mensagem.
     enviarMensagem(buffer, socket);
+     */
 }
 
-void enviarMensagem(char *buffer, int socket){
+void enviarMensagem(char *buffer, int socket){                
     
-    /*
-    // enviando o tamanho da mensagem.
-    int lenght = retChar(sizeof(buffer) + 1);
-    write(socket, &lenght, 1);
-    */
-    
-    // enviando a mensagem para o cliente.
+    // enviando a mensagem para o cliente.    
     write(socket , buffer , strlen(buffer) + 1);
 }
 
-void menuOperacao(int socket){
+void enviarBloco(char *buffer, char *login, int sock){
+
+    // enviando o tamanho do size login do emissor.
+    char lenght = retChar(strlen(login) + 1);    
+    int len = retInt(lenght);    
+    write(sock , &lenght , 1);
+    
+    // enviando o nick    
+    write(sock, login, len);
+    
+    // enviando a mensagem.
+    write(sock, buffer, 251);   
+}
+void menuOperacao(char *userNick, int socket){
     
     listaLogin = iniciarLista();
     char *buffer;
@@ -148,7 +165,7 @@ void menuOperacao(int socket){
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMensagem(buffer, socket);                                                               
+                menuMensagem(buffer, userNick, socket);                                                               
             }
         }
         free(buffer);
@@ -157,20 +174,19 @@ void menuOperacao(int socket){
     free(alteraModo);    
 }
 
-int abreConexao(){
-    
-    int sock;
+char *abreConexao(int *retSocket){
+        
     struct sockaddr_in servidor;    
      
     //Create socket
-    sock = socket(AF_INET , SOCK_STREAM , 0);
-    if (sock == -1){
+    *retSocket = socket(AF_INET , SOCK_STREAM , 0);
+    if (*retSocket == -1){
         
         printf("Erro ao criar socket cliente...\n");
-        return sock;
+        return NULL;
     }          
     
-    char *ip = malloc(sizeof(char)*16);
+    char *ip = malloc(sizeof(char)*16), *userNick;
     while(1){
         
         printf("Digite o ip do servidor: ");
@@ -195,10 +211,10 @@ int abreConexao(){
     
     //Busca conexão com o servidor...
     
-    if (connect(sock, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+    if (connect(*retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
-        return -1;
+        return NULL;
     }                    
     
     // Cria usuário.
@@ -219,13 +235,13 @@ int abreConexao(){
         char lenght = retChar(len);
         
         // Enviando o tamanho da senha.
-        write(sock, &lenght, 1);       
+        write(*retSocket, &lenght, 1);       
         
         // Devolvendo senha.
-        write(sock, resposta, len);        
+        write(*retSocket, resposta, len);        
         
         // Recebendo confiramção.
-        recv(sock, &ok, sizeof (char), 0);
+        recv(*retSocket, &ok, sizeof (char), 0);
 
         if (ok == 'S') { // se receber acesso autorizado.
                          // sai do loop e vai para criação de usuário.
@@ -237,8 +253,8 @@ int abreConexao(){
     if(tentativas == 3){
         
         printf("Conexão perdida.\n\n");
-        close(sock);
-        return sock = -1;
+        close(*retSocket);
+        return NULL;
     }
     printf("\n\n");
     // criando usuário.
@@ -253,13 +269,13 @@ int abreConexao(){
         char lenght = retChar(len);
         
         // Enviando o tamanho do nick.
-        write(sock, &lenght, 1);       
+        write(*retSocket, &lenght, 1);       
         
         // enviando login para aprovação...
-        write(sock, nick, len);
+        write(*retSocket, nick, len);
         
         // recebendo confirmação...
-        recv(sock, &ok, 1, 0);
+        recv(*retSocket, &ok, 1, 0);
         if(ok == 'S'){
             
             break;
@@ -267,8 +283,12 @@ int abreConexao(){
         printf("Este login já esta em uso.\n\n");
     }        
     
+    userNick = malloc(sizeof(char)* (strlen(nick)+1));
+    strncpy(userNick, nick, (strlen(nick)+1));
+    
+    free(nick);
     printf("Login cadastrado...\n");                
-    return sock;
+    return userNick;
 }
 
 void recebeMensagem(void *idSocket){
@@ -281,21 +301,36 @@ void recebeMensagem(void *idSocket){
     
     int read_size;    
     int socket = *(int*) idSocket;
-    char *buffer = malloc(sizeof(char)*251);
+    char *buffer = malloc(sizeof(char)*251), lenght, *userNick;
     
     // recebe mensagens do cliente.
-    while( (read_size = recv(socket, buffer, 251 , 0)) > 0 ){
-                
+    while(1){
+        
+        // Recebendo o tamanho do login.
+        read_size = recv(socket, &lenght, 1 , 0);
+        if(read_size < 0){
+            
+            break;
+        }
+        
+        // Reebendo o userNick.
+        int len = retInt(lenght);
+        userNick = malloc(sizeof(char)*len);        
+        read_size = recv(socket, userNick, len , 0);                        
+
+        // recebendo a mensagem.
+        read_size = recv(socket, buffer, 251 , 0);
+        
         // extraindo mensagem do buffer recebido.
         Comando *bloco = extraiMensagem(buffer);
         
         // Identifica quem enviou.
         if (!strncmp(bloco->comando, "all", 4)) {
 
-           printf("%s-:> %s\n",bloco->comando, bloco->parametro);             
+           printf("%s-:> %s\n",userNick, bloco->parametro);             
         } else { // Enviando mensagem unicast.
 
-            printf("%s-:> %s\n",bloco->comando, bloco->parametro);
+            printf("%s-:> %s\n",userNick, bloco->parametro);
         }
     }            
     if(read_size == 0){
