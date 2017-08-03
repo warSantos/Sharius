@@ -304,6 +304,34 @@ void escutaSolicitacao(void *password){
     }
 }
 
+int recebeBloco(char** buffer, char** nickEmissor, int socket){
+                
+    int read_size;
+    *buffer = malloc(sizeof(char)*251);
+    //buffer = malloc(sizeof(char) * 251);
+    
+    // Recebendo o size do login.
+        
+        char lenght;
+        read_size = recv(socket, &lenght, 1 , 0);        
+        if(read_size < 0){
+            
+            return read_size;
+        }
+        
+        int len = retInt(lenght);
+        *nickEmissor = malloc(sizeof(char)*len);
+        //nickEmissor = malloc(sizeof(char)*len);
+        
+        // Recebendo o login.
+        recv(socket, *nickEmissor, len , 0);
+        
+        // Recebendo a mensagem.
+        recv(socket, *buffer, 251 , 0);
+        
+    return read_size;
+}
+
 void *escutaCliente(void *idSocket){
     
     //Id de ientificação do cliente que utiliza a função
@@ -311,35 +339,16 @@ void *escutaCliente(void *idSocket){
     // Logo o idSocket de cada chamada da função escutaCliente 
     // é diferente é um socket diferente.
     
-    int socket = *(int*)idSocket;    
-    int read_size;
-    char *buffer = malloc(sizeof(char) * 251), *nickEmissor;
+    int socket = *(int*)idSocket, read_size;    
+    //int read_size;
+    char *buffer, *nickEmissor;// = malloc(sizeof(char) * 251), *nickEmissor;
     
     // recebe mensagens do cliente.
-    while(1){
-        
-        // Recebendo o size do login.
-        char lenght;
-        read_size = recv(socket, &lenght, 1 , 0);        
-        if(read_size < 0){
-            
-            break;
-        }
-        
-        int len = retInt(lenght);
-        nickEmissor = malloc(sizeof(char)*len);
-        
-        // Recebendo o login.
-        recv(socket, nickEmissor, len , 0);
-        
-        // Recebendo a mensagem.
-        recv(socket, buffer, 251 , 0);
+    while((read_size = recebeBloco(&buffer, &nickEmissor, socket)) > 0){
         
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);
-        
-        lenght = retChar(strlen(nickEmissor) + 1);        
-        
+                
         // Repassa para broadcast.
         if (!strncmp(bloco->comando, "all", 4)) {
 
