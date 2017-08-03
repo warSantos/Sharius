@@ -345,8 +345,12 @@ void *escutaCliente(void *idSocket){
 
             Link aux = listaLogin->primeiro;
             while (aux != NULL) {
-                                                
-                enviarBloco(buffer, nickEmissor, *aux->socket);
+                
+                // não enviar para o mesmo que recebeu.
+                if(strcmp(aux->nick, nickEmissor)){
+                
+                    enviarBloco(buffer, nickEmissor, *aux->socket);
+                }                
                 aux = aux->prox;
             }            
         } else { // Enviando mensagem unicast.
