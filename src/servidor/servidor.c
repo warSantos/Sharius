@@ -1,8 +1,4 @@
 #include "./servidor.h"
-#include<sys/socket.h>
-#include<arpa/inet.h> //inet_addr
-#include <netinet/in.h> //inet_addr
-#include<unistd.h>    //write
 
 void ajudaMensagem(){
         
