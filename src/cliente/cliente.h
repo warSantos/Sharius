@@ -43,12 +43,15 @@ void enviarMensagem(char *buffer, int socket);
 void menuOperacao(char *userNick, int socket);
 
 // Abre conexão inicial com o servidor...
-char *abreConexao(int *retSocket);
+int abreConexao(char **userNick);
 
 // Fica escutando as conexões na porta do serviço e
 // recebe as mensagem do cliente e as imprimi na tela.
 // parecido com o servidor de mensagem no módulo servidor
 // porém nao redireciona mensagens...
 void recebeMensagem(void *idSocket);
+
+// recebe mensagens em blocos com size login, login e buffer.
+int recebeBloco(char **buffer, char **nickEmissor, int socket);
 
 #endif

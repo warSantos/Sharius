@@ -166,19 +166,19 @@ void menuOperacao(char *userNick, int socket){
     free(alteraModo);    
 }
 
-char *abreConexao(int *retSocket){
+int abreConexao(char **userNick){
         
     struct sockaddr_in servidor;    
      
     //Create socket
-    *retSocket = socket(AF_INET , SOCK_STREAM , 0);
-    if (*retSocket == -1){
+    int retSocket = socket(AF_INET , SOCK_STREAM , 0);
+    if (retSocket == -1){
         
         printf("Erro ao criar socket cliente...\n");
-        return NULL;
+        return retSocket;
     } 
     
-    char *ip = "127.0.0.1", *userNick;
+    char *ip = "127.0.0.1";
     /*
     char *ip = malloc(sizeof(char)*16), *userNick;
     
@@ -206,10 +206,10 @@ char *abreConexao(int *retSocket){
     
     //Busca conexão com o servidor...
     
-    if (connect(*retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+    if (connect(retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
-        return NULL;
+        return retSocket;
     }                    
     
     // Cria usuário.
@@ -228,18 +228,20 @@ char *abreConexao(int *retSocket){
         scanf("%15[^\n]s", resposta);
         __fpurge(stdin);        
         */
+        
         size_t len = strlen(resposta) + 1;
         char lenght = retChar(len);
         
         // Enviando o tamanho da senha.
-        write(*retSocket, &lenght, 1);       
+        write(retSocket, &lenght, 1);       
         
         // Devolvendo senha.
-        write(*retSocket, resposta, len);        
+        write(retSocket, resposta, len);        
         
         // Recebendo confiramção.
-        recv(*retSocket, &ok, sizeof (char), 0);
-
+        recv(retSocket, &ok, sizeof (char), 0);
+        
+                
         if (ok == 'S') { // se receber acesso autorizado.
                          // sai do loop e vai para criação de usuário.
             break;
@@ -250,8 +252,8 @@ char *abreConexao(int *retSocket){
     if(tentativas == 3){
         
         printf("Conexão perdida.\n\n");
-        close(*retSocket);
-        return NULL;
+        close(retSocket);
+        return -1;
     }
     printf("\n\n");
     // criando usuário.
@@ -266,13 +268,13 @@ char *abreConexao(int *retSocket){
         char lenght = retChar(len);
         
         // Enviando o tamanho do nick.
-        write(*retSocket, &lenght, 1);       
+        write(retSocket, &lenght, 1);       
         
         // enviando login para aprovação...
-        write(*retSocket, nick, len);
+        write(retSocket, nick, len);
         
         // recebendo confirmação...
-        recv(*retSocket, &ok, 1, 0);
+        recv(retSocket, &ok, 1, 0);
         if(ok == 'S'){
             
             break;
@@ -280,12 +282,12 @@ char *abreConexao(int *retSocket){
         printf("Este login já esta em uso.\n\n");
     }        
     
-    userNick = malloc(sizeof(char)* (strlen(nick)+1));
-    strncpy(userNick, nick, (strlen(nick)+1));
+    *userNick = malloc(sizeof(char)* (strlen(nick)+1));
+    strncpy(*userNick, nick, (strlen(nick)+1));
     
     free(nick);
     printf("Login cadastrado...\n");                
-    return userNick;
+    return retSocket;
 }
 
 void recebeMensagem(void *idSocket){
@@ -298,37 +300,14 @@ void recebeMensagem(void *idSocket){
     
     int read_size;    
     int socket = *(int*) idSocket;
-    char *buffer = malloc(sizeof(char)*251), lenght, *userNick;
+    char *buffer, *userNick;
     
     // recebe mensagens do cliente.
-    while(1){
-        
-        // Recebendo o tamanho do login.
-        read_size = recv(socket, &lenght, 1 , 0);
-        if(read_size < 0){
-            
-            break;
-        }
-        
-        // Reebendo o userNick.
-        int len = retInt(lenght);
-        userNick = malloc(sizeof(char)*len);        
-        read_size = recv(socket, userNick, len , 0);                        
-
-        // recebendo a mensagem.
-        read_size = recv(socket, buffer, 251 , 0);
-        
+    while((read_size = recebeBloco(&buffer, &userNick, socket)) > 0){
+                        
         // extraindo mensagem do buffer recebido.
-        Comando *bloco = extraiMensagem(buffer);
-        
-        // Identifica quem enviou.
-        if (!strncmp(bloco->comando, "all", 4)) {
-
-           printf("%s-:> %s\n",userNick, bloco->parametro);             
-        } else { // Enviando mensagem unicast.
-
-            printf("%s-:> %s\n",userNick, bloco->parametro);
-        }
+        Comando *bloco = extraiMensagem(buffer);        
+        printf("@%s -:> %s\n",userNick, bloco->parametro);        
     }            
     if(read_size == 0){
         
@@ -341,4 +320,32 @@ void recebeMensagem(void *idSocket){
          
     //Free the socket pointer
     free(idSocket);
+}
+
+int recebeBloco(char** buffer, char** nickEmissor, int socket){
+                
+    int read_size;
+    *buffer = malloc(sizeof(char)*251);
+    //buffer = malloc(sizeof(char) * 251);
+    
+    // Recebendo o size do login.
+        
+        char lenght;
+        read_size = recv(socket, &lenght, 1 , 0);        
+        if(read_size < 0){
+            
+            return read_size;
+        }
+        
+        int len = retInt(lenght);
+        *nickEmissor = malloc(sizeof(char)*len);
+        //nickEmissor = malloc(sizeof(char)*len);
+        
+        // Recebendo o login.
+        recv(socket, *nickEmissor, len , 0);
+        
+        // Recebendo a mensagem.
+        recv(socket, *buffer, 251 , 0);
+        
+    return read_size;
 }

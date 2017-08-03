@@ -5,8 +5,8 @@ int main(){
     
     
     // Abrindo conexão com o servidor...
-    int socket;
-    char *userNick = abreConexao(&socket);        
+    char *userNick;
+    int socket = abreConexao(&userNick);        
     
     if(socket == -1){
         
