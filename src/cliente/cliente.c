@@ -1,9 +1,4 @@
 #include "cliente.h"
-#include<sys/socket.h>
-#include<arpa/inet.h> //inet_addr
-#include <netinet/in.h> //inet_addr
-#include<unistd.h>    //write
-
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
@@ -82,7 +77,8 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
         imprimirLista(listaLogin);
         return;
     }     
-    enviarBloco(buffer, userNick, idSocket);    
+    //enviarBloco(buffer, userNick, idSocket);    
+    enviarStr(idSocket, buffer);
 }
 
 void menuOperacao(char *userNick, int idSocket){

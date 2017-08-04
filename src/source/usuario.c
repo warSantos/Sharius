@@ -1,5 +1,4 @@
 #include "../headers/usuario.h"
-#include <stdio_ext.h>
 
 /* FUNÇÕES PARA TRABALHO DE GERENCIAMENTO DE USUÁRIO! */
 
@@ -353,7 +352,7 @@ int abreConexao(char **userNick){
     }        
     
     // enviando login para a thread de escutaCliente.
-    enviarNick(retSocket, nick);
+    enviarStr(retSocket, nick);
     
     *userNick = malloc(sizeof(char)* (strlen(nick)+1));
     strncpy(*userNick, nick, (strlen(nick)+1));
@@ -369,31 +368,29 @@ void enviarMensagem(char *buffer, int idSocket){
     write(idSocket , buffer , strlen(buffer) + 1);
 }
 
-void enviarNick(int idSocket, char *nick){
+void enviarStr(int idSocket, char *str){
     
-    char lenght = retChar(sizeof(nick) + 1);    
+    char lenght = retChar(strlen(str) + 1);    
     // enviando o tamanho do nick.
     write(idSocket, &lenght, 1);
-    write(idSocket, nick, retInt(lenght));
+    write(idSocket, str, retInt(lenght));
     // enviando o login.
 }
 
-int recebeNick(int idSocket, char **donoThread){
+int recebeStr(int idSocket, char **donoThread){
         
     char lenght;    
     // recebendo o tamanho do nick
     int read = recv(idSocket, &lenght, 1 , 0);        
     if(read <= 0){
-        
-        printf("ERROR!!!\n");
+                
         return read;
     }
     // recebendo o nick.
     *donoThread = malloc(sizeof(char)*retInt(lenght));
     read = recv(idSocket, *donoThread, retInt(lenght), 0);
     if(read <= 0){
-        
-        printf("ERROR!!!\n");
+                
         return read;
     }
     return read;
@@ -423,7 +420,7 @@ int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
         
         char lenght;
         read_size = recv(idSocket, &lenght, 1 , 0);        
-        if(read_size < 0){
+        if(read_size <= 0){
             
             return read_size;
         }
@@ -433,10 +430,13 @@ int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
         //nickEmissor = malloc(sizeof(char)*len);
         
         // Recebendo o login.
-        recv(idSocket, *nickEmissor, len , 0);
-        
+        read_size = recv(idSocket, *nickEmissor, len , 0);
+        if(read_size <= 0){
+            
+            return read_size;
+        }
         // Recebendo a mensagem.
-        recv(idSocket, *buffer, 251 , 0);
+        read_size = recv(idSocket, *buffer, 251 , 0);
         
     return read_size;
 }

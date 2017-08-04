@@ -7,8 +7,6 @@
 #ifndef cliente_H
 #define cliente_H
 
-#include <pthread.h>
-#include <stdio_ext.h>
 #include "../headers/usuario.h"
 
 /*

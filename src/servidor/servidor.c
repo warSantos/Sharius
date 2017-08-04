@@ -323,21 +323,20 @@ void *escutaCliente(void *socketCliente){
     
     int idSocket = *(int*)socketCliente, read_size;    
     //int read_size;
-    char *buffer, *nickEmissor, *donoThread;
+    char *buffer, *donoThread;
     
     // recebendo o nome do dono da thread.
-    if(recebeNick(idSocket, &donoThread) <= 0){
+    if(recebeStr(idSocket, &donoThread) <= 0){
     
-        printf("Erro ao receber nome na thread de escuta individua.\n");
+        printf("Erro ao receber nome na thread de escuta individual.\n");
         return 0;
     }
     
     // recebe mensagens do cliente.
-    while((read_size = recebeBloco(&buffer, &nickEmissor, idSocket)) > 0){
+    while((read_size = recebeStr(idSocket, &buffer)) > 0){
         
         // extraindo cliente para envio.
-        Comando *bloco = extraiMensagem(buffer);
-                
+        Comando *bloco = extraiMensagem(buffer);        
         // Repassa para broadcast.
         if (!strncmp(bloco->comando, "all", 4)) {
 
@@ -345,9 +344,9 @@ void *escutaCliente(void *socketCliente){
             while (aux != NULL) {
                 
                 // não enviar para o mesmo que recebeu.
-                if(strcmp(aux->nick, nickEmissor)){
+                if(strcmp(aux->nick, donoThread)){
                 
-                    enviarBloco(buffer, nickEmissor, *aux->socket);
+                    enviarBloco(buffer, donoThread, *aux->socket);
                 }                
                 aux = aux->prox;
             }            
@@ -357,7 +356,7 @@ void *escutaCliente(void *socketCliente){
             Link aux = pesquisarNick(listaLogin, bloco->comando);
             if (aux != NULL) {
                                 
-                enviarBloco(buffer, nickEmissor, *aux->socket);
+                enviarBloco(buffer, donoThread, *aux->socket);
                 
             }else{
                 

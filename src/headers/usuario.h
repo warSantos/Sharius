@@ -7,13 +7,13 @@
 #ifndef usuario_H
 #define usuario_H
 
+#include "strUtils.h"
 #include <stdio_ext.h>
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr
 #include <netinet/in.h> //inet_addr
 #include<unistd.h>    //write
 #include <pthread.h>
-#include "strUtils.h"
 
 // Mutex para trancar acesso a lista.
 pthread_mutex_t lista;
@@ -91,10 +91,10 @@ int abreConexao(char **userNick);
 void enviarMensagem(char *buffer, int idSocket);
 
 // Envia o o tamanho e a string nick
-void enviarNick(int idSocket, char *nick);
+void enviarStr(int idSocket, char *str);
 
-// recebe o tamanho do nick e o nick "donoThread
-int recebeNick(int idSocket, char **donoThread);
+// Recebe uma string e o seu tamanho.
+int recebeStr(int idSocket, char **donoThread);
 
 // Similar a enviar mensagem porem envia um bloco com size
 // do login, login e o buffer.
