@@ -82,13 +82,19 @@ int inserirUsuario(Descritor *listaLogin);
 void imprimirLista(Descritor *listaLogin);
 
 // Remove usuário da lista do server.
-void removerUsuario(Descritor *listaLogin, char *nick);
+int removerUsuario(Descritor *listaLogin, char *nick);
 
 // Abre conexão inicial com o servidor...
 int abreConexao(char **userNick);
 
 // Utiliza socket da função escultaSolicitação para enviar mensagem.
 void enviarMensagem(char *buffer, int idSocket);
+
+// Envia o o tamanho e a string nick
+void enviarNick(int idSocket, char *nick);
+
+// recebe o tamanho do nick e o nick "donoThread
+int recebeNick(int idSocket, char **donoThread);
 
 // Similar a enviar mensagem porem envia um bloco com size
 // do login, login e o buffer.

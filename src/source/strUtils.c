@@ -159,8 +159,7 @@ Comando *extraiMensagem(char *buffer){
     }else{ // Menssagem para broadcast...
         
         bloco->comando = "all";
-        bloco->lenghtComando = 4;
-        j = 4;
+        bloco->lenghtComando = 4;        
     }
     bloco->parametro = calloc(sizeof (char), 250);    
     j = 0;
@@ -170,9 +169,9 @@ Comando *extraiMensagem(char *buffer){
 
         bloco->parametro[j] = buffer[i];
         ++j;
-        ++i;
+        ++i;        
     }
-    bloco->lenghtParametro = j + 1;
+    bloco->lenghtParametro = j;
     bloco->parametro[j] = '\0';
     return bloco;
 }

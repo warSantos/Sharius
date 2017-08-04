@@ -197,22 +197,21 @@ void imprimirLista(Descritor *listaLogin){
     }
 }
 
-void removerUsuario(Descritor *listaLogin, char *nick){
+int removerUsuario(Descritor *listaLogin, char *nick){
     
     if(listaVazia(listaLogin)){
         
         printf("\n\nNão há usuários Online.\n\n");
-        return;
+        return 1;
     }
     Link aux = listaLogin->primeiro;    
     // Caso o usuario a ser removido seja o último da lista.
     if(!strcmp(nick, aux->nick)){
                 
-        listaLogin->primeiro = aux->prox;
-        printf("\n\nUsuário %s removido com sucesso.\n\n", aux->nick);
+        listaLogin->primeiro = aux->prox;        
         listaLogin->tamanho--;
         free(aux);
-        return;
+        return 0;
     }
     Link aux2 = listaLogin->primeiro;
     // Caso não seja o primeiro elemento.
@@ -225,16 +224,14 @@ void removerUsuario(Descritor *listaLogin, char *nick){
                 
                 listaLogin->ultimo = aux2;
             }
-            aux2->prox = aux->prox;            
-            printf("\n\nUsuário %s removido com sucesso.\n\n", aux->nick);
+            aux2->prox = aux->prox;                        
             listaLogin->tamanho--;
             free(aux);
-            return;
+            return 0;
         }
         aux2 = aux2->prox;  
     }    
-    printf("Usuários online: %d.\n\n", listaLogin->tamanho);
-    printf("\n\nEste usuário não esta na lista.\n\n");
+    return 1;
 }
 
 /* FUNÇÕES PARA TRABALHO COM SOCKETS! */
@@ -355,6 +352,9 @@ int abreConexao(char **userNick){
         printf("Este login já esta em uso.\n\n");
     }        
     
+    // enviando login para a thread de escutaCliente.
+    enviarNick(retSocket, nick);
+    
     *userNick = malloc(sizeof(char)* (strlen(nick)+1));
     strncpy(*userNick, nick, (strlen(nick)+1));
     
@@ -367,6 +367,36 @@ void enviarMensagem(char *buffer, int idSocket){
     
     // enviando a mensagem para o cliente.    
     write(idSocket , buffer , strlen(buffer) + 1);
+}
+
+void enviarNick(int idSocket, char *nick){
+    
+    char lenght = retChar(sizeof(nick) + 1);    
+    // enviando o tamanho do nick.
+    write(idSocket, &lenght, 1);
+    write(idSocket, nick, retInt(lenght));
+    // enviando o login.
+}
+
+int recebeNick(int idSocket, char **donoThread){
+        
+    char lenght;    
+    // recebendo o tamanho do nick
+    int read = recv(idSocket, &lenght, 1 , 0);        
+    if(read <= 0){
+        
+        printf("ERROR!!!\n");
+        return read;
+    }
+    // recebendo o nick.
+    *donoThread = malloc(sizeof(char)*retInt(lenght));
+    read = recv(idSocket, *donoThread, retInt(lenght), 0);
+    if(read <= 0){
+        
+        printf("ERROR!!!\n");
+        return read;
+    }
+    return read;
 }
 
 void enviarBloco(char *buffer, char *login, int sock){

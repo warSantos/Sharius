@@ -4,6 +4,9 @@
 #include <netinet/in.h> //inet_addr
 #include<unistd.h>    //write
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 void ajudaMensagem(){
         
     printf("\n\tAjuda.\n\n");
@@ -60,8 +63,11 @@ int menuComando(char *buffer){
 void menuMensagem(char *buffer, char *userNick, int idSocket){
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
-    Comando *bloco = extraiMensagem(buffer);
-    
+    Comando *bloco = extraiMensagem(buffer);    
+    if(!bloco->lenghtParametro){
+        
+        return;
+    }
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
     if(!strncmp(bloco->parametro, "-help", 6)){
         
@@ -75,8 +81,7 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
         
         imprimirLista(listaLogin);
         return;
-    } 
-    
+    }     
     enviarBloco(buffer, userNick, idSocket);    
 }
 
@@ -163,7 +168,7 @@ void recebeMensagem(void *socketServer){
                         
         // extraindo mensagem do buffer recebido.
         Comando *bloco = extraiMensagem(buffer);        
-        printf("@%s -:> %s\n",userNick, bloco->parametro);        
+        printf(ANSI_COLOR_RED "@%s -:> %s" ANSI_COLOR_RESET "\n",userNick, bloco->parametro);       
     }            
     if(read_size == 0){
         

@@ -39,8 +39,15 @@ int menuComando(char *buffer){
                
         inserirUsuario(listaLogin);
     }else if(!strncmp(bloco->comando, "remove", 7)){
+        
         if(bloco->lenghtParametro){        
-            removerUsuario(listaLogin, bloco->parametro);
+            
+            if(removerUsuario(listaLogin, bloco->parametro)){
+                
+                printf("Usuário inexistente.\n");
+                return 1;
+            }
+            printf("Usuário: %s removido.\n", bloco->parametro);
         }else{
             
             printf("Erro na exlusão.\nSintaxe $ remove NICK.\n\n");
@@ -69,8 +76,11 @@ int menuComando(char *buffer){
 void menuMensagem(char *buffer, int idSocket) {
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
-    Comando *bloco = extraiMensagem(buffer);
-    
+    Comando *bloco = extraiMensagem(buffer);    
+    if(!bloco->parametro){
+        
+        return;
+    }
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
     if (!strncmp(bloco->parametro, "-help", 6)) {
 
@@ -313,7 +323,14 @@ void *escutaCliente(void *socketCliente){
     
     int idSocket = *(int*)socketCliente, read_size;    
     //int read_size;
-    char *buffer, *nickEmissor;// = malloc(sizeof(char) * 251), *nickEmissor;
+    char *buffer, *nickEmissor, *donoThread;
+    
+    // recebendo o nome do dono da thread.
+    if(recebeNick(idSocket, &donoThread) <= 0){
+    
+        printf("Erro ao receber nome na thread de escuta individua.\n");
+        return 0;
+    }
     
     // recebe mensagens do cliente.
     while((read_size = recebeBloco(&buffer, &nickEmissor, idSocket)) > 0){
@@ -352,7 +369,12 @@ void *escutaCliente(void *socketCliente){
     }            
     if(read_size == 0){
                 
-        fflush(stdout);        
+        pthread_mutex_lock(&lista);
+        // Possível local para implantação de mutex.        
+        removerUsuario(listaLogin, donoThread);                    
+        pthread_mutex_unlock(&lista);
+        fflush(stdout);
+        
     }else if(read_size == -1){
         
         perror("recv failed");
