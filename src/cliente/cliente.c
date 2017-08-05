@@ -176,5 +176,5 @@ void recebeMensagem(void *socketServer){
     }
          
     //Free the socket pointer
-    free(socketServer);
+    close(idSocket);
 }

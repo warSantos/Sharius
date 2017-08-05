@@ -269,7 +269,7 @@ int abreConexao(char **userNick){
     servidor.sin_family = AF_INET;
     
     // Define a porta em que esta ativo o serviço no servidor...
-    servidor.sin_port = htons(7772);
+    servidor.sin_port = htons(40001);
     
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
     

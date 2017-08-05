@@ -59,6 +59,7 @@ int menuComando(char *buffer){
         
         printf("Fechando conexões...\n");
         printf("Have a nice day....\n");
+        fechaConexoes();
         return 0;
     }else if(!strncmp(bloco->comando, "help", 5)){
         
@@ -215,7 +216,7 @@ void escutaSolicitacao(void *password){
         
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
     servidor.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr("127.0.0.1"); // Setando IP local.
-    servidor.sin_port = htons(7772); // Setando e porta em que rodara o processo.       
+    servidor.sin_port = htons(40001); // Setando e porta em que rodara o processo.       
     
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
     
@@ -383,4 +384,19 @@ void *escutaCliente(void *socketCliente){
     free(socketCliente);
      
     return 0;        
+}
+
+void fechaConexoes(){
+        
+    if(!listaVazia(listaLogin)){
+        
+        Link aux = listaLogin->primeiro;
+        while(aux != NULL){
+
+            shutdown(*aux->socket, 2);
+            removerUsuario(listaLogin, aux->nick);
+            aux = aux->prox;
+        }        
+    }
+    free(listaLogin);
 }

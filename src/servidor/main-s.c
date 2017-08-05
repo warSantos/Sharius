@@ -38,6 +38,7 @@ int main(){
     
     // Falta melhorar a função de fechar conexões...
     pthread_exit(&t);
+    close(idSocket);
     
     return 0;
 }
