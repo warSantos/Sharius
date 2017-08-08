@@ -215,7 +215,7 @@ void escutaSolicitacao(void *password){
     }
         
     servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
-    servidor.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr("127.0.0.1"); // Setando IP local.
+    servidor.sin_addr.s_addr = htonl(INADDR_ANY);
     servidor.sin_port = htons(40001); // Setando e porta em que rodara o processo.       
     
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
@@ -382,7 +382,7 @@ void *escutaCliente(void *socketCliente){
          
     //Free the socket pointer
     free(socketCliente);
-     
+    printf("fechando conexão com cliente...\n");
     return 0;        
 }
 

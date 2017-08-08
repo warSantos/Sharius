@@ -247,10 +247,8 @@ int abreConexao(char **userNick){
         return retSocket;
     } 
     
-    char *ip = "127.0.0.1";
-    /*
-    char *ip = malloc(sizeof(char)*16), *userNick;
-    
+    //char *ip = "127.0.0.1";
+    char *ip = malloc(sizeof(char)*16);    
     while(1){
         
         printf("Digite o ip do servidor: ");
@@ -261,7 +259,7 @@ int abreConexao(char **userNick){
             break;
         }
     }        
-    */
+    
     // Definindo IP do servidor...
     servidor.sin_addr.s_addr = inet_addr(ip);
     

@@ -76,8 +76,7 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
         
         imprimirLista(listaLogin);
         return;
-    }     
-    //enviarBloco(buffer, userNick, idSocket);    
+    }             
     enviarStr(idSocket, buffer);
 }
 
@@ -175,6 +174,7 @@ void recebeMensagem(void *socketServer){
         perror("recv failed");
     }
          
-    //Free the socket pointer
-    close(idSocket);
+    //fechando a conexão
+    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
+    close(idSocket);        
 }
