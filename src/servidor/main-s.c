@@ -8,10 +8,11 @@ int main(){
     
     // Cria conexão inicial com clientes e fornece uma thread de
     // recebimento de menagem para o cliente.
-    //char *senha = malloc(sizeof(char)*16);
-    char *senha = "123";
-    //printf("Digite a senha de gerenciamento: ");
-    //scanf("%15[^\n]s", senha);
+    char *senha = malloc(sizeof(char)*16);    
+    printf("Digite a senha de gerenciamento: ");
+    scanf("%15[^\n]s", senha);
+    __fpurge(stdin);
+    
     pthread_t t;
     if(pthread_create(&t, NULL, (void *) escutaSolicitacao, (void *) senha)){    
         
@@ -21,17 +22,17 @@ int main(){
     
     // Esperando a thread de escuta iniciar...
     usleep(500);
-    /*
+    
     // Abrindo conexão local...
-    int idSocket = abreConexao(); 
+    char *userNick;
+    int idSocket = abreConexaoLocal(&userNick, senha); 
     
     if(idSocket == -1){
         
         printf("Erro ao abrir conexão com servidor local...\n");
         return 1;
-    }
-    */
-    int idSocket = 0;
+    }   
+    
     // menu de administração do servidor.
     menuOperacao(idSocket);
     pthread_join(t, NULL);

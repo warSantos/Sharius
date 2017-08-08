@@ -146,6 +146,126 @@ void menuOperacao(char *userNick, int idSocket){
     free(alteraModo);    
 }
 
+int abreConexao(char **userNick){
+        
+    struct sockaddr_in servidor;    
+     
+    //Create socket
+    int retSocket = socket(AF_INET , SOCK_STREAM , 0);
+    if (retSocket == -1){
+        
+        printf("Erro ao criar socket cliente...\n");
+        return retSocket;
+    } 
+        
+    char *ip = malloc(sizeof(char)*16);    
+    while(1){
+        
+        printf("Digite o ip do servidor: ");
+        scanf("%15[^\n]s", ip);
+        __fpurge(stdin);
+        if(!verificaIp(ip)){
+            
+            break;
+        }
+    }        
+    
+    // Definindo IP do servidor...
+    servidor.sin_addr.s_addr = inet_addr(ip);
+    
+    // Definindo o tipo de protocolo...
+    servidor.sin_family = AF_INET;
+    
+    // Define a porta em que esta ativo o serviço no servidor...
+    servidor.sin_port = htons(40001);
+    
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
+    
+    //Busca conexão com o servidor...
+    
+    if (connect(retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+                
+        perror("Erro. conexão não estabelecida...");
+        return retSocket;
+    }                    
+    
+    // Cria usuário.
+    // Recebe mensagem de autenticação.
+    int tentativas = 0;
+    char ok;
+    while(tentativas < 3){                
+        
+        // Recebendo senha do teclado.
+        char *resposta = malloc(sizeof(char)*16);
+        printf("Senha de acesso: ");       
+        
+        scanf("%15[^\n]s", resposta);
+        __fpurge(stdin);                
+        
+        size_t len = strlen(resposta) + 1;
+        char lenght = retChar(len);
+        
+        // Enviando o tamanho da senha.
+        write(retSocket, &lenght, 1);       
+        
+        // Devolvendo senha.
+        write(retSocket, resposta, len);        
+        
+        // Recebendo confiramção.
+        recv(retSocket, &ok, sizeof (char), 0);
+        
+                
+        if (ok == 'S') { // se receber acesso autorizado.
+                         // sai do loop e vai para criação de usuário.
+            break;
+        }        
+        printf("Senha errada.\n");
+        tentativas++;
+    }
+    if(tentativas == 3){
+        
+        printf("Conexão perdida.\n\n");
+        close(retSocket);
+        return -1;
+    }
+    printf("\n\n");
+    // criando usuário.
+    
+    char *nick;// = malloc(sizeof(char)*16);
+   // free(ip);// = malloc(sizeof(char)*16);
+    
+    while(1){
+                
+        nick = criaNick();
+        size_t len = strlen(nick) + 1;
+        char lenght = retChar(len);
+        
+        // Enviando o tamanho do nick.
+        write(retSocket, &lenght, 1);       
+        
+        // enviando login para aprovação...
+        write(retSocket, nick, len);
+        
+        // recebendo confirmação...
+        recv(retSocket, &ok, 1, 0);
+        if(ok == 'S'){
+            
+            break;
+        }
+        printf("Este login já esta em uso.\n\n");
+    }        
+    
+    // enviando login para a thread de escutaCliente.
+    enviarStr(retSocket, nick);
+    
+    *userNick = malloc(sizeof(char)* (strlen(nick)+1));
+    strncpy(*userNick, nick, (strlen(nick)+1));
+    
+    free(nick);
+    printf("Login cadastrado...\n");                
+    return retSocket;
+}
+
 void recebeMensagem(void *socketServer){
     
     //Id de ientificação do cliente que utiliza a função

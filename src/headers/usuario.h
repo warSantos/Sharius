@@ -84,9 +84,6 @@ void imprimirLista(Descritor *listaLogin);
 // Remove usuário da lista do server.
 int removerUsuario(Descritor *listaLogin, char *nick);
 
-// Abre conexão inicial com o servidor...
-int abreConexao(char **userNick);
-
 // Utiliza socket da função escultaSolicitação para enviar mensagem.
 void enviarMensagem(char *buffer, int idSocket);
 

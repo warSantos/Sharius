@@ -33,6 +33,9 @@ void menuMenssagem(char *buffer, char *userNick, int idSocket);
 // usuário e também o mesageiro para o hospede do server.
 void menuOperacao(char *userNick, int idSocket);
 
+// Abre conexão inicial com o servidor...
+int abreConexao(char **userNick);
+
 // Fica escutando as conexões na porta do serviço e
 // recebe as mensagem do cliente e as imprimi na tela.
 // parecido com o servidor de mensagem no módulo servidor

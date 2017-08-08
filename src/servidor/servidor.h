@@ -42,6 +42,9 @@ void enviarBloco(char *buffer, char *login, int sock);
 // envia mensagem através de um socket aberto.
 void enviarMensagem(char *buffer, int socket);
 
+// Abre conexão local...
+int abreConexaoLocal(char **userNick, char *senha);
+
 // Encerra os socket quando o servidor é terminado...
 void fechaConexoes();
 

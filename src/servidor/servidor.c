@@ -95,10 +95,7 @@ void menuMensagem(char *buffer, int idSocket) {
 
         imprimirLista(listaLogin);
         return;
-    }   
-        
-    // enviando mensagem para o servidor com o seu login.    
-    //enviarMensagem( , idSocket);
+    }               
     enviarMensagem(buffer, idSocket);
 }
 
@@ -384,6 +381,92 @@ void *escutaCliente(void *socketCliente){
     free(socketCliente);
     printf("fechando conexão com cliente...\n");
     return 0;        
+}
+
+int abreConexaoLocal(char **userNick, char *senha){
+        
+    struct sockaddr_in servidor;    
+     
+    //Create socket
+    int retSocket = socket(AF_INET , SOCK_STREAM , 0);
+    if (retSocket == -1){
+        
+        printf("Erro ao criar socket cliente...\n");
+        return retSocket;
+    } 
+    
+    char *ip = "127.0.0.1";            
+    
+    // Definindo IP do servidor...
+    servidor.sin_addr.s_addr = inet_addr(ip);
+    
+    // Definindo o tipo de protocolo...
+    servidor.sin_family = AF_INET;
+    
+    // Define a porta em que esta ativo o serviço no servidor...
+    servidor.sin_port = htons(40001);
+    
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
+    
+    //Busca conexão com o servidor...
+    
+    if (connect(retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+                
+        perror("Erro. conexão não estabelecida...");
+        return retSocket;
+    }                    
+    
+    // Criar usuário.        
+    char ok;               
+    char *nick;       
+                            
+    size_t len = strlen(senha) + 1;
+    char lenght = retChar(len);
+
+    // Enviando o tamanho da senha.
+    write(retSocket, &lenght, 1);
+
+    // Devolvendo senha.
+    write(retSocket, senha, len);
+
+    // Recebendo confiramção.
+    recv(retSocket, &ok, sizeof (char), 0);                                            
+    if(ok != 'S'){
+        
+        printf("Erro no password.\n");
+        return -1;
+    }
+    
+    while(1){
+                
+        nick = criaNick();
+        size_t len = strlen(nick) + 1;
+        char lenght = retChar(len);
+        
+        // Enviando o tamanho do nick.
+        write(retSocket, &lenght, 1);       
+        
+        // enviando login para aprovação...
+        write(retSocket, nick, len);
+        
+        // recebendo confirmação...
+        recv(retSocket, &ok, 1, 0);
+        if(ok == 'S'){
+            
+            break;
+        }
+        printf("Este login já esta em uso.\n\n");
+    }        
+    
+    // enviando login para a thread de escutaCliente.
+    enviarStr(retSocket, nick);
+    
+    *userNick = malloc(sizeof(char)* (strlen(nick)+1));
+    strncpy(*userNick, nick, (strlen(nick)+1));
+    
+    free(nick);
+    printf("Login cadastrado.\n");                
+    return retSocket;
 }
 
 void fechaConexoes(){
