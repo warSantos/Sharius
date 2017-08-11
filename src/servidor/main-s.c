@@ -13,7 +13,7 @@ int main(){
     scanf("%15[^\n]s", senha);
     __fpurge(stdin);
     
-    pthread_t t;
+    pthread_t t, t1;
     if(pthread_create(&t, NULL, (void *) escutaSolicitacao, (void *) senha)){    
         
         printf("Erro na inicialiazação do servidor de mensagem...\n");
@@ -33,9 +33,17 @@ int main(){
         return 1;
     }   
     
+    // abrindo thread de escuta do servidor...
+    if(pthread_create(&t1, NULL, (void *) recebeMensagem, (void *) &idSocket)){    
+        
+        printf("Erro na inicialiazação do servidor de escuta...\n");
+        return 1;
+    }
+    
     // menu de administração do servidor.
     menuOperacao(idSocket);
     pthread_join(t, NULL);
+    pthread_join(t1, NULL);
     
     // Falta melhorar a função de fechar conexões...
     pthread_exit(&t);

@@ -231,8 +231,7 @@ int abreConexao(char **userNick){
     printf("\n\n");
     // criando usuário.
     
-    char *nick;// = malloc(sizeof(char)*16);
-   // free(ip);// = malloc(sizeof(char)*16);
+    char *nick;   
     
     while(1){
                 
@@ -255,6 +254,10 @@ int abreConexao(char **userNick){
         printf("Este login já esta em uso.\n\n");
     }        
     
+    // Recebendo confirmação de preparo para receber nome...
+    char ac;
+    recv(retSocket, &ac, 1, 0);
+    
     // enviando login para a thread de escutaCliente.
     enviarStr(retSocket, nick);
     
@@ -264,37 +267,4 @@ int abreConexao(char **userNick){
     free(nick);
     printf("Login cadastrado...\n");                
     return retSocket;
-}
-
-void recebeMensagem(void *socketServer){
-    
-    //Id de ientificação do cliente que utiliza a função
-    // Podem ser várias threads desta liberadas
-    // Logo o idSocket de cada chamada da função escutaCliente 
-    // é diferente é um socket diferente.
-    printf("Servidor de mensagens pronto...\n\n");
-    
-    int read_size;    
-    int idSocket = *(int*) socketServer;
-    char *buffer, *userNick;
-    
-    // recebe mensagens do cliente.
-    while((read_size = recebeBloco(&buffer, &userNick, idSocket)) > 0){
-                        
-        // extraindo mensagem do buffer recebido.
-        Comando *bloco = extraiMensagem(buffer);        
-        printf(ANSI_COLOR_RED "@%s -:> %s" ANSI_COLOR_RESET "\n",userNick, bloco->parametro);       
-    }            
-    if(read_size == 0){
-        
-        puts("Client disconnected");
-        fflush(stdout);        
-    }else if(read_size == -1){
-        
-        perror("recv failed");
-    }
-         
-    //fechando a conexão
-    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
-    close(idSocket);        
 }

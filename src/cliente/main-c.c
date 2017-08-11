@@ -1,9 +1,7 @@
 #include "../cliente/cliente.h"
 
 int main(){       
-               
-    
-    
+                       
     // Abrindo conexão com o servidor...
     char *userNick;
     int idSocket = abreConexao(&userNick);        

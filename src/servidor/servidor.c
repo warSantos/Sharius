@@ -96,13 +96,13 @@ void menuMensagem(char *buffer, int idSocket) {
         imprimirLista(listaLogin);
         return;
     }               
-    enviarMensagem(buffer, idSocket);
+    enviarStr(idSocket, buffer);
 }
 
 void menuOperacao(int idSocket){
     
     listaLogin = iniciarLista();
-    char *buffer;// = calloc(sizeof(char),251);
+    char *buffer;
     char *alteraModo = calloc(sizeof(char),3);
     alteraModo[0] = '!';
     alteraModo[1] = 'c';
@@ -221,7 +221,7 @@ void escutaSolicitacao(void *password){
     while(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
         
         printf("Erro no bind.\n");
-        close(socketLocal);
+       // close(socketLocal);
         usleep(1000000);
         //return;
     }    
@@ -280,6 +280,8 @@ void escutaSolicitacao(void *password){
             // Recebendo o nick
             recv(socketCliente, nick, len, 0);            
             aux = pesquisarNick(listaLogin, nick);
+            printf("MOMENTO DE CADASTRO: %s\n", nick);
+            printf("tml: %d\n", listaLogin->tamanho);
             char ok;
             if (aux == NULL) { // se login nao existir
                 
@@ -290,14 +292,15 @@ void escutaSolicitacao(void *password){
             ok = 'N';
             write(socketCliente, &ok, 1);
         }        
-                
+                        
         pthread_t threadCliente;
         novoSocket = malloc(1);
         *novoSocket = socketCliente;     
         
         pthread_mutex_lock(&lista);
-        // Possível local para implantação de mutex.
+        // Possível local para implantação de mutex.        
         addUserRemoto(listaLogin, nick, novoSocket);
+        printf("--> %s tl: %d\n", nick, listaLogin->tamanho);
         pthread_mutex_unlock(&lista);
         
         if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
@@ -321,7 +324,10 @@ void *escutaCliente(void *socketCliente){
     
     int idSocket = *(int*)socketCliente, read_size;    
     //int read_size;
-    char *buffer, *donoThread;
+    
+    // enviando confirmação de pronto para receber nome...
+    char *buffer, *donoThread, ac = 'S';                
+    write(idSocket, &ac, 1);
     
     // recebendo o nome do dono da thread.
     if(recebeStr(idSocket, &donoThread) <= 0){
@@ -426,7 +432,7 @@ int abreConexaoLocal(char **userNick, char *senha){
     // Enviando o tamanho da senha.
     write(retSocket, &lenght, 1);
 
-    // Devolvendo senha.
+    // enviando a senha.
     write(retSocket, senha, len);
 
     // Recebendo confiramção.
@@ -457,6 +463,9 @@ int abreConexaoLocal(char **userNick, char *senha){
         }
         printf("Este login já esta em uso.\n\n");
     }        
+    
+    char ac;
+    recv(retSocket, &ac, 1, 0);
     
     // enviando login para a thread de escutaCliente.
     enviarStr(retSocket, nick);

@@ -1,5 +1,8 @@
 #include "../headers/usuario.h"
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 /* FUNÇÕES PARA TRABALHO DE GERENCIAMENTO DE USUÁRIO! */
 
 int listaVazia(Descritor *listaLogin){
@@ -109,7 +112,7 @@ char *retornaNick(Descritor *listaLogin, char *nick){
 
 int inserirUsuario(Descritor *listaLogin){
         
-    char *nick;// = (char *) malloc(sizeof(char) * 16);        
+    char *nick;
     
     // Verificação se o Login é válido.
     while(1){
@@ -260,7 +263,7 @@ int recebeStr(int idSocket, char **donoThread){
         return read;
     }
     // recebendo o nick.
-    *donoThread = malloc(sizeof(char)*retInt(lenght));
+    *donoThread = malloc(retInt(lenght));
     read = recv(idSocket, *donoThread, retInt(lenght), 0);
     if(read <= 0){
                 
@@ -287,8 +290,6 @@ int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
                 
     int read_size;
     *buffer = malloc(sizeof(char)*251);
-    //buffer = malloc(sizeof(char) * 251);
-    
     // Recebendo o size do login.
         
         char lenght;
@@ -299,8 +300,7 @@ int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
         }
         
         int len = retInt(lenght);
-        *nickEmissor = malloc(sizeof(char)*len);
-        //nickEmissor = malloc(sizeof(char)*len);
+        *nickEmissor = malloc(sizeof(char)*len);        
         
         // Recebendo o login.
         read_size = recv(idSocket, *nickEmissor, len , 0);
@@ -312,4 +312,37 @@ int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
         read_size = recv(idSocket, *buffer, 251 , 0);
         
     return read_size;
+}
+
+void recebeMensagem(void *socketServer){
+    
+    //Id de ientificação do cliente que utiliza a função
+    // Podem ser várias threads desta liberadas
+    // Logo o idSocket de cada chamada da função escutaCliente 
+    // é diferente é um socket diferente.
+    printf("Servidor de mensagens pronto...\n\n");
+    
+    int read_size;    
+    int idSocket = *(int*) socketServer;
+    char *buffer, *userNick;
+    
+    // recebe mensagens do cliente.
+    while((read_size = recebeBloco(&buffer, &userNick, idSocket)) > 0){
+                        
+        // extraindo mensagem do buffer recebido.
+        Comando *bloco = extraiMensagem(buffer);        
+        printf(ANSI_COLOR_RED "@%s -:> %s" ANSI_COLOR_RESET "\n",userNick, bloco->parametro);       
+    }            
+    if(read_size == 0){
+        
+        puts("Desconectando...");
+        fflush(stdout);        
+    }else if(read_size == -1){
+        
+        perror("recv failed");
+    }
+         
+    //fechando a conexão
+    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
+    close(idSocket);        
 }
