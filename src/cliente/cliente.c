@@ -148,8 +148,7 @@ void menuOperacao(char *userNick, int idSocket){
 
 int abreConexao(char **userNick){
         
-    struct sockaddr_in servidor;    
-     
+    struct sockaddr_in servidor;         
     //Create socket
     int retSocket = socket(AF_INET , SOCK_STREAM , 0);
     if (retSocket == -1){

@@ -22,9 +22,10 @@ int main(){
     
     // Esperando a thread de escuta iniciar...
     usleep(500);
-    
+    printf("servidor de escuta inicializado...\n\n");
     // Abrindo conexão local...
     char *userNick;
+    
     int idSocket = abreConexaoLocal(&userNick, senha); 
     
     if(idSocket == -1){
