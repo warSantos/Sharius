@@ -11,16 +11,16 @@
  */
 
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 
-int menuComando(char *buffer);
+int menuComando(char *buffer, char *senha, int *idSocket);
 
 // Função para delegar o buffer a função de estraiMenssagem para processamento
 // e delegação dos dados processados para a função de enviar mesagem.
-void menuMenssagem(char *buffer, int socket);
+void menuMenssagem(char *buffer, int *idSocket);
 
 // Menu de interação do usuário hospede do servidor.
 // Nesta função estão reunidas as funções de gerenciamento de 
 // usuário e também o mesageiro para o hospede do server.
-void menuOperacao(int socket);
+void menuOperacao(char *senha);
 
 // Insere os dados dos usuários via socket.
 void addUserRemoto(Descritor *listaLogin, char *nick, int *sock);

@@ -324,8 +324,7 @@ void recebeMensagem(void *socketServer){
     
     int read_size;    
     int idSocket = *(int*) socketServer;
-    char *buffer, *userNick;
-    
+    char *buffer, *userNick;    
     // recebe mensagens do cliente.
     while((read_size = recebeBloco(&buffer, &userNick, idSocket)) > 0){
                         

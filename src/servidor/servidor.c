@@ -28,7 +28,7 @@ void ajudaComando(){
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
-int menuComando(char *buffer){
+int menuComando(char *buffer, char *senha, int *idSocket){
     
     Comando *bloco = split(buffer);
     if(!bloco->lenghtComando){
@@ -38,6 +38,33 @@ int menuComando(char *buffer){
     if(!strncmp(bloco->comando, "add", 4)){
                
         inserirUsuario(listaLogin);
+    }else if(!strncmp(bloco->comando, "connect", 8)){ 
+        
+        if (*idSocket == -1) {
+
+            // Abrindo conexão local...
+            char *userNick;
+
+            *idSocket = abreConexaoLocal(&userNick, senha);
+
+            if (*idSocket == -1) {
+
+                printf("Erro ao abrir conexão com servidor local...\n");
+                return 1;
+            }
+            
+            pthread_t t;
+
+            // abrindo thread de escuta do servidor...
+            if (pthread_create(&t, NULL, (void *) recebeMensagem, (void *) &idSocket)) {
+
+                printf("Erro na inicialiazação do servidor de escuta...\n");
+                return 1;
+            }
+        }else{
+            
+            printf("Voce ja está conectado...\n\n");
+        }
     }else if(!strncmp(bloco->comando, "remove", 7)){
         
         if(bloco->lenghtParametro){        
@@ -74,15 +101,14 @@ int menuComando(char *buffer){
     return 1;
 }
 
-void menuMensagem(char *buffer, int idSocket) {
+void menuMensagem(char *buffer, int *idSocket) {
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
     Comando *bloco = extraiMensagem(buffer);    
     if(!bloco->parametro){
         
         return;
-    }
-    //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
+    }    
     if (!strncmp(bloco->parametro, "-help", 6)) {
 
         ajudaMensagem();
@@ -96,10 +122,15 @@ void menuMensagem(char *buffer, int idSocket) {
         imprimirLista(listaLogin);
         return;
     }               
-    enviarStr(idSocket, buffer);
+    if(*idSocket == -1){
+        
+        printf("Você não esta conectado ao servidor.\n");
+        return;
+    }
+    enviarStr(*idSocket, buffer);
 }
 
-void menuOperacao(int idSocket){
+void menuOperacao(char *senha){
     
     listaLogin = iniciarLista();
     char *buffer;
@@ -108,7 +139,7 @@ void menuOperacao(int idSocket){
     alteraModo[1] = 'c';
     printf("\n\n\tCarregando configurações...\n\n");
     // Menu de comandos.
-    int loop = 1;
+    int loop = 1, idSocket = -1;
     while(loop){
         
         if(alteraModo[0] == '!' && alteraModo[1] == 'c'){
@@ -147,7 +178,7 @@ void menuOperacao(int idSocket){
             // Se o último comando utilizado nao foi o de alterar para o modo de comando...
             if(buffer[0] != '!' || buffer[1] != 'c') {
                                 
-                if(!menuComando(buffer)){
+                if(!menuComando(buffer, senha, &idSocket)){
                     
                     exit(0);
                 }                
@@ -157,7 +188,7 @@ void menuOperacao(int idSocket){
             // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
             if(buffer[0] != '!'|| buffer[1] != 'm') {
                 
-                menuMensagem(buffer, idSocket);                                                               
+                menuMensagem(buffer, &idSocket);                                                           
             }
         }
         free(buffer);
@@ -172,20 +203,18 @@ void addUserRemoto(Descritor *listaLogin, char *nick, int *sock){
     Link aux = malloc(sizeof(Login));
     aux->nick = malloc(sizeof(char) * len);        
     aux->socket = sock;    
-    strncpy(aux->nick, nick, len);            
-    
+    strncpy(aux->nick, nick, len);                
     // Caso seja a primeira inserção de um usuário na lista.
     if(listaVazia(listaLogin)){
         
         listaLogin->primeiro = aux;
         listaLogin->ultimo = aux;
-        aux->prox = NULL;           
+        aux->prox = NULL;                   
     }else{
     
         listaLogin->ultimo->prox = aux;
-        listaLogin->ultimo = aux;        
-    }    
-    printf("PRIMEIRA INSERÇÃO %s .\n", aux->nick);
+        listaLogin->ultimo = aux;                
+    }        
     listaLogin->tamanho++;    
 }
 
@@ -295,14 +324,12 @@ void escutaSolicitacao(void *password){
         }        
                         
         pthread_t threadCliente;
-        novoSocket = malloc(1);
+        novoSocket = malloc(sizeof(int));
         *novoSocket = socketCliente;     
         
-        pthread_mutex_lock(&lista);
-        // Possível local para implantação de mutex.        
-        printf("--> %s tl: %d\n", nick, listaLogin->tamanho);
-        addUserRemoto(listaLogin, nick, novoSocket);
-        printf("--> %s tl: %d\n", nick, listaLogin->tamanho);
+        // Adicionando usuário a lista.
+        pthread_mutex_lock(&lista);                
+        addUserRemoto(listaLogin, nick, novoSocket);        
         pthread_mutex_unlock(&lista);
         
         if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
@@ -329,7 +356,7 @@ void *escutaCliente(void *socketCliente){
     
     // enviando confirmação de pronto para receber nome...
     char *buffer, *donoThread, ac = 'S';                
-    write(idSocket, &ac, 1);
+    write(idSocket, &ac, 1);    
     
     // recebendo o nome do dono da thread.
     if(recebeStr(idSocket, &donoThread) <= 0){
@@ -339,12 +366,18 @@ void *escutaCliente(void *socketCliente){
     }
     
     // recebe mensagens do cliente.
-    while((read_size = recebeStr(idSocket, &buffer)) > 0){
-        
+    while(1){
+                
+        read_size = recebeStr(idSocket, &buffer);
+        if(read_size < 0){
+            
+            printf("Nao recebi nada.\n\n");
+            break;
+        }
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);        
         // Repassa para broadcast.
-        if (!strncmp(bloco->comando, "all", 4)) {
+        if(!strncmp(bloco->comando, "all", 4)) {
 
             Link aux = listaLogin->primeiro;
             while (aux != NULL) {
@@ -356,7 +389,7 @@ void *escutaCliente(void *socketCliente){
                 }                
                 aux = aux->prox;
             }            
-        } else { // Enviando mensagem unicast.
+        }else{ // Enviando mensagem unicast.
 
             // passando o nick específico para pesquisa.
             Link aux = pesquisarNick(listaLogin, bloco->comando);
@@ -382,11 +415,11 @@ void *escutaCliente(void *socketCliente){
         
     }else if(read_size == -1){
         
-        perror("recv failed");
+        perror("Falha no recv...\n\n");
     }
          
     //Free the socket pointer
-    free(socketCliente);
+    close(idSocket);
     printf("fechando conexão com cliente...\n");
     return 0;        
 }
@@ -433,10 +466,10 @@ int abreConexaoLocal(char **userNick, char *senha){
 
     // Enviando o tamanho da senha.
     write(retSocket, &lenght, 1);
-    //printf("LENGHT: %d\n", (int)lenght);
+    
     // enviando a senha.
     write(retSocket, senha, len);
-    //printf("SENHA: %s\n", senha);
+    
     // Recebendo confiramção.
     recv(retSocket, &ok, sizeof (char), 0);                                            
     if(ok != 'S'){
@@ -448,20 +481,17 @@ int abreConexaoLocal(char **userNick, char *senha){
     while(1){
                 
         nick = criaNick();
-        size_t len = strlen(nick) + 1;
+        len = strlen(nick) + 1;
         lenght = retChar(len);
         
         // Enviando o tamanho do nick.
-        write(retSocket, &lenght, 1);       
-        //printf("LENGHT: %d\n", (int)lenght);
+        write(retSocket, &lenght, 1);           
         
         // enviando login para aprovação...
-        write(retSocket, nick, len);
-        //printf("NICK: %s\n", nick);
+        write(retSocket, nick, len);        
         
         // recebendo confirmação...
         recv(retSocket, &ok, 1, 0);
-        //printf("OK: %c\n", ok);
         if(ok == 'S'){
             
             break;
@@ -470,7 +500,7 @@ int abreConexaoLocal(char **userNick, char *senha){
     }        
     
     char ac;
-    recv(retSocket, &ac, 1, 0);
+    recv(retSocket, &ac, 1, 0);    
     
     // enviando login para a thread de escutaCliente.
     enviarStr(retSocket, nick);
@@ -479,9 +509,7 @@ int abreConexaoLocal(char **userNick, char *senha){
     *userNick = malloc(sizeof(char)* len);
     strncpy(*userNick, nick, len);
     
-    free(nick);
-    printf("Login cadastrado %s .\n", *userNick);                
-    printf("listaLogin tamanho: %d\n", listaLogin->tamanho);
+    free(nick);    
     return retSocket;
 }
 
