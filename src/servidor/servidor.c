@@ -28,7 +28,7 @@ void ajudaComando(){
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
-int menuComando(char *buffer, char *senha, int *idSocket){
+int menuComando(char *buffer){
     
     Comando *bloco = split(buffer);
     if(!bloco->lenghtComando){
@@ -38,33 +38,6 @@ int menuComando(char *buffer, char *senha, int *idSocket){
     if(!strncmp(bloco->comando, "add", 4)){
                
         inserirUsuario(listaLogin);
-    }else if(!strncmp(bloco->comando, "connect", 8)){ 
-        
-        if (*idSocket == -1) {
-
-            // Abrindo conexão local...
-            char *userNick;
-
-            *idSocket = abreConexaoLocal(&userNick, senha);
-
-            if (*idSocket == -1) {
-
-                printf("Erro ao abrir conexão com servidor local...\n");
-                return 1;
-            }
-            
-            pthread_t t;
-
-            // abrindo thread de escuta do servidor...
-            if (pthread_create(&t, NULL, (void *) recebeMensagem, (void *) &idSocket)) {
-
-                printf("Erro na inicialiazação do servidor de escuta...\n");
-                return 1;
-            }
-        }else{
-            
-            printf("Voce ja está conectado...\n\n");
-        }
     }else if(!strncmp(bloco->comando, "remove", 7)){
         
         if(bloco->lenghtParametro){        
@@ -178,7 +151,7 @@ void menuOperacao(char *senha){
             // Se o último comando utilizado nao foi o de alterar para o modo de comando...
             if(buffer[0] != '!' || buffer[1] != 'c') {
                                 
-                if(!menuComando(buffer, senha, &idSocket)){
+                if(!menuComando(buffer)){
                     
                     exit(0);
                 }                
@@ -366,14 +339,8 @@ void *escutaCliente(void *socketCliente){
     }
     
     // recebe mensagens do cliente.
-    while(1){
-                
-        read_size = recebeStr(idSocket, &buffer);
-        if(read_size < 0){
-            
-            printf("Nao recebi nada.\n\n");
-            break;
-        }
+    while((read_size = recebeStr(idSocket, &buffer)) < 0){
+                                
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);        
         // Repassa para broadcast.
@@ -419,7 +386,7 @@ void *escutaCliente(void *socketCliente){
     }
          
     //Free the socket pointer
-    close(idSocket);
+    close(*(int *)socketCliente);
     printf("fechando conexão com cliente...\n");
     return 0;        
 }

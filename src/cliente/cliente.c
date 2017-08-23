@@ -40,8 +40,8 @@ int menuComando(char *buffer){
     }else if(!strncmp(bloco->comando, "quit", 5)){
         
         printf("Fechando conexões...\n");
-        printf("Have a nice day....\n");
-        return 0;
+        printf("Have a nice day....\n");        
+        return 2;
     }else if(!strncmp(bloco->comando, "help", 5)){
         
         ajudaComando();
@@ -51,8 +51,9 @@ int menuComando(char *buffer){
     }else{
         
         printf("\nComando não identificado.\n\n");
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 void menuMensagem(char *buffer, char *userNick, int idSocket){
@@ -127,8 +128,9 @@ void menuOperacao(char *userNick, int idSocket){
             // Se o último comando utilizado nao foi o de alterar para o modo de comando...
             if(buffer[0] != '!' || buffer[1] != 'c') {
                                 
-                if(!menuComando(buffer)){
+                if(menuComando(buffer) == 2){
                     
+                    close(idSocket);
                     exit(0);
                 }                
             }                        

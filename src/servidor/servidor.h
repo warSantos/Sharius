@@ -11,7 +11,7 @@
  */
 
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 
-int menuComando(char *buffer, char *senha, int *idSocket);
+int menuComando(char *buffer);
 
 // Função para delegar o buffer a função de estraiMenssagem para processamento
 // e delegação dos dados processados para a função de enviar mesagem.
