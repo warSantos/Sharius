@@ -276,6 +276,7 @@ void escutaSolicitacao(void *password){
         Link aux;
         while(1){
             
+            /*
             // Recebendo o tamanho do nick.
             recv(socketCliente, &lenght, 1, 0);
             len = retInt(lenght);            
@@ -283,8 +284,14 @@ void escutaSolicitacao(void *password){
             
             // Recebendo o nick
             recv(socketCliente, nick, len, 0);                        
-            aux = pesquisarNick(listaLogin, nick);        
+            */
             
+            if(recebeStr(socketCliente, &nick) <= 0){
+                                
+                close(socketCliente);
+            } 
+                                       
+            aux = pesquisarNick(listaLogin, nick);                    
             char ok;
             if (aux == NULL) { // se login nao existir
                 
@@ -309,8 +316,9 @@ void escutaSolicitacao(void *password){
             
             printf("Erro ao criar a thread.\n");
             return;
-        }               
-    }
+        }
+       // free(nick);
+    }    
     if(socketCliente < 0){
         
         printf("Falha na função accpet.\n");
@@ -339,38 +347,49 @@ void *escutaCliente(void *socketCliente){
     }
     
     // recebe mensagens do cliente.
-    while((read_size = recebeStr(idSocket, &buffer)) < 0){
-                                
+    Link aux;
+    short int qtdeMsg = 0;
+    while((read_size = recebeStr(idSocket, &buffer)) > 0){
+          
         // extraindo cliente para envio.
         Comando *bloco = extraiMensagem(buffer);        
         // Repassa para broadcast.
         if(!strncmp(bloco->comando, "all", 4)) {
-
-            Link aux = listaLogin->primeiro;
+            
+            
+                
+            aux = listaLogin->primeiro;
             while (aux != NULL) {
-                
+
                 // não enviar para o mesmo que recebeu.
-                if(strcmp(aux->nick, donoThread)){
-                
+                if (strcmp(aux->nick, donoThread)) {
+
                     enviarBloco(buffer, donoThread, *aux->socket);
-                }                
+                    qtdeMsg++;
+                }
                 aux = aux->prox;
-            }            
+            }
+
+            if(!qtdeMsg){
+                
+                enviarBloco("Não há outros usuários no chat.", "SERVIDOR", idSocket);
+            }
+            qtdeMsg = 0;
+            
         }else{ // Enviando mensagem unicast.
 
             // passando o nick específico para pesquisa.
-            Link aux = pesquisarNick(listaLogin, bloco->comando);
+            aux = pesquisarNick(listaLogin, bloco->comando);
             if (aux != NULL) {
                                 
                 enviarBloco(buffer, donoThread, *aux->socket);
                 
             }else{
                 
-                // Retorna mesagem de erro.
-                //char *userNotExist = "Usuário inexistente.\n";
-                //write(idSocket , userNotExist , strlen(userNotExist)+1);
+                // Retorna mesagem de erro.               
+                enviarBloco("Este usuário não esta no chat.", "SERVIDOR", idSocket);
             }
-        }
+        }        
     }            
     if(read_size == 0){
                 

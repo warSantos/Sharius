@@ -269,6 +269,7 @@ int recebeStr(int idSocket, char **donoThread){
                 
         return read;
     }
+    
     return read;
 }
 
