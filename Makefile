@@ -1,3 +1,4 @@
+# makefile para módulo cliente e servidor
 CC = gcc
 CFLAGS = -c -Wall -O3
 COBJ = mkdir -p obj
