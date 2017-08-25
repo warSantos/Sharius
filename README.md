@@ -1,2 +1,2 @@
-# Sharius consite inicialmente em um projeto de mensageiro em rede local, com sockets em C.
-# posteriormente tende a adicionar tranferẽncia de arquivos.
+# Sharius consite inicialmente em um projeto de mensageiro para rede local, com sockets em C.
+# posteriormente tende a adicionar tranferência de arquivos.

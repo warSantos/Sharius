@@ -201,16 +201,10 @@ int abreConexao(char **userNick){
         printf("Senha de acesso: ");       
         
         scanf("%15[^\n]s", resposta);
-        __fpurge(stdin);                
+        __fpurge(stdin);                                
         
-        size_t len = strlen(resposta) + 1;
-        char lenght = retChar(len);
-        
-        // Enviando o tamanho da senha.
-        write(retSocket, &lenght, 1);       
-        
-        // Devolvendo senha.
-        write(retSocket, resposta, len);        
+        // enviando senha.
+        enviarStr(retSocket, resposta);
         
         // Recebendo confiramção.
         recv(retSocket, &ok, sizeof (char), 0);
@@ -236,15 +230,10 @@ int abreConexao(char **userNick){
     
     while(1){
                 
-        nick = criaNick();
-        size_t len = strlen(nick) + 1;
-        char lenght = retChar(len);
+        nick = criaNick();        
         
-        // Enviando o tamanho do nick.
-        write(retSocket, &lenght, 1);       
-        
-        // enviando login para aprovação...
-        write(retSocket, nick, len);
+        // enviando nick.
+        enviarStr(retSocket, nick);
         
         // recebendo confirmação...
         recv(retSocket, &ok, 1, 0);

@@ -450,11 +450,7 @@ int abreConexaoLocal(char **userNick, char *senha){
     size_t len = strlen(senha) + 1;
     char lenght = retChar(len);
 
-    // Enviando o tamanho da senha.
-    write(retSocket, &lenght, 1);
-    
-    // enviando a senha.
-    write(retSocket, senha, len);
+    enviarStr(retSocket, senha);
     
     // Recebendo confiramção.
     recv(retSocket, &ok, sizeof (char), 0);                                            
@@ -470,11 +466,7 @@ int abreConexaoLocal(char **userNick, char *senha){
         len = strlen(nick) + 1;
         lenght = retChar(len);
         
-        // Enviando o tamanho do nick.
-        write(retSocket, &lenght, 1);           
-        
-        // enviando login para aprovação...
-        write(retSocket, nick, len);        
+        enviarStr(retSocket, nick);
         
         // recebendo confirmação...
         recv(retSocket, &ok, 1, 0);
