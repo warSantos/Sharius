@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -c -Wall -O3
+COBJ = mkdir -p obj
 MOVE = mv *.o obj/
 HDRS = src/headers/
 SRC = src/source/
@@ -8,7 +9,7 @@ SRC-H = src/servidor/
 FILES = $(wildcard src/source/*)
 OBJ = $(FILES:. c=*.o)
 
-all: sharius-servidor sharius-cliente move
+all: sharius-servidor sharius-cliente cobj move
 
 sharius-servidor: $(OBJ)	main-s.o	servidor.o
 	$(CC) $(OBJ) main-s.o servidor.o -o sharius-servidor -lpthread
@@ -42,5 +43,9 @@ run-servidor:
 
 clean:
 	rm -rf obj/*.o
+
+cobj:
+	$(COBJ)
+
 move:
 	$(MOVE)
