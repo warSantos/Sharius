@@ -1,16 +1,18 @@
 #include "../headers/strUtils.h"
 
-char retChar(size_t t){
-
-    int temp = (int) t;
-    char ret = (char) temp;
+char *retChar(int t){
+        
+    char *ret = malloc(4);
+    int *p = &t;
+    memcpy(ret, p, 4);
     return ret;
 }
 
-int retInt(char t){
+int retInt(char *t){
     
-    int ret = (char) t;
-    return ret;
+    int *ret = malloc(sizeof(int));
+    memcpy(ret, t, 4);
+    return *ret;
 }
 
 int charInvalido(char *nick, char *caracteresInvalidos){
@@ -74,7 +76,7 @@ int verificaIp(char *ip){
             nOcteto++;                        
         }else{
             
-            octeto = octeto + retInt(ip[i]);            
+            octeto = octeto + ip[i];          
         }                        
     }
     if (qtdePontos != 3) {

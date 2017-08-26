@@ -246,71 +246,79 @@ void enviarMensagem(char *buffer, int idSocket){
 
 void enviarStr(int idSocket, char *str){
     
-    char lenght = retChar(strlen(str) + 1);    
+    int len = strlen(str) + 1;
+    char *lenght = retChar(len);
+    
     // enviando o tamanho do nick.
-    write(idSocket, &lenght, 1);
-    write(idSocket, str, retInt(lenght));
+    write(idSocket, lenght, 4);
+    
     // enviando o login.
+    write(idSocket, str, retInt(lenght));    
 }
 
 int recebeStr(int idSocket, char **donoThread){
         
-    char lenght;    
-    // recebendo o tamanho do nick
-    int read = recv(idSocket, &lenght, 1 , 0);        
-    if(read <= 0){
-                
-        return read;
-    }
-    // recebendo o nick.
-    *donoThread = malloc(retInt(lenght));
-    read = recv(idSocket, *donoThread, retInt(lenght), 0);
-    if(read <= 0){
-                
-        return read;
-    }
+    char *lenght = malloc(4);    
     
+    // recebendo o tamanho do nick
+    int read = recv(idSocket, lenght, 4, 0);  
+    int len = retInt(lenght);        
+    if(read <= 0){
+                
+        return read;
+    }    
+    
+    // recebendo o nick.
+    *donoThread = malloc(len);
+    read = recv(idSocket, *donoThread, len, 0);
+    
+    if(read <= 0){
+                
+        return read;
+    }    
     return read;
 }
 
 void enviarBloco(char *buffer, char *login, int sock){
 
     // enviando o tamanho do size login do emissor.
-    char lenght = retChar(strlen(login) + 1);    
-    int len = retInt(lenght);    
-    write(sock , &lenght , 1);
+    int len = strlen(login) + 1;
+    char *lenght = retChar(len);        
+    
+    write(sock , lenght , 4);
     
     // enviando o nick    
     write(sock, login, len);
     
     // enviando a mensagem.
-    write(sock, buffer, 251);   
+    write(sock, buffer, 2048);   
 }
 
 int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
                 
     int read_size;
-    *buffer = malloc(sizeof(char)*251);
+    *buffer = malloc(sizeof(char)*2048);
     // Recebendo o size do login.
         
-        char lenght;
-        read_size = recv(idSocket, &lenght, 1 , 0);        
-        if(read_size <= 0){
-            
-            return read_size;
-        }
-        
-        int len = retInt(lenght);
-        *nickEmissor = malloc(sizeof(char)*len);        
-        
-        // Recebendo o login.
-        read_size = recv(idSocket, *nickEmissor, len , 0);
-        if(read_size <= 0){
-            
-            return read_size;
-        }
-        // Recebendo a mensagem.
-        read_size = recv(idSocket, *buffer, 251 , 0);
+    char *lenght = malloc(4);
+    read_size = recv(idSocket, lenght, 4, 0);
+    if (read_size <= 0) {
+
+        return read_size;
+    }
+
+    int len = retInt(lenght);
+    *nickEmissor = malloc(len);
+
+    // Recebendo o login.
+    read_size = recv(idSocket, *nickEmissor, len, 0);
+    if (read_size <= 0) {
+
+        return read_size;
+    }
+
+    // Recebendo a mensagem.
+    read_size = recv(idSocket, *buffer, 2048, 0);
         
     return read_size;
 }

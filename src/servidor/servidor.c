@@ -122,8 +122,8 @@ void menuOperacao(char *senha){
             
             printf("> ");
         }
-        buffer = calloc(sizeof(char),251);
-        scanf("%250[^\n]s", buffer);        
+        buffer = calloc(sizeof(char),2048);
+        scanf("%2048[^\n]s", buffer);        
         __fpurge(stdin);
                         
         
@@ -224,9 +224,8 @@ void escutaSolicitacao(void *password){
     if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
         
         printf("Erro no bind.\n");
-        close(socketLocal);
-        //usleep(1000000);
-        //return;
+        fechaConexoes();
+        close(socketLocal);       
         exit(1);
     }    
     // Limitando o número de conexões que o socket local vai ouvir para 15.
@@ -248,44 +247,28 @@ void escutaSolicitacao(void *password){
         // mantendo a conexão até o término da execução.                
         
         // Capturando senha do cliente.
-        int tentativas = 0, len; 
-        char *senhaTemp, lenght;
+        int tentativas = 0; 
+        char *senhaTemp;
         while(tentativas < 3){
-            
-            // Recebendo o tamanho da senha.
-            recv(socketCliente, &lenght, 1, 0);
-            len = retInt(lenght);
-            senhaTemp = malloc(sizeof(char)*len);
-            
-            // Recebendo a senha.
-            recv(socketCliente, senhaTemp, len, 0);            
+                        
+            // recebendo a senha.
+            recebeStr(socketCliente, &senhaTemp);            
             tentativas++;
             char ok;
             if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
                 
                 ok = 'S';
                 write(socketCliente, &ok, 1);
+                free(senhaTemp);
                 break;
             }
             ok = 'N';
             write(socketCliente, &ok, 1);
-        }
-        free(senhaTemp);
-        
+        }                
         char *nick;
         Link aux;
         while(1){
-            
-            /*
-            // Recebendo o tamanho do nick.
-            recv(socketCliente, &lenght, 1, 0);
-            len = retInt(lenght);            
-            nick = malloc(sizeof(char)*len);
-            
-            // Recebendo o nick
-            recv(socketCliente, nick, len, 0);                        
-            */
-            
+                    
             if(recebeStr(socketCliente, &nick) <= 0){
                                 
                 close(socketCliente);
@@ -317,7 +300,7 @@ void escutaSolicitacao(void *password){
             printf("Erro ao criar a thread.\n");
             return;
         }
-       // free(nick);
+        free(nick);
     }    
     if(socketCliente < 0){
         
@@ -389,7 +372,8 @@ void *escutaCliente(void *socketCliente){
                 // Retorna mesagem de erro.               
                 enviarBloco("Este usuário não esta no chat.", "SERVIDOR", idSocket);
             }
-        }        
+        }  
+        free(bloco);
     }            
     if(read_size == 0){
                 
@@ -446,10 +430,8 @@ int abreConexaoLocal(char **userNick, char *senha){
     // Criar usuário.        
     char ok;               
     char *nick;       
-                            
-    size_t len = strlen(senha) + 1;
-    char lenght = retChar(len);
-
+    
+    // enviando senha.
     enviarStr(retSocket, senha);
     
     // Recebendo confiramção.
@@ -462,9 +444,7 @@ int abreConexaoLocal(char **userNick, char *senha){
     
     while(1){
                 
-        nick = criaNick();
-        len = strlen(nick) + 1;
-        lenght = retChar(len);
+        nick = criaNick();        
         
         enviarStr(retSocket, nick);
         
@@ -482,8 +462,8 @@ int abreConexaoLocal(char **userNick, char *senha){
     
     // enviando login para a thread de escutaCliente.
     enviarStr(retSocket, nick);
-    
-    len = (strlen(nick)+1);
+         
+    int len = strlen(nick)+1;
     *userNick = malloc(sizeof(char)* len);
     strncpy(*userNick, nick, len);
     

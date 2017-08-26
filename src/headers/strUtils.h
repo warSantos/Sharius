@@ -14,10 +14,10 @@ typedef struct comando {
 } Comando;
 
 // faz casting de size_t para char.
-char retChar(size_t t);
+char *retChar(int t);
 
 // faz casting char para inteiro.
-int retInt(char t);
+int retInt(char *t);
 
 // Verifica recebe uma string e verica se ela possui algum caractere proibido.
 // Os caracteres proibidos devem ser passados na string caracOut.

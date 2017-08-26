@@ -100,8 +100,8 @@ void menuOperacao(char *userNick, int idSocket){
             
             printf("> ");
         }
-        buffer = calloc(sizeof(char),251);
-        scanf("%250[^\n]s", buffer);
+        buffer = calloc(sizeof(char),2048);
+        scanf("%2048[^\n]s", buffer);
         __fpurge(stdin);
                                 
         // Identifica o princípio de um possível comando de alteração de modo.
