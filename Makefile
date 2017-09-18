@@ -15,7 +15,7 @@ all: sharius-servidor sharius-cliente cobj move
 sharius-servidor: $(OBJ)	main-s.o	servidor.o
 	$(CC) $(OBJ) main-s.o servidor.o -o sharius-servidor -lpthread
 
-sharius-cliente:	$(OBJ)	main-c.o	cliente.o
+sharius-cliente:	main-c.o	cliente.o
 	$(CC)	$(OBJ)	main-c.o cliente.o -o sharius-cliente -lpthread
 
 main-s.o:	$(SRC-H)main-s.c
@@ -49,4 +49,4 @@ cobj:
 	$(COBJ)
 
 move:
-	$(MOVE)
+	$(MOVE) && echo $(OBJ)
