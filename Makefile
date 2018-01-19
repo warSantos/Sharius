@@ -8,7 +8,7 @@ SRC = src/source/
 SRC-C = src/cliente/
 SRC-H = src/servidor/
 FILES = $(wildcard src/source/*)
-OBJ = $(FILES:. c=*.o)
+OBJ = $(FILES:.c=*.o)
 
 all: sharius-servidor sharius-cliente cobj move
 
@@ -49,4 +49,4 @@ cobj:
 	$(COBJ)
 
 move:
-	$(MOVE) && echo $(OBJ)
+	$(MOVE)

@@ -55,8 +55,9 @@ dkms.conf
 
 # directories
 nbproject
-teste_gerado.txt
-fat.part
-fat
+obj
 
+#exceções
 doc/main\.tex\.backup
+sharius-cliente
+sharius-server
