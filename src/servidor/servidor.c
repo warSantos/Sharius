@@ -37,12 +37,12 @@ int menuComando(char *buffer){
     }
     if(!strncmp(bloco->comando, "add", 4)){
                
-        inserirUsuario(listaLogin);
+        inserirUsuario();
     }else if(!strncmp(bloco->comando, "remove", 7)){
         
         if(bloco->lenghtParametro){        
             
-            if(removerUsuario(listaLogin, bloco->parametro)){
+            if(removerUsuario(bloco->parametro)){
                 
                 printf("Usuário inexistente.\n");
                 return 1;
@@ -54,7 +54,7 @@ int menuComando(char *buffer){
         }    
     }else if(!strncmp(bloco->comando, "list", 5)){
         
-        imprimirLista(listaLogin);
+        imprimirLista();
     }else if(!strncmp(bloco->comando, "quit", 5)){
         
         printf("Fechando conexões...\n");
@@ -92,7 +92,7 @@ void menuMensagem(char *buffer, int *idSocket) {
         return;
     } else if (!strncmp(bloco->parametro, "-list", 6)) {
 
-        imprimirLista(listaLogin);
+        imprimirLista();
         return;
     }               
     if(*idSocket == -1){
@@ -170,7 +170,7 @@ void menuOperacao(char *senha){
     free(alteraModo);    
 }
 
-void addUserRemoto(Descritor *listaLogin, char *nick, int *sock){
+void addUserRemoto(char *nick, int *sock){
     
     size_t len = strlen(nick)+1;
     Link aux = malloc(sizeof(Login));
@@ -178,7 +178,7 @@ void addUserRemoto(Descritor *listaLogin, char *nick, int *sock){
     aux->socket = sock;    
     strncpy(aux->nick, nick, len);                
     // Caso seja a primeira inserção de um usuário na lista.
-    if(listaVazia(listaLogin)){
+    if(listaVazia()){
         
         listaLogin->primeiro = aux;
         listaLogin->ultimo = aux;
@@ -274,7 +274,7 @@ void escutaSolicitacao(void *password){
                 close(socketCliente);
             } 
                                        
-            aux = pesquisarNick(listaLogin, nick);                    
+            aux = pesquisarNick(nick);                    
             char ok;
             if (aux == NULL) { // se login nao existir
                 
@@ -292,12 +292,13 @@ void escutaSolicitacao(void *password){
         
         // Adicionando usuário a lista.
         pthread_mutex_lock(&lista);                
-        addUserRemoto(listaLogin, nick, novoSocket);        
+        addUserRemoto(nick, novoSocket);        
         pthread_mutex_unlock(&lista);
         
         if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
             
             printf("Erro ao criar a thread.\n");
+            removerUsuario(nick);
             return;
         }
         free(nick);
@@ -362,7 +363,7 @@ void *escutaCliente(void *socketCliente){
         }else{ // Enviando mensagem unicast.
 
             // passando o nick específico para pesquisa.
-            aux = pesquisarNick(listaLogin, bloco->comando);
+            aux = pesquisarNick(bloco->comando);
             if (aux != NULL) {
                                 
                 enviarBloco(buffer, donoThread, *aux->socket);
@@ -379,7 +380,7 @@ void *escutaCliente(void *socketCliente){
                 
         pthread_mutex_lock(&lista);
         // Possível local para implantação de mutex.        
-        removerUsuario(listaLogin, donoThread);                    
+        removerUsuario(donoThread);                    
         pthread_mutex_unlock(&lista);
         fflush(stdout);
         
@@ -471,15 +472,19 @@ int abreConexaoLocal(char **userNick, char *senha){
     return retSocket;
 }
 
+void sendList(){
+
+}
+
 void fechaConexoes(){
         
-    if(!listaVazia(listaLogin)){
+    if(!listaVazia()){
         
         Link aux = listaLogin->primeiro;
         while(aux != NULL){
 
             shutdown(*aux->socket, 2);
-            removerUsuario(listaLogin, aux->nick);
+            removerUsuario(aux->nick);
             aux = aux->prox;
         }        
     }

@@ -5,7 +5,7 @@
 
 /* FUNÇÕES PARA TRABALHO DE GERENCIAMENTO DE USUÁRIO! */
 
-int listaVazia(Descritor *listaLogin){
+int listaVazia(){
     
     // listaLogin->tamanho > 0
     if(listaLogin->tamanho){
@@ -99,9 +99,9 @@ char *criaIp(){
     }
 }
 
-char *retornaNick(Descritor *listaLogin, char *nick){
+char *retornaNick(char *nick){
     
-    Link aux = pesquisarNick(listaLogin ,nick);
+    Link aux = pesquisarNick(nick);
     if(aux != NULL){ // Existe usuário e seu nick
                      // esta sendo retornado.
         return aux->nick;
@@ -110,7 +110,7 @@ char *retornaNick(Descritor *listaLogin, char *nick){
     return NULL;
 }
 
-int inserirUsuario(Descritor *listaLogin){
+int inserirUsuario(){
         
     char *nick;
     
@@ -121,7 +121,7 @@ int inserirUsuario(Descritor *listaLogin){
         if((nick = criaNick()) != NULL){
             
             // Se o nick não for existente na lista de login.
-            if(pesquisarNick(listaLogin, nick) != NULL){                                                            
+            if(pesquisarNick(nick) != NULL){                                                            
                 
                 printf("Este login esta indisponível no momento.\n");
             }
@@ -152,7 +152,7 @@ int inserirUsuario(Descritor *listaLogin){
     free(nick);    
     
     // Caso seja a primeira inserção de um usuário na lista.
-    if(listaVazia(listaLogin)){
+    if(listaVazia()){
         
         listaLogin->primeiro = aux;
         listaLogin->ultimo = aux;
@@ -167,7 +167,7 @@ int inserirUsuario(Descritor *listaLogin){
     return 0;
 }
 
-Link pesquisarNick(Descritor *listaLogin, char *nick){
+Link pesquisarNick(char *nick){
     
     Link aux = listaLogin->primeiro;
     while(aux != NULL){
@@ -181,9 +181,9 @@ Link pesquisarNick(Descritor *listaLogin, char *nick){
     return NULL;
 }
 
-void imprimirLista(Descritor *listaLogin){
+void imprimirLista(){
     
-    if(listaVazia(listaLogin)){
+    if(listaVazia()){
         
         printf("Não existe usuários no chat.\n");
         return;
@@ -199,9 +199,9 @@ void imprimirLista(Descritor *listaLogin){
     }
 }
 
-int removerUsuario(Descritor *listaLogin, char *nick){
+int removerUsuario(char *nick){
     
-    if(listaVazia(listaLogin)){
+    if(listaVazia()){
         
         printf("\n\nNão há usuários Online.\n\n");
         return 1;

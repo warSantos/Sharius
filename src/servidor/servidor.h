@@ -23,7 +23,7 @@ void menuMenssagem(char *buffer, int *idSocket);
 void menuOperacao(char *senha);
 
 // Insere os dados dos usuários via socket.
-void addUserRemoto(Descritor *listaLogin, char *nick, int *sock);
+void addUserRemoto(char *nick, int *sock);
 
 // Fica aguardando conexões e envio de mesagens.
 // Responsável por repassar as mesagens para os demais usuários,

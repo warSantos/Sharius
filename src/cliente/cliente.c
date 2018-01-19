@@ -36,7 +36,7 @@ int menuComando(char *buffer){
     }
     if(!strncmp(bloco->comando, "list", 5)){
         
-        imprimirLista(listaLogin);
+        
     }else if(!strncmp(bloco->comando, "quit", 5)){
         
         printf("Fechando conexões...\n");
@@ -75,7 +75,7 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
         return;
     }else if(!strncmp(bloco->parametro, "-list", 6)){
         
-        imprimirLista(listaLogin);
+        
         return;
     }             
     enviarStr(idSocket, buffer);
@@ -83,7 +83,6 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
 
 void menuOperacao(char *userNick, int idSocket){
     
-    listaLogin = iniciarLista();
     char *buffer;
     char *alteraModo = calloc(sizeof(char),3);
     alteraModo[0] = '!';

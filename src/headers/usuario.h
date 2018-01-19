@@ -70,19 +70,19 @@ char *criaIp();
 
 // Verifica se nick existe na tabela de usuários e retorna o endereço de sua posição na lista.
 // Caso o usuário requerido não exista na lista é retornada nulo.
-Link pesquisarNick(Descritor *listaLogin, char *nick);
+Link pesquisarNick(char *nick);
 
 // Utiliza a função de pesquisar ip para retornar o ip como string.
-char *retornaIp(Descritor *listaLogin, char *ip);   
+char *retornaIp(char *ip);   
 
 // Insere uma nova celula na tabela de logins com seu respectivo endereço IP.
-int inserirUsuario(Descritor *listaLogin);
+int inserirUsuario();
 
 // Imprimi a lista de usuários ativos no servidor.
-void imprimirLista(Descritor *listaLogin);
+void imprimirLista();
 
 // Remove usuário da lista do server.
-int removerUsuario(Descritor *listaLogin, char *nick);
+int removerUsuario(char *nick);
 
 // Utiliza socket da função escultaSolicitação para enviar mensagem.
 void enviarMensagem(char *buffer, int idSocket);
