@@ -1,4 +1,4 @@
-#include "../servidor/servidor.h"
+#include "../headers/servidor.h"
 
 int main(){
     

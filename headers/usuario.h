@@ -7,7 +7,7 @@
 #ifndef usuario_H
 #define usuario_H
 
-#include "strUtils.h"
+#include "../headers/strUtils.h"
 #include <stdio_ext.h>
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr

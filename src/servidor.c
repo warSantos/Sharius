@@ -1,4 +1,4 @@
-#include "./servidor.h"
+#include "../headers/servidor.h"
 
 void ajudaMensagem(){
         
