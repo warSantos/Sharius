@@ -228,13 +228,14 @@ void escutaSolicitacao(void *password){
         close(socketLocal);       
         exit(1);
     }    
-    // Limitando o número de conexões que o socket local vai ouvir para 15.
-    listen(socketLocal, 15);
+    // Limitando o número de conexões que o servidor vai aceitar para 4 conexões.
+    listen(socketLocal, 4);
     
     sizeSockaddr = sizeof(struct sockaddr_in);
     
+    int qtdeConexoes = 0;
     // Esperando por conexões.
-    // Faça enquanto conexões forem solicitadas.
+    
     while(1){
         
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);

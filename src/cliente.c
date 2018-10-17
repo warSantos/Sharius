@@ -24,7 +24,7 @@ void ajudaComando(){
     printf("\n\tclear - limpa o bufferscreen (tela).");
     printf("\n\tlist - imprimi lista de usuários ativos.");
     printf("\n\thelp - consulta ajuda.");
-    printf("\n\tquit - encerra conexão com logins e deleta sala.");        
+    printf("\n\tquit - encerra conexão com logins e deleta sala.\n");        
 }
 
 int menuComando(char *buffer){

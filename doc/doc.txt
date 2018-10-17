@@ -1,0 +1,83 @@
+﻿Fluxo Básico de Operações (Servidor).
+
+1. Servidor iniciar espera por conexções.
+1. Servidor cria socket.
+2. Servidor faz o bind do socket.
+3. Servidor entra no estado de espera por conexões (4 conexões).
+2. Servidor aceita conexções.
+1. Servidor recebe solicitação de conexão.
+2. Servidor autentica usuário.
+3. Servidor cria thread para usuário.
+4. Servidor insere o usuário em uma das duplas.
+5. Retorna ao passo 2.1 até obter 4 conexões.
+3. Servidor distribui as cartas.
+1. Servidor chama função de distribuir cartas.
+2. Servidor envia carta para usuário.
+3. Espera confirmação.
+4. Retorna ao passo 3.1 até que todos os usuários estejam com cartas.
+4. Inicio de partida e decorrer da partida.
+1. Servidor sorteia um jogador para iniciar partida.
+2. Servidor envia sinal de livre para usuário.
+3. Servidor aguarda pelo jogador e abre tempo limite para jogada.
+4. Servidor recebe a carta do jogador.
+5. Servidor envia a carta aos demais jogadores.
+6. Servidor passa vez para o  o próximo jogador.
+7. Retorna ao passo 2 até que o jogo termine.
+
+Fluxo básico de operações do jogador.
+
+1. Jogador acessa o server para jogar.
+1. Jogador cria socket.
+2. Inicia processo de conexão com o servidor.
+3. Se autentica.
+4. Aguarda o servidor iniciar a partida.
+2. Jogador recebe catas.
+1. Jogador aguarda por suas cartas.
+2. Recebe cartas do servidor.
+3. Confirma recebimento das cartas.
+4. Aguarda pelo início da partida.
+3. Introdução e decorrer da partida.
+1. Jogador espera sua vez de jogar e enquanto isso visualiza as jogadas dos demais jogadores.
+2. Recebe sinal do servidor para proceder com sua jogada.
+3. Escolhe carta e realiza jogada.
+4. Retorna ao passo 4.1 até que o jogo termine.
+
+Opções de jogada para o players.
+Os players possuem as seguintes opções de jogada.
+1. Jogar um carta.
+2. Aumentar aposta (truco 4 pontos, meia 8 pontos, pedir 9, 10 pontos e Jogo 12 pontos).
+3. Recusar aumento de aposta.
+4. Aceitar aposta.
+
+Sistema de codificações para envio de mensagens.
+1. Sinal de envio de carta.
+2. Sinal de solicitação de aumento da aposta.
+3. Sinal de solicitação de aumento de aposta.
+4. Sinal de recuso de aumento de aposta.
+
+Estrutura de codificação das cartas.
+As cartas residem em um vetor de string, de forma que a sua hierarquia esta atrelado a sua posição no vertor. Desta forma o “Zap” (4 de paus) estaria na primeira posição deste vetor, seguido pelo “7 copas” (7 de coração), “Espadilha” (Az de espada) e assim sucessivamente.
+Vertor de cartas.
+0. 4 de paus (zap).
+1. 7 copas (7 de coração).
+2. Espadilha (Az de espada).
+3. Pica Fumo (7 de ouros).
+4. 3. 
+5. 2.
+6. Az.
+7. Reis.
+8. Valetes.
+9. Damas.
+10. 7.
+11. 6.
+12. 5.
+13. 4.
+
+Sistema de gerenciamento do jogo (Servidor).
+O servidor é responsável por gerenciar o fluxo do jogo e consequentemente definir qual jogar deve jogar a cada jogada.
+O sistema de permissão funciona através de “sinais”, de modo enquanto um jogador faz uma jogada os demais estão bloqueados e qualquer informação enviada durante o período de bloqueio é descartada.
+
+Particulariedades do jogo que ainda precisão ser decididas
+
+1. O jogo “cangar” como resolver? O jogador que detem a carta maior ganha rodada.
+2. Cartas como 3 e 2 devem possuir distinção de hierarquia por nipe? 3 de paus ser superior a 3 de coração por exemplo?
