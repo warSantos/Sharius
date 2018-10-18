@@ -12,7 +12,7 @@ void ajudaMensagem(){
     printf("\tTODA mesagem iniciada por @ será comprendido como uma mensagem privada.\n");
     printf("\tEntão evite iniciar mesagens com @ com destino para broadcast (todos na sala).\n");
     printf("\n\t-clear - limpa o bufferscreen (tela).");
-    printf("\n\t-list - imprimi lista de usuários ativos.");    
+    printf("\n\t-list - imprimi lista de usuários ativos.");
 }
 
 void ajudaComando(){
@@ -54,7 +54,7 @@ int menuComando(char *buffer){
         }    
     }else if(!strncmp(bloco->comando, "list", 5)){
         
-        imprimirLista();
+        //imprimirLista();
     }else if(!strncmp(bloco->comando, "quit", 5)){
         
         printf("Fechando conexões...\n");
@@ -92,7 +92,7 @@ void menuMensagem(char *buffer, int *idSocket) {
         return;
     } else if (!strncmp(bloco->parametro, "-list", 6)) {
 
-        imprimirLista();
+        //imprimirLista();
         return;
     }               
     if(*idSocket == -1){
@@ -236,7 +236,7 @@ void escutaSolicitacao(void *password){
     int qtdeConexoes = 0;
     // Esperando por conexões.
     
-    while(1){
+    while(qtdeConexoes < 4){
         
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
         if(socketCliente < 0){
@@ -303,6 +303,7 @@ void escutaSolicitacao(void *password){
             return;
         }
         free(nick);
+        qtdeConexoes++;
     }    
     if(socketCliente < 0){
         
@@ -341,8 +342,6 @@ void *escutaCliente(void *socketCliente){
         // Repassa para broadcast.
         if(!strncmp(bloco->comando, "all", 4)) {
             
-            
-                
             aux = listaLogin->primeiro;
             while (aux != NULL) {
 
@@ -471,10 +470,6 @@ int abreConexaoLocal(char **userNick, char *senha){
     
     free(nick);    
     return retSocket;
-}
-
-void sendList(){
-
 }
 
 void fechaConexoes(){

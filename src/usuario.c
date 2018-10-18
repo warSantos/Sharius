@@ -181,24 +181,6 @@ Link pesquisarNick(char *nick){
     return NULL;
 }
 
-void imprimirLista(){
-    
-    if(listaVazia()){
-        
-        printf("Não existe usuários no chat.\n");
-        return;
-    }
-    printf("Usuários online: %d.\n\n", listaLogin->tamanho);
-    Link aux = listaLogin->primeiro;               
-    printf("Usuários Online.\n");
-    
-    while(aux != NULL){
-        
-        printf("> %s \n", aux->nick);
-        aux = aux->prox;
-    }
-}
-
 int removerUsuario(char *nick){
     
     if(listaVazia()){

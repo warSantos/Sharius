@@ -16,7 +16,7 @@ typedef struct comando {
 // faz casting de size_t para char.
 char *retChar(int t);
 
-// faz casting char para inteiro.
+// copia o valor de um vetor de char para um inteiro.
 int retInt(char *t);
 
 // Verifica recebe uma string e verica se ela possui algum caractere proibido.

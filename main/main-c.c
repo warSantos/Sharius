@@ -20,7 +20,7 @@ int main(){
         return 1;
     }
     
-    // menu de administração do servidor.
+    // menu de administração do cliente.
     menuOperacao(userNick, idSocket);
     pthread_join(t, NULL);
     
