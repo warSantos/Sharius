@@ -9,7 +9,6 @@ int main(){
 	int valorMesa[4];
 	int Player[4];
 	char resposta[10];
-	Jogador jogador[4];
 	//enquanto n acabar o jogo
 	Cartas(baralho);
 	for(i=0;i<4;i++){
@@ -36,6 +35,7 @@ int main(){
 		printf("%c%c\n",jogador[i].mao[4],jogador[i].mao[5] );
 		printf("%i\n",jogador[i].valorCarta[2]);
 	}
+
 	while(l!=0){
 		Cartas(baralho);
 		embaralhar(baralho);
