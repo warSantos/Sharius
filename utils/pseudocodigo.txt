@@ -1,0 +1,81 @@
+Servidor iniciar partida.
+
+Enquanto o nenhuma equipe ganhar o jogo
+
+    Servidor embaralha as cartas.
+    Servidor distribui as cartas entre os jogadores.
+    Servidor envia as cartas para os jogadores.
+    Servidor recebe confirmação de envio das cartas.
+
+    Se não tiver uma ordem de qual jogador iniciar.
+        então sorteie.
+
+    Se alguma equipe estiver com 10 pontos.
+        Se a equipe decidir aceitar a aposta.
+            então o valor da rodada passa a ser 4 pontos.
+        Se não a equipe adiversária ganha 2 pontos.
+            retorna ao inicio do while.
+    
+    Enquanto não acabar a rodada (3 turnos ou vitoria antecipada de uma das duplas).
+
+        Enquanto nao acabar o turno (Todo jogadores jogarem uma carta)
+            
+            Se a mesa nao estiver vazia
+                Atualize a mesa para os jogadores
+
+            Envia sinal de permissao para o jogador da vez.
+            
+            Recebe resposta do jogador.
+            
+            Se a resposta for uma carta.
+                Adicione carta na mesa.
+                Mude o ponteiro de vez para o proximo jogador.
+
+            Se a resposta for um pedido um pedido de auemnto de aposta.
+                
+                Se for mao de dez
+
+                    dupla perde os tentos do turno
+                Se nao
+                    
+                    (Passo lambda) Envie solicitação de aumento de aposta para a dulpa.
+                    Envie sinal de permissao para o proximo jogador responder solicitação.
+                    Se o jogador aceitar (aceitar somente ou aumentar a aposta).
+                        
+                        Se o jogador responder com um aumento de aposta.
+                            Volte ao passo lambda.
+                        Se nao 
+                            Entao o valor do turno é reajustado.
+                    Se o jogador recusar            
+        Se cangar
+
+            Se for o primeiro turno.                
+                Informara aos jogadores que cangou.            
+            Se for no segundo turno                
+                Quem ganhou o primeiro turno ganha os pontos dos turnos.            
+            Se for na terceira             
+                nenhuma dupla ganha pontos
+
+    Apos acabar os turnos contabiliza os pontos para a dupla vencedora.
+
+
+Jogador entra na partida
+
+Enquanto a partida não acabar
+
+    Jogador recebe sua mao
+
+    Jogador envia confirmação de que as cartas chegaram ok
+
+    Enquanto nao acabar a rodada
+
+        Jogador recebe resposta do Servidor
+        Se for um pedido de truco
+            Jogador responde pedido
+
+        Se for um sinal para jogarem            
+            Jogador escolhe uma opção
+            Jogador envia esta opção para o Servidor
+
+        Se for a mesa
+            imprime a mesa atualizada na tela

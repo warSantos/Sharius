@@ -22,8 +22,8 @@ mcliente:	usuario	$(SRC)/cliente.c	$(HDRS)/servidor.h
 usuario:	truco	$(SRC)/usuario.c	$(HDRS)/usuario.h
 	$(CC) $(FLAGS) $(SRC)/usuario.c -o $(OBJ)/usuario.o
 
-truco:	$(SRC)/truco.c	$(HDRS)/truco.h
-	$(CC) $(FLAGS) $(SRC)/truco.c
+truco:	utils	$(SRC)/truco.c	$(HDRS)/truco.h
+	$(CC) $(FLAGS) $(SRC)/truco.c -o $(OBJ)/truco.o
 
 utils:	mk	$(SRC)/strUtils.c	$(HDRS)/strUtils.h
 	$(CC) $(FLAGS) $(SRC)/strUtils.c -o $(OBJ)/strUtils.o

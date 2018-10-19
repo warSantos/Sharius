@@ -8,7 +8,7 @@ int main(){
     
     // Cria conexão inicial com clientes e fornece uma thread de
     // recebimento de menagem para o cliente.
-    char *senha = malloc(sizeof(char)*16);    
+    char *senha = malloc(sizeof(char)*16);
     printf("Digite a senha de gerenciamento: ");
     scanf("%15[^\n]s", senha);
     __fpurge(stdin);
@@ -19,12 +19,13 @@ int main(){
         printf("Erro na inicialiazação do servidor de inicialização...\n");
         return 1;
     }
-    
-    // menu de administração do servidor.
-    menuOperacao(senha);
-    pthread_join(t, NULL);   
 
-    // Falta melhorar a função de fechar conexões...
+    pthread_join(t, NULL);
+
+    // Servidor envia as cartas para os jogadores.
+    
+    // Função para controle de fluxo da partida.
+
     pthread_exit(&t);
     
     return 0;

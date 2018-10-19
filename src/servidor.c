@@ -28,52 +28,6 @@ void ajudaComando(){
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
-int menuComando(char *buffer){
-    
-    Comando *bloco = split(buffer);
-    if(!bloco->lenghtComando){
-        
-        return 1;
-    }
-    if(!strncmp(bloco->comando, "add", 4)){
-               
-        inserirUsuario();
-    }else if(!strncmp(bloco->comando, "remove", 7)){
-        
-        if(bloco->lenghtParametro){        
-            
-            if(removerUsuario(bloco->parametro)){
-                
-                printf("Usuário inexistente.\n");
-                return 1;
-            }
-            printf("Usuário: %s removido.\n", bloco->parametro);
-        }else{
-            
-            printf("Erro na exlusão.\nSintaxe $ remove NICK.\n\n");
-        }    
-    }else if(!strncmp(bloco->comando, "list", 5)){
-        
-        //imprimirLista();
-    }else if(!strncmp(bloco->comando, "quit", 5)){
-        
-        printf("Fechando conexões...\n");
-        printf("Have a nice day....\n");
-        fechaConexoes();
-        return 0;
-    }else if(!strncmp(bloco->comando, "help", 5)){
-        
-        ajudaComando();
-    }else if(!strncmp(bloco->comando, "clear", 6)){
-        
-        system("clear");
-    }else{
-        
-        printf("\nComando não identificado.\n\n");
-    }
-    return 1;
-}
-
 void menuMensagem(char *buffer, int *idSocket) {
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
@@ -174,27 +128,27 @@ void addUserRemoto(char *nick, int *sock){
     
     size_t len = strlen(nick)+1;
     Link aux = malloc(sizeof(Login));
-    aux->nick = malloc(sizeof(char) * len);        
-    aux->socket = sock;    
-    strncpy(aux->nick, nick, len);                
+    aux->nick = malloc(sizeof(char) * len);
+    aux->socket = sock;
+    strncpy(aux->nick, nick, len);
     // Caso seja a primeira inserção de um usuário na lista.
     if(listaVazia()){
         
         listaLogin->primeiro = aux;
         listaLogin->ultimo = aux;
-        aux->prox = NULL;                   
+        aux->prox = NULL;          
     }else{
     
         listaLogin->ultimo->prox = aux;
-        listaLogin->ultimo = aux;                
-    }        
+        listaLogin->ultimo = aux;
+    }
     listaLogin->tamanho++;    
 }
 
 // Versão para uso real
 void escutaSolicitacao(void *password){
         
-    char *senha = (char *)password;            
+    char *senha = (char *)password;
     // enquanto o main estiver ativo.
     // pensando em possivelmente passar um parâmetro que indica termino
     // para esta função.
@@ -236,79 +190,117 @@ void escutaSolicitacao(void *password){
     int qtdeConexoes = 0;
     // Esperando por conexões.
     
-    while(qtdeConexoes < 4){
+    while(1){
         
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
         if(socketCliente < 0){
             
             break;
         }
-        // Criando uma thread para um cliente.
-        // A nova thread ficara responsável por enviar as mensagens do cliente
-        // mantendo a conexão até o término da execução.                
-        
-        // Capturando senha do cliente.
-        int tentativas = 0; 
-        char *senhaTemp;
-        while(tentativas < 3){
-                        
-            // recebendo a senha.
-            recebeStr(socketCliente, &senhaTemp);            
-            tentativas++;
-            char ok;
-            if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
-                
-                ok = 'S';
-                write(socketCliente, &ok, 1);
-                free(senhaTemp);
-                break;
-            }
-            ok = 'N';
-            write(socketCliente, &ok, 1);
-        }                
-        char *nick;
-        Link aux;
-        while(1){
-                    
-            if(recebeStr(socketCliente, &nick) <= 0){
-                                
-                close(socketCliente);
-            } 
-                                       
-            aux = pesquisarNick(nick);                    
-            char ok;
-            if (aux == NULL) { // se login nao existir
-                
-                ok = 'S';
-                write(socketCliente, &ok, 1);
-                break;
-            }                    
-            ok = 'N';
-            write(socketCliente, &ok, 1);
-        }        
-                        
-        pthread_t threadCliente;
-        novoSocket = malloc(sizeof(int));
-        *novoSocket = socketCliente;     
-        
-        // Adicionando usuário a lista.
-        pthread_mutex_lock(&lista);                
-        addUserRemoto(nick, novoSocket);        
-        pthread_mutex_unlock(&lista);
-        
-        if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
+        // Se o limite de conexões não foi atingido.
+        if (qtdeConexoes < 4){
+
+            // Criando uma thread para um cliente.
+            // A nova thread ficara responsável por enviar as mensagens do cliente
+            // mantendo a conexão até o término da execução.                
             
-            printf("Erro ao criar a thread.\n");
-            removerUsuario(nick);
-            return;
+            // Capturando senha do cliente.
+            int tentativas = 0; 
+            char *senhaTemp;
+            while(tentativas < 3){
+                            
+                // recebendo a senha.
+                recebeStr(socketCliente, &senhaTemp);            
+                tentativas++;
+                char ok;
+                if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
+                    
+                    ok = 'S';
+                    write(socketCliente, &ok, 1);
+                    free(senhaTemp);
+                    break;
+                }
+                ok = 'N';
+                write(socketCliente, &ok, 1);
+            }                
+            char *nick;
+            Link aux;
+            while(1){
+                        
+                if(recebeStr(socketCliente, &nick) <= 0){
+                                    
+                    close(socketCliente);
+                }                       
+                aux = pesquisarNick(nick);                    
+                char ok;
+                if (aux == NULL) { // se login nao existir
+                    
+                    ok = 'S';
+                    write(socketCliente, &ok, 1);
+                    break;
+                }                    
+                ok = 'N';
+                write(socketCliente, &ok, 1);
+            }        
+                            
+            pthread_t threadCliente;
+            novoSocket = malloc(sizeof(int));
+            *novoSocket = socketCliente;     
+            
+            // Adicionando usuário a lista.
+            pthread_mutex_lock(&lista);                
+            addUserRemoto(nick, novoSocket);        
+            pthread_mutex_unlock(&lista);
+            
+            if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
+                
+                printf("Erro ao criar a thread.\n");
+                removerUsuario(nick);
+                return;
+            }
+            free(nick);
+        } else { // Se o limite de conexões foi atingido.
+            // Informe ao jogador que não é mais possível sua participação.            
+            
+            pthread_t threadCliente;
+            novoSocket = malloc(sizeof(int));
+            *novoSocket = socketCliente;
+            
+            // Adicionando usuário a lista.
+            pthread_mutex_lock(&lista);            
+            addUserRemoto(nick, novoSocket);
+            pthread_mutex_unlock(&lista);
+            
+            if(pthread_create(&threadCliente, NULL, limiteAtingido, (void *) novoSocket)){
+                
+                printf("Erro ao criar a thread.\n");
+                removerUsuario(nick);
+                return;
+            }
         }
-        free(nick);
         qtdeConexoes++;
     }    
     if(socketCliente < 0){
         
         printf("Falha na função accpet.\n");
     }
+}
+
+void *limiteAtingido (void *socketCliente){
+
+    int idSocket = *(int*)socketCliente, read_size;    
+    //int read_size;
+    
+    // enviando mensagem de aviso.
+    char *msgLimite = "50:Limite de jogadres atingido. Por favor tente novamente mais tarde";
+
+    // enviando confirmação de pronto para receber nome...
+    char *buffer, *donoThread, ac = 'S';                
+    write(idSocket, msgLimite, len(msgLimite) + 1);
+
+    //Free the socket pointer
+    close(*(int *)socketCliente);
+    printf("fechando conexão com cliente...\n");
 }
 
 void *escutaCliente(void *socketCliente){
@@ -395,83 +387,6 @@ void *escutaCliente(void *socketCliente){
     return 0;        
 }
 
-int abreConexaoLocal(char **userNick, char *senha){
-        
-    struct sockaddr_in servidor;    
-     
-    //Create socket
-    int retSocket = socket(AF_INET , SOCK_STREAM , 0);
-    if (retSocket == -1){
-        
-        printf("Erro ao criar socket cliente...\n");
-        return retSocket;
-    } 
-    
-    char *ip = "127.0.0.1";            
-    
-    // Definindo IP do servidor...
-    servidor.sin_addr.s_addr = inet_addr(ip);
-    
-    // Definindo o tipo de protocolo...
-    servidor.sin_family = AF_INET;
-    
-    // Define a porta em que esta ativo o serviço no servidor...
-    servidor.sin_port = htons(40001);
-    
-    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
-    
-    //Busca conexão com o servidor...
-    
-    if (connect(retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
-                
-        perror("Erro. conexão não estabelecida...");
-        return retSocket;
-    }                    
-    
-    // Criar usuário.        
-    char ok;               
-    char *nick;       
-    
-    // enviando senha.
-    enviarStr(retSocket, senha);
-    
-    // Recebendo confiramção.
-    recv(retSocket, &ok, sizeof (char), 0);                                            
-    if(ok != 'S'){
-        
-        printf("Erro no password.\n");
-        return -1;
-    }
-    
-    while(1){
-                
-        nick = criaNick();        
-        
-        enviarStr(retSocket, nick);
-        
-        // recebendo confirmação...
-        recv(retSocket, &ok, 1, 0);
-        if(ok == 'S'){
-            
-            break;
-        }
-        printf("Este login já esta em uso.\n\n");
-    }        
-    
-    char ac;
-    recv(retSocket, &ac, 1, 0);    
-    
-    // enviando login para a thread de escutaCliente.
-    enviarStr(retSocket, nick);
-         
-    int len = strlen(nick)+1;
-    *userNick = malloc(sizeof(char)* len);
-    strncpy(*userNick, nick, len);
-    
-    free(nick);    
-    return retSocket;
-}
-
 void fechaConexoes(){
         
     if(!listaVazia()){
@@ -489,6 +404,7 @@ void fechaConexoes(){
 void enviarCartas(){
 
 }
+
 void jogo(){
     
     int l=1,i,j,k=0,m=0,n = 0,o=0;
@@ -499,27 +415,6 @@ void jogo(){
     for(i=0;i<4;i++){
         jogador[i].numero = i+1;
     }
-    /*for(i=0;i<40;i++){
-        printf("carta :%c%c\n",baralho[i].nome[0],baralho[i].nome[1]);
-        printf("valor :%i\n",baralho[i].valor );
-    }
-    embaralhar(baralho);
-    printf("Embaralhado\n");
-    for(i=0;i<40;i++){
-        printf("carta :%c%c\n",baralho[i].nome[0],baralho[i].nome[1]);
-        printf("valor :%i\n",baralho[i].valor );
-    }
-    distribuircarta(baralho,jogador);
-    printf("distribuircarta\n");
-    for(i=0;i<4;i++){
-        printf("\n%i\n",jogador[i].numero);
-        printf("%c%c\n",jogador[i].mao[0],jogador[i].mao[1] );
-        printf("%i\n",jogador[i].valorCarta[0]);
-        printf("%c%c\n",jogador[i].mao[2],jogador[i].mao[3] );
-        printf("%i\n",jogador[i].valorCarta[1]);
-        printf("%c%c\n",jogador[i].mao[4],jogador[i].mao[5] );
-        printf("%i\n",jogador[i].valorCarta[2]);
-    }*/
     Cartas(baralho);
     while(l!=0){
         //embaralhando o baralho para distribuir
@@ -543,15 +438,15 @@ void jogo(){
                 printf("Mao de 10 do time 2 , jogador 2 e 4 \n");
                 scanf("%s",resposta);
                 if(strcmp(resposta,"sim") == 0){
-                valorRodada = 4;
+                    valorRodada = 4;
                 }
                 else{
-                i = 3;
-            }
-        }
-            
+                    i = 3;
+                }
+            }            
         }
         while(i!=3){
+            
             for(j=0;j<4;j++){
                 printf("\n Vez do jogador %i\n",jogador[j].numero);
                 
@@ -577,7 +472,6 @@ void jogo(){
         }
             }
             i++;
-
         }
         if(placarJogo[0] > 10 || placarJogo[1] > 10){
             l=0;

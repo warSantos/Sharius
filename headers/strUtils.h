@@ -11,7 +11,7 @@ typedef struct comando {
     char *comando;
     char *parametro;
     int lenghtComando;
-    int lenghtParametro;    
+    int lenghtParametro;
 } Comando;
 
 // faz casting de size_t para char.
