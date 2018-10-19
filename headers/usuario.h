@@ -8,6 +8,7 @@
 #define usuario_H
 
 #include "../headers/strUtils.h"
+#include "../headers/truco.h"
 #include <stdio_ext.h>
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr

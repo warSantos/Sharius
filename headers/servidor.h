@@ -2,6 +2,7 @@
 #define menu_H
 
 #include "../headers/usuario.h"
+#include "../headers/truco.h"
 
 /*
  *

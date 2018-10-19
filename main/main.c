@@ -1,11 +1,7 @@
-#include <strings.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include "Truco.h"
+#include "../headers/truco.h"
+
 int main(){
+	
 	int l=1,i,j,k=0,m=0,n = 0,o=0;
 	int placarJogo[2],placarRodada[2],valorRodada = 2;
 	Carta baralho[40];

@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Truco.h"
+#include "../headers/truco.h"
+
 void Cartas(Carta baralho[40]){
 	// 4
 	strcpy(baralho[0].nome, "4o"); 
@@ -96,6 +97,7 @@ void Cartas(Carta baralho[40]){
 	strcpy(baralho[39].nome, "4p"); 
 	baralho[39].valor = 14;
 }
+
 void embaralhar(Carta baralho[40]){
 	int i=0,j,k,auxValor;
 	char auxNome[3];
@@ -115,6 +117,7 @@ void embaralhar(Carta baralho[40]){
 		i++;
 	}
 }
+
 void distribuircarta(Carta baralho[40],Jogador jogador[4]){
 	int i=0,j=0,k=0,l=0;
 	for(i=0;i<4;i++){

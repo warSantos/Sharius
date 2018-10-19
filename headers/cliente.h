@@ -8,6 +8,7 @@
 #define cliente_H
 
 #include "../headers/usuario.h"
+#include "../headers/truco.h"
 
 /*
  * 
