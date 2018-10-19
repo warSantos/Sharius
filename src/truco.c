@@ -4,7 +4,7 @@
 #include <string.h>
 #include "../headers/truco.h"
 
-void Cartas(Carta baralho[40]){
+void construirBaralho(Carta baralho[40]){
 	// 4
 	strcpy(baralho[0].nome, "4o"); 
 	baralho[0].valor = 1;
@@ -98,7 +98,7 @@ void Cartas(Carta baralho[40]){
 	baralho[39].valor = 14;
 }
 
-void embaralhar(Carta baralho[40]){
+void embaralhar(){
 	int i=0,j,k,auxValor;
 	char auxNome[3];
 	srand(time(NULL));
@@ -118,7 +118,7 @@ void embaralhar(Carta baralho[40]){
 	}
 }
 
-void distribuircarta(Carta baralho[40],Jogador jogador[4]){
+void distribuircarta(){
 	int i=0,j=0,k=0;
 	for(i=0;i<4;i++){
 		for(j=0;j<3;j++){
@@ -129,7 +129,7 @@ void distribuircarta(Carta baralho[40],Jogador jogador[4]){
 	}
 }
 
-int vencRodada(Mesa mesa[4]){
+int vencRodada(){
 	int aux=0,aux2,i;
 	for(i=0;i<4;i++){
 		if(mesa[i].carta.valor > aux ){

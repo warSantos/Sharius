@@ -3,10 +3,14 @@
 
 #include "../headers/usuario.h"
 
-Jogador jogador[4];
+// Estrutura que comporta os dados sobre todos os jogadores 
+// de uma partida (cartas, valor das cartas, nome, id e socket_fd).
+Jogador jogadores[4];
 
+// Esta estrutura comportas as catas disponíveis para o jogo, 
+// declarada como global para que deste modo evite reconstrução
+// do baralho.
 Carta baralho[40];
-
 
 /*
  *
@@ -56,5 +60,9 @@ int abreConexaoLocal(char **userNick, char *senha);
 
 // Encerra os socket quando o servidor é terminado...
 void fechaConexoes();
+
+void enviarCartas();
+
+void controleJogo();
 
 #endif

@@ -238,7 +238,7 @@ void escutaSolicitacao(void *password){
                     ok = 'S';
                     write(socketCliente, &ok, 1);
                     break;
-                }                    
+                }                   
                 ok = 'N';
                 write(socketCliente, &ok, 1);
             }        
@@ -399,9 +399,41 @@ void fechaConexoes(){
     }
     free(listaLogin);
 }
+
 void enviarCartas(){
 
+    // Chamando uma função para embaralhar cartas.
+    embaralhar ();
+    // Aplicando função de distribuir cartas.
+    distribuirCarta ();
+    int numeroJogador = 0;
+    // Enquanto todos os jogadores não estiverem com suas cartas.
+    while (numeroJogador < 4){
+        
+        // Envie as cartas e o valor das cartas.
+        enviarStr (jogadores[numeroJogador].socket, jogadores[numeroJogador].mao);
+    }
 }
 
-void jogo(){
+void controleJogo(){    
+
+    // Construindo baralho.
+    construirBaralho ();
+
+    // Enquanto não houver vencedores.
+    while (1){
+
+        // Enviando as cartas para os jogadores.
+        enviarCartas();
+
+        int turnos = 0, vezJogador;
+        // Iniciando rodada.
+        while(turnos < 3){
+            
+            // Enviando sinais de permissão para os jogadores.
+            while (vezJogador < 4){
+
+            }
+        }
+    }
 }

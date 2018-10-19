@@ -10,20 +10,22 @@ typedef struct{
 
 typedef struct{
 	int numero;
+	int socket;
+	char *nick;
 	Carta mao[3];
 } Jogador;
 
 typedef struct{
-	int numero;
-	Carta carta;
+	int numeroJogador;
+	Carta cartas[4];
 } Mesa;
 
-void Cartas(Carta baralho[40]);
+void construirBaralho();
 
-void embaralhar(Carta baralho[40]);
+void embaralhar();
 
-void distribuircarta(Carta baralho[40],Jogador jogador[4]);
+void distribuircarta();
 
-int vencRodada(Mesa mesa[4]);
+int vencRodada();
 
 #endif
