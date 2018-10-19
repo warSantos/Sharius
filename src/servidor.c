@@ -268,13 +268,11 @@ void escutaSolicitacao(void *password){
             
             // Adicionando usuário a lista.
             pthread_mutex_lock(&lista);            
-            addUserRemoto(nick, novoSocket);
             pthread_mutex_unlock(&lista);
             
             if(pthread_create(&threadCliente, NULL, limiteAtingido, (void *) novoSocket)){
                 
-                printf("Erro ao criar a thread.\n");
-                removerUsuario(nick);
+                printf("Erro ao criar a thread.\n");                
                 return;
             }
         }
@@ -296,7 +294,7 @@ void *limiteAtingido (void *socketCliente){
 
     // enviando confirmação de pronto para receber nome...
     char *buffer, *donoThread, ac = 'S';                
-    write(idSocket, msgLimite, len(msgLimite) + 1);
+    write(idSocket, msgLimite, strlen(msgLimite) + 1);
 
     //Free the socket pointer
     close(*(int *)socketCliente);
@@ -406,75 +404,4 @@ void enviarCartas(){
 }
 
 void jogo(){
-    
-    int l=1,i,j,k=0,m=0,n = 0,o=0;
-    int placarJogo[2],placarRodada[2],valorRodada = 2;
-    char resposta[10];
-    //enquanto n acabar o jogo
-    Cartas(baralho);
-    for(i=0;i<4;i++){
-        jogador[i].numero = i+1;
-    }
-    Cartas(baralho);
-    while(l!=0){
-        //embaralhando o baralho para distribuir
-        embaralhar(baralho);
-        //distribuindo as cartas entre os jogadores
-        distribuircarta(baralho,jogador);
-        //enviando as cartas para os jogadores
-        enviarCartas();
-        i=0;
-        if(placarJogo[0] == 10 || placarJogo[1] == 10){
-            if(placarJogo[0] == 10){
-                printf("Mao de 10 do time 1 , jogador 1 e 3 \n");
-                scanf("%s",resposta);
-                if(strcmp(resposta,"sim") == 0){
-                    valorRodada = 4;
-                }
-                else{
-                    i = 3;
-                }
-            }else if(placarJogo[1] == 10){
-                printf("Mao de 10 do time 2 , jogador 2 e 4 \n");
-                scanf("%s",resposta);
-                if(strcmp(resposta,"sim") == 0){
-                    valorRodada = 4;
-                }
-                else{
-                    i = 3;
-                }
-            }            
-        }
-        while(i!=3){
-            
-            for(j=0;j<4;j++){
-                printf("\n Vez do jogador %i\n",jogador[j].numero);
-                
-                if(k != 3){
-                    k++;
-                    }
-                }
-                o = 0;
-                printf("mesa\n");
-                while (o!= m){
-                    printf("%c%c  ",mesa[o].carta.nome[0],mesa[o].carta.nome[1]);
-                    o++;
-                }
-            }
-            resultado = vencRodada(mesa);
-            if(resultado == 5){
-                printf("resultado da rodada foi empate\n");
-            }
-            else{
-                printf("Vencedor da rodada foi %i\n", resultado);
-            }++;
-
-        }
-            }
-            i++;
-        }
-        if(placarJogo[0] > 10 || placarJogo[1] > 10){
-            l=0;
-        }
-    }
 }

@@ -1,5 +1,6 @@
 CC=gcc
-FLAGS=-O3 -Wall -c
+#FLAGS=-O3 -Wall -c
+FLAGS=-c
 
 OBJ=./obj
 HDRS=./headers

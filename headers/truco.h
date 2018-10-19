@@ -4,20 +4,19 @@
 #include "../headers/strUtils.h"
 
 typedef struct{
-	char nome[3];
 	int valor;
-}Carta;
+	char nome[3];
+} Carta;
 
 typedef struct{
 	int numero;
 	Carta mao[3];
-}Jogador;
+} Jogador;
 
 typedef struct{
 	int numero;
 	Carta carta;
-}Mesa;
-
+} Mesa;
 
 void Cartas(Carta baralho[40]);
 

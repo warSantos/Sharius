@@ -11,8 +11,6 @@
 
 Jogador maoJogador;
 
-
-
 /*
  * 
  * Módulo cliente responsável por enviar mensagens para o servidor.
