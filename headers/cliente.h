@@ -10,6 +10,10 @@
 #include "../headers/usuario.h"
 #include "../headers/truco.h"
 
+Jogador maoJogador;
+
+
+
 /*
  * 
  * Módulo cliente responsável por enviar mensagens para o servidor.

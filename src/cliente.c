@@ -55,32 +55,73 @@ int menuComando(char *buffer){
     }
     return 0;
 }
+void menu(){
+    printf(" 00 - Jogar Carta ");
+    if(valorRodada == 2){
+        printf("01 - truco\n");
+    }
+    if (valorRodada == 4){
+        printf("02 - seis\n");
+    }
+    if(valorRodadda == 8){
+        printf("03 - nove\n");
+    }
+    if(valorRodadda == 10){
+        printf("04 - doze\n");
+    }
+    printf("05 - help\n");
 
+}
 void menuMensagem(char *buffer, char *userNick, int idSocket){
     
     // Comando vai ser utilizado com identificador de usuário por padão é (all).
-    Comando *bloco = extraiMensagem(buffer);    
+    Comando *bloco = extraiMensagem(buffer);
     if(!bloco->lenghtParametro){
         
         return;
     }
+    else if(!strncpm(bloco->parametro,"00" , 3)){
+        jogar();
+    }
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
-    if(!strncmp(bloco->parametro, "-help", 6)){
-        
-        ajudaMensagem();
+    else if(!strncmp(bloco->parametro, "01", 3) && valorRodada == 2 ){
+        aumentoValor();
         return;
-    }else if(!strncmp(bloco->parametro, "-clear", 7)){
-        
-        system("clear");
+    }else if(!strncmp(bloco->parametro, "02", 3 && valorRodada == 4)){
+        aumentoValor();
         return;
-    }else if(!strncmp(bloco->parametro, "-list", 6)){
-        
+    }else if(!strncmp(bloco->parametro,"03", 3) && valorRodada == 8){
+        aumentoValor();
+        return;
+    }else if(!strncmp(bloco->parametro,"04",3) && valorRodada == 10 ){
+        aumentoValor();
+        return;
+    }else if(!strncmp(bloco->parametro,"05",3)){
         
         return;
-    }             
+    }else if(!strncmp(bloco->parametro,"06",3)){
+        return;
+    }
+
+    else{
+        printf("digito numero errado\n");
+        menuOperacao 
+
+    }
     enviarStr(idSocket, buffer);
 }
+void menuOperacao007(char *userNick, int idSocket){
+    char *buffer;
+    menu();
+    int loop = 1;
+    while(loop){
+        buffer = calloc(sizeof(char),20);
+        scanf("%s",buffer);
+        __fpurge(stdin);
+        menuMensagem(buffer,userNick,idSocket);
+    }
 
+}
 void menuOperacao(char *userNick, int idSocket){
     
     char *buffer;
@@ -258,36 +299,29 @@ int abreConexao(char **userNick){
     return retSocket;
 }
 void visualizrCarta(){
-    for(q=0;q<3;q++){
-        if(jogador[j].mao[q].nome[0] != 0){
-            printf("%c%c\n",jogador[j].mao[q].nome[0],jogador[j].mao[q].nome[1] );
+    for(i=0;i<3;i++){
+        if(maoJogador.mao[i                     
+            4].nome[0] != 0){
+            printf("%c%c\n",maoJogador[j].mao[q].nome[0],maoJogador[j].mao[q].nome[1] );
         }
-    }
-                printf("\n");
-                scanf("%s",resposta);
-                for(k=0;k<3;){
-                    if(jogador[j].mao[k].nome[0] == resposta[0] && jogador[j].mao[k].nome[1] == resposta[1]){
-                        strcpy(mesa[m].carta.nome,jogador[j].mao[k].nome);
-                        jogador[j].mao[k].nome[0] = 0;
-                        jogador[j].mao[k].nome[1] = 1;
-                        mesa[m].carta.valor = jogador[j].mao[k].valor;
-                        mesa[m].numero = jogador[j].numero;
-                        k = 3;
-                        m++;
-                }
+    }                
 }
 void jogar(){
+    char resposta[3];
     printf("\n");
     scanf("%s",resposta);
     for(k=0;k<3;){
-        if(jogador[j].mao[k].nome[0] == resposta[0] && jogador[j].mao[k].nome[1] == resposta[1]){
-            strcpy(mesa[m].carta.nome,jogador[j].mao[k].nome);
-            jogador[j].mao[k].nome[0] = 0;
-            jogador[j].mao[k].nome[1] = 1;
-            mesa[m].carta.valor = jogador[j].mao[k].valor;
-            mesa[m].numero = jogador[j].numero;
+        if(maojogador.mao[k].nome[0] == resposta[0] && maojogador.mao[k].nome[1] == resposta[1]){
+            strcpy(,maoJogador[j].mao[k].nome);
+            maoJogador.mao[k].nome[0] = 0;
+            maoJogador.mao[k].nome[1] = 0;
+             = maoJogador[j].mao[k].valor;
+             = maoJogador[j].numero;
             k = 3;
             m++;
         }
     }
+}
+void aumentoValor(){
+
 }

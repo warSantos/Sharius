@@ -18,10 +18,6 @@ typedef struct{
 	Carta carta;
 }Mesa;
 
-Jogador jogador[4];
-
-Carta baralho[40];
-
 
 void Cartas(Carta baralho[40]);
 

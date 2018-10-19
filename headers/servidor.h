@@ -4,6 +4,11 @@
 #include "../headers/usuario.h"
 #include "../headers/truco.h"
 
+Jogador jogador[4];
+
+Carta baralho[40];
+
+
 /*
  *
  * Menu de comandos do Servidor.
