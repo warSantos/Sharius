@@ -2,7 +2,6 @@
 #define menu_H
 
 #include "../headers/usuario.h"
-#include "../headers/truco.h"
 
 /*
  *
@@ -31,6 +30,10 @@ void addUserRemoto(char *nick, int *sock);
 // Receber solicitações de login.
 // Gerenciamento de conexões externas.
 void escutaSolicitacao();
+
+// Informa a um jogador que sua conexão com o server não pode ser 
+// estabelecida devido o limite dos jogadores ter sido atingido.
+void *limiteAtingido (void *socketCliente);
 
 // Recebe as mensagens de um cliente e repassa elas aos demais 
 // logados no chat.

@@ -129,33 +129,6 @@ void distribuircarta(Carta baralho[40],Jogador jogador[4]){
 	}
 }
 
-/*int maode10(int placarJogo[2]){
-	int resultado;
-	if(placarJogo[0] == 10){
-		printf("Mao de 10 do time 1 , jogador 1 e 3 \n");
-		scanf("%s",resposta);
-		if(strcmp(resposta,"sim") == 0){
-			resultado = 1;
-			return resultado;
-		}
-		else{
-			resultado = -1;
-			return resultado;
-		}
-	}else if(placarJogo[1] == 10){
-		printf("Mao de 10 do time 2 , jogador 2 e 4 \n");
-		scanf("%s",resposta);
-		if(strcmp(resposta,"sim") == 0){
-			resultado = 2;
-			return resultado;
-		}
-		else{
-			resultado = -2;
-			return resultado;
-		}
-	}
-			
-}*/
 int vencRodada(Mesa mesa[4]){
 	int aux=0,aux2,i;
 	for(i=0;i<4;i++){
@@ -177,26 +150,3 @@ int vencRodada(Mesa mesa[4]){
 int vencjogo(){
 
 }
-/*int truco(){
-
-	seis();
-}
-int seis(){
-	nove();
-}
-int nove(){
-	doze();
-}*/
-/*int doze(int numero,Jogador jogador[4]){
-	int valorRodada;
-	char resposta[5];
-	printf("voce a aceita doze jogador %i ?\n",jogador[numero].numero);
-	scanf("%s",resposta);
-	if(strcmp(resposta,"sim")== 0){
-		valorRodada = 12;
-		return valorRodada;
-	}
-	else if(strcmp(resposta,"nao")==0){
-
-	}
-}*/
