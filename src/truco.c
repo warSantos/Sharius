@@ -119,26 +119,66 @@ void embaralhar(Carta baralho[40]){
 }
 
 void distribuircarta(Carta baralho[40],Jogador jogador[4]){
-	int i=0,j=0,k=0,l=0;
+	int i=0,j=0,k=0;
 	for(i=0;i<4;i++){
 		for(j=0;j<3;j++){
-			jogador[i].mao[l] = baralho[k].nome[0];
-			l++;
-			jogador[i].mao[l] = baralho[k].nome[1];
-			l++;
-			jogador[i].valorCarta[j] = baralho[k].valor;
+			strcpy(jogador[i].mao[j].nome,baralho[k].nome);
+			jogador[i].mao[j].valor = baralho[k].valor;
 			k++;
 		}
-		l=0;
 	}
 }
-int vencRodada(){
 
+/*int maode10(int placarJogo[2]){
+	int resultado;
+	if(placarJogo[0] == 10){
+		printf("Mao de 10 do time 1 , jogador 1 e 3 \n");
+		scanf("%s",resposta);
+		if(strcmp(resposta,"sim") == 0){
+			resultado = 1;
+			return resultado;
+		}
+		else{
+			resultado = -1;
+			return resultado;
+		}
+	}else if(placarJogo[1] == 10){
+		printf("Mao de 10 do time 2 , jogador 2 e 4 \n");
+		scanf("%s",resposta);
+		if(strcmp(resposta,"sim") == 0){
+			resultado = 2;
+			return resultado;
+		}
+		else{
+			resultado = -2;
+			return resultado;
+		}
+	}
+			
+}*/
+int vencRodada(Mesa mesa[4]){
+	int aux=0,aux2,i;
+	for(i=0;i<4;i++){
+		if(mesa[i].carta.valor > aux ){
+			aux = mesa[i].carta.valor;
+			printf("%i\n",mesa[i].carta.valor);
+			aux2 = mesa[i].numero;
+			printf("%i\n",mesa[i].numero);
+		}
+		else if(mesa[i].carta.valor == aux){
+			if((aux2 % 2) == 0 && (mesa[i].numero % 2) != 0 || (aux2 % 2) != 0 && (mesa[i].numero %2) == 0){
+				aux2 = 5;
+			}
+
+		}
+	}
+	return aux2;
 }
 int vencjogo(){
 
 }
-int truco(){
+/*int truco(){
+
 	seis();
 }
 int seis(){
@@ -146,7 +186,17 @@ int seis(){
 }
 int nove(){
 	doze();
-}
-int doze(){
+}*/
+/*int doze(int numero,Jogador jogador[4]){
+	int valorRodada;
+	char resposta[5];
+	printf("voce a aceita doze jogador %i ?\n",jogador[numero].numero);
+	scanf("%s",resposta);
+	if(strcmp(resposta,"sim")== 0){
+		valorRodada = 12;
+		return valorRodada;
+	}
+	else if(strcmp(resposta,"nao")==0){
 
-}
+	}
+}*/

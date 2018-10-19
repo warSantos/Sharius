@@ -65,55 +65,44 @@ int main(){
 		}
 		while(i!=3){
 			for(j=0;j<4;j++){
-				printf("Vez do jogador %i\n",jogador[j].numero);
-				scanf("%s",resposta);
-				if(strcmp(resposta,"truco") == 0 && valorRodada == 2){
-					truco();
-
-				}
-				if(strcmp(resposta,"seis") == 0 && valorRodada == 4){
-					seis();
-				}
-				if(strcmp(resposta,"nove") == 0 && valorRodada == 6){
-					nove();
-				}
-				if(strcmp(resposta,"doze") == 0 && valorRodada == 10){
-					doze();
-				}
-				for(k=0;k<7;){
-					if(jogador[j].mao[k] == resposta[0]){
-						if(jogador[j].mao[k+1]== resposta[1]){
-							mesa[m] = jogador[j].mao[k];
-							jogador[j].mao[k] = 0;
-							m++;
-							mesa[m] = jogador[j].mao[k+1];
-							jogador[j].mao[k+1] = 0;
-							m++;
-							if(k == 0){
-								valorMesa[n] = jogador[j].valorCarta[0];
-								n++;
-							}
-							else if(k == 2){
-								valorMesa[n] = jogador[j].valorCarta[1];
-								n++;
-							}
-							else{
-								valorMesa[n] = jogador[j].valorCarta[2];
-								n++;
-							}
-							k = 7;
-						}
+				printf("\n Vez do jogador %i\n",jogador[j].numero);
+				for(q=0;q<3;q++){
+					if(jogador[j].mao[q].nome[0] != 0){
+						printf("%c%c\n",jogador[j].mao[q].nome[0],jogador[j].mao[q].nome[1] );
 					}
-					if(k != 7){
+				}
+				printf("\n");
+				scanf("%s",resposta);
+				for(k=0;k<3;){
+					if(jogador[j].mao[k].nome[0] == resposta[0] && jogador[j].mao[k].nome[1] == resposta[1]){
+							strcpy(mesa[m].carta.nome,jogador[j].mao[k].nome);
+							jogador[j].mao[k].nome[0] = 0;
+							jogador[j].mao[k].nome[1] = 1;
+							mesa[m].carta.valor = jogador[j].mao[k].valor;
+							mesa[m].numero = jogador[j].numero;
+							k = 3;
+							m++;
+					}
+					if(k != 3){
 						k++;
 					}
 				}
 				o = 0;
 				printf("mesa\n");
 				while (o!= m){
-					printf("%c%c\n",mesa[o],mesa[o+1] );
-					o = o+2;
+					printf("%c%c  ",mesa[o].carta.nome[0],mesa[o].carta.nome[1]);
+					o++;
 				}
+			}
+			resultado = vencRodada(mesa);
+			if(resultado == 5){
+				printf("resultado da rodada foi empate\n");
+			}
+			else{
+				printf("Vencedor da rodada foi %i\n", resultado);
+			}++;
+
+		}
 			}
 			i++;
 
