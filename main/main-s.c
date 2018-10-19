@@ -18,14 +18,14 @@ int main(){
         
         printf("Erro na inicialiazação do servidor de inicialização...\n");
         return 1;
-    }        
+    }
     
     // menu de administração do servidor.
     menuOperacao(senha);
     pthread_join(t, NULL);   
-    
+
     // Falta melhorar a função de fechar conexões...
-    pthread_exit(&t);    
+    pthread_exit(&t);
     
     return 0;
 }

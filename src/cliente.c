@@ -257,3 +257,37 @@ int abreConexao(char **userNick){
     printf("Login cadastrado...\n");                
     return retSocket;
 }
+void visualizrCarta(){
+    for(q=0;q<3;q++){
+        if(jogador[j].mao[q].nome[0] != 0){
+            printf("%c%c\n",jogador[j].mao[q].nome[0],jogador[j].mao[q].nome[1] );
+        }
+    }
+                printf("\n");
+                scanf("%s",resposta);
+                for(k=0;k<3;){
+                    if(jogador[j].mao[k].nome[0] == resposta[0] && jogador[j].mao[k].nome[1] == resposta[1]){
+                        strcpy(mesa[m].carta.nome,jogador[j].mao[k].nome);
+                        jogador[j].mao[k].nome[0] = 0;
+                        jogador[j].mao[k].nome[1] = 1;
+                        mesa[m].carta.valor = jogador[j].mao[k].valor;
+                        mesa[m].numero = jogador[j].numero;
+                        k = 3;
+                        m++;
+                }
+}
+void jogar(){
+    printf("\n");
+    scanf("%s",resposta);
+    for(k=0;k<3;){
+        if(jogador[j].mao[k].nome[0] == resposta[0] && jogador[j].mao[k].nome[1] == resposta[1]){
+            strcpy(mesa[m].carta.nome,jogador[j].mao[k].nome);
+            jogador[j].mao[k].nome[0] = 0;
+            jogador[j].mao[k].nome[1] = 1;
+            mesa[m].carta.valor = jogador[j].mao[k].valor;
+            mesa[m].numero = jogador[j].numero;
+            k = 3;
+            m++;
+        }
+    }
+}

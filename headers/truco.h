@@ -12,10 +12,16 @@ typedef struct{
 	int numero;
 	Carta mao[3];
 }Jogador;
+
 typedef struct{
 	int numero;
 	Carta carta;
 }Mesa;
+
+Jogador jogador[4];
+
+Carta baralho[40];
+
 
 void Cartas(Carta baralho[40]);
 
