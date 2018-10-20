@@ -220,21 +220,15 @@ int removerUsuario(char *nick){
 
 /* FUNÇÕES PARA TRABALHO COM SOCKETS! */
 
-void enviarMensagem(char *buffer, int idSocket){                
-    
-    // enviando a mensagem para o cliente.    
-    write(idSocket , buffer , strlen(buffer) + 1);
-}
-
 void enviarStr(int idSocket, char *str){
     
     int len = strlen(str) + 1;
     char *lenght = retChar(len);
     
-    // enviando o tamanho do nick.
+    // enviando o tamanho da string.
     write(idSocket, lenght, 4);
     
-    // enviando o login.
+    // enviando a string.
     write(idSocket, str, retInt(lenght));    
 }
 
@@ -242,7 +236,7 @@ int recebeStr(int idSocket, char **donoThread){
         
     char *lenght = malloc(4);    
     
-    // recebendo o tamanho do nick
+    // recebendo o tamanho da string.
     int read = recv(idSocket, lenght, 4, 0);  
     int len = retInt(lenght);        
     if(read <= 0){
@@ -250,7 +244,7 @@ int recebeStr(int idSocket, char **donoThread){
         return read;
     }    
     
-    // recebendo o nick.
+    // recebendo a string.
     *donoThread = malloc(len);
     read = recv(idSocket, *donoThread, len, 0);
     
@@ -316,7 +310,7 @@ void recebeMensagem(void *socketServer){
     int read_size;    
     int idSocket = *(int*) socketServer;
     char *buffer, *userNick;    
-    // recebe mensagens do cliente.
+    // recebe mensagens enviadas pelo servidor para o cliente.
     while((read_size = recebeBloco(&buffer, &userNick, idSocket)) > 0){
                         
         // extraindo mensagem do buffer recebido.

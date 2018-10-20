@@ -9,10 +9,10 @@ SRC=./src
 all:	servidor	cliente
 
 servidor:	mservidor	main/main-s.c
-	$(CC) main/main-s.c $(OBJ)/strUtils.o $(OBJ)/usuario.o $(OBJ)/servidor.o -o servidor -lpthread
+	$(CC) main/main-s.c $(OBJ)/strUtils.o $(OBJ)/truco.o $(OBJ)/usuario.o $(OBJ)/servidor.o -o servidor -lpthread
 
 cliente:	mcliente	main/main-c.c
-	$(CC) main/main-c.c $(OBJ)/strUtils.o $(OBJ)/usuario.o $(OBJ)/cliente.o -o cliente -lpthread
+	$(CC) main/main-c.c $(OBJ)/strUtils.o $(OBJ)/truco.o $(OBJ)/usuario.o $(OBJ)/cliente.o -o cliente -lpthread
 
 mservidor:	usuario	$(SRC)/servidor.c	$(HDRS)/servidor.h
 	$(CC) $(FLAGS) $(SRC)/servidor.c -o $(OBJ)/servidor.o

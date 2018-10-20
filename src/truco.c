@@ -4,7 +4,7 @@
 #include <string.h>
 #include "../headers/truco.h"
 
-void construirBaralho(Carta baralho[40]){
+void construirBaralho(Carta *baralho){
 	// 4
 	strcpy(baralho[0].nome, "4o"); 
 	baralho[0].valor = 1;
@@ -98,51 +98,55 @@ void construirBaralho(Carta baralho[40]){
 	baralho[39].valor = 14;
 }
 
-void embaralhar(){
+void embaralhar(Carta *baralho){
 	int i=0,j,k,auxValor;
 	char auxNome[3];
 	srand(time(NULL));
-	while(i!=40){
+	while(i != 40){
 		j = rand()%40;
 		k = rand()%40;
 		if(k == j){
 			k = rand()%40;
 		}
-		strcpy(auxNome,baralho[j].nome);
-		strcpy(baralho[j].nome,baralho[k].nome);
-		strcpy(baralho[k].nome,auxNome);
+		strcpy(auxNome, baralho[j].nome);
+		strcpy(baralho[j].nome, baralho[k].nome);
+		strcpy(baralho[k].nome, auxNome);
 		auxValor = baralho[j].valor;
-		baralho[j].valor =baralho[k].valor;
+		baralho[j].valor = baralho[k].valor;
 		baralho[k].valor = auxValor;
 		i++;
 	}
 }
 
-void distribuircarta(){
+void distribuirCartas(Jogador *jogadores, Carta *baralho){
 	int i=0,j=0,k=0;
-	for(i=0;i<4;i++){
-		for(j=0;j<3;j++){
-			strcpy(jogador[i].mao[j].nome,baralho[k].nome);
-			jogador[i].mao[j].valor = baralho[k].valor;
+	for(i = 0; i < 4; i++){
+		for(j = 0; j < 3; j++){
+			strcpy(jogadores[i].mao[j].nome, baralho[k].nome);
+			jogadores[i].mao[j].valor = baralho[k].valor;
 			k++;
 		}
 	}
 }
 
-int vencRodada(){
+int vencerRodada(Mesa mesa){
+
 	int aux=0,aux2,i;
-	for(i=0;i<4;i++){
-		if(mesa[i].carta.valor > aux ){
-			aux = mesa[i].carta.valor;
-			printf("%i\n",mesa[i].carta.valor);
-			aux2 = mesa[i].numero;
-			printf("%i\n",mesa[i].numero);
+	for(i = 0; i < 4; i++){
+		
+		if(mesa.cartas[i].valor > aux ){
+			
+			aux = mesa.cartas[i].valor;
+			printf("%i\n",mesa.cartas[i].valor);
+			aux2 = mesa.numeroJogador;
+			printf("%i\n",mesa.numeroJogador);
 		}
-		else if(mesa[i].carta.valor == aux){
-			if((aux2 % 2) == 0 && (mesa[i].numero % 2) != 0 || (aux2 % 2) != 0 && (mesa[i].numero %2) == 0){
+		else if(mesa.cartas[i].valor == aux){
+			
+			if((aux2 % 2) == 0 && (mesa.numeroJogador % 2) != 0 
+				|| (aux2 % 2) != 0 && (mesa.numeroJogador %2) == 0){
 				aux2 = 5;
 			}
-
 		}
 	}
 	return aux2;

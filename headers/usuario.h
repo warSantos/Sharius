@@ -7,7 +7,6 @@
 #ifndef usuario_H
 #define usuario_H
 
-#include "../headers/strUtils.h"
 #include "../headers/truco.h"
 #include <stdio_ext.h>
 #include<sys/socket.h>

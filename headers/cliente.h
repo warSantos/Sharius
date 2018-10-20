@@ -9,7 +9,7 @@
 
 #include "../headers/usuario.h"
 
-Jogador maoJogador;
+Jogador jogadorCliente;
 
 /*
  * 

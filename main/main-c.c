@@ -3,10 +3,9 @@
 int main(){       
                        
     // Abrindo conexão com o servidor...
-    char *userNick;
-    int idSocket = abreConexao(&userNick);        
+    jogadorCliente.socket = abreConexao(&jogadorCliente.nick);        
     
-    if(idSocket == -1){
+    if(jogadorCliente.socket == -1){
         
         printf("Falha ao criar conexão com o servidor remoto...\n");
         return 1;
@@ -14,14 +13,14 @@ int main(){
     
     // Iniciando servidor para recebimento de mensagem.    
     pthread_t t;
-    if(pthread_create(&t, NULL, (void *) recebeMensagem, (void *) &idSocket)){    
+    if(pthread_create(&t, NULL, (void *) recebeMensagem, (void *) &jogadorCliente.socket)){    
         
         printf("Erro na inicialiazação do servidor de escuta...\n");
         return 1;
     }
     
     // menu de administração do cliente.
-    menuOperacao(userNick, idSocket);
+    menuOperacao(jogadorCliente.nick, jogadorCliente.socket);
     pthread_join(t, NULL);
     
     // Falta melhorar a função de fechar conexões...

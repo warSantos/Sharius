@@ -61,8 +61,7 @@ int abreConexaoLocal(char **userNick, char *senha);
 // Encerra os socket quando o servidor é terminado...
 void fechaConexoes();
 
+// Envia as cartas dos jogadores do servidor para o cliente.
 void enviarCartas();
-
-void controleJogo();
 
 #endif

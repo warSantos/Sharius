@@ -31,18 +31,18 @@ void menu(){
     
     printf(" 00 - Jogar Carta ");
     if(valorRodada == 2){
-        printf("01 - truco\n");
+        printf("01 - Pedir truco\n");
     }
     if (valorRodada == 4){
-        printf("02 - seis\n");
+        printf("02 - Pedir seis\n");
     }
     if(valorRodadda == 8){
-        printf("03 - nove\n");
+        printf("03 - Pedir nove\n");
     }
     if(valorRodadda == 10){
-        printf("04 - doze\n");
+        printf("04 - Pedir Jogo\n");
     }
-    printf("05 - help\n");
+    printf("10 - help\n");
 
 }
 
@@ -75,14 +75,13 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
         return;
     }else if(!strncmp(bloco->parametro,"06",3)){
         return;
-    }
-
-    else{
+    }else{
         printf("Opção inválida, por favor digite novamente.\n");
         //menuOperacao
     }
     enviarStr(idSocket, buffer);
 }
+
 void menuOperacao007(char *userNick, int idSocket){
     char *buffer;
     menu();
@@ -95,6 +94,7 @@ void menuOperacao007(char *userNick, int idSocket){
     }
 
 }
+
 void menuOperacao(char *userNick, int idSocket){
     
     char *buffer;
@@ -268,36 +268,39 @@ int abreConexao(char **userNick){
     strncpy(*userNick, nick, (strlen(nick)+1));
     
     free(nick);
-    printf("Login cadastrado...\n");                
+    printf("Login cadastrado...\n");
     return retSocket;
 }
 
-void visualizrCarta(){
-    for(i=0;i<3;i++){
-        if(maoJogador.mao[i                     
-            4].nome[0] != 0){
-            printf("%c%c\n",maoJogador[j].mao[q].nome[0],maoJogador[j].mao[q].nome[1] );
+void visualizarCarta(){
+    int i;
+    for(i = 0; i < 3; i++){
+        if(jogadorCliente.mao[i].nome[0] != 0){
+            printf("%c%c\n",jogadorCliente[j].mao[q].nome[0],jogadorCliente[j].mao[q].nome[1] );
         }
     }                
 }
 
 void jogar(){
+
     char resposta[3];
     printf("\n");
     scanf("%s",resposta);
+    int k;
     for(k = 0;k < 3; k++){
         
-        if(maojogador.mao[k].nome[0] == resposta[0] && maojogador.mao[k].nome[1] == resposta[1]){
+        if(jogadorCliente.mao[k].nome[0] == resposta[0] 
+            && jogadorCliente.mao[k].nome[1] == resposta[1]){
             
-            strcpy(,maoJogador[j].mao[k].nome);
-            maoJogador.mao[k].nome[0] = 0;
-            maoJogador.mao[k].nome[1] = 0;
-             = maoJogador[j].mao[k].valor;
-             = maoJogador[j].numero;
+            strcpy( ,jogadorCliente.mao[k].nome);
+            jogadorCliente.mao[k].nome[0] = '0';
+            jogadorCliente.mao[k].nome[1] = '0';
+             = jogadorCliente[j].mao[k].valor;
+             = jogadorCliente[j].numero;
             // adicionar código de enviar carta.
             break;
         }
-    }    
+    }
 }
 
 void aumentoValor(){

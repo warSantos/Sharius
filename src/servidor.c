@@ -28,102 +28,6 @@ void ajudaComando(){
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
-void menuMensagem(char *buffer, int *idSocket) {
-    
-    // Comando vai ser utilizado com identificador de usuário por padão é (all).
-    Comando *bloco = extraiMensagem(buffer);    
-    if(!bloco->parametro){
-        
-        return;
-    }    
-    if (!strncmp(bloco->parametro, "-help", 6)) {
-
-        ajudaMensagem();
-        return;
-    } else if (!strncmp(bloco->parametro, "-clear", 7)) {
-
-        system("clear");
-        return;
-    } else if (!strncmp(bloco->parametro, "-list", 6)) {
-
-        //imprimirLista();
-        return;
-    }               
-    if(*idSocket == -1){
-        
-        printf("Você não esta conectado ao servidor.\n");
-        return;
-    }
-    enviarStr(*idSocket, buffer);
-}
-
-void menuOperacao(char *senha){
-    
-    listaLogin = iniciarLista();
-    char *buffer;
-    char *alteraModo = calloc(sizeof(char),3);
-    alteraModo[0] = '!';
-    alteraModo[1] = 'c';
-    printf("\n\n\tCarregando configurações...\n\n");
-    // Menu de comandos.
-    int loop = 1, idSocket = -1;
-    while(loop){
-        
-        if(alteraModo[0] == '!' && alteraModo[1] == 'c'){
-            
-            printf("$ ");
-        }else{
-            
-            printf("> ");
-        }
-        buffer = calloc(sizeof(char),2048);
-        scanf("%2048[^\n]s", buffer);        
-        __fpurge(stdin);
-                        
-        
-        // Identifica o princípio de um possível comando de alteração de modo.
-        if (buffer[0] == '!' && buffer[1] == 'c') {
-            
-            system("clear");
-            // Altera pro modo de comando.            
-            printf("\n\nModo de comando.\n\n");
-            alteraModo[0] = '!';
-            alteraModo[1] = 'c';
-            // Altera para o modo de mensagem.    
-            
-        } else if (buffer[0] == '!' && buffer[1] == 'm') {
-            
-            system("clear");
-            printf("\n\nModo de mensagem.\n\n");
-            alteraModo[0] = '!';
-            alteraModo[1] = 'm';
-        }        
-        
-        // Se estiver no mode de comandos...
-        if(alteraModo[0] == '!' && alteraModo[1] == 'c'){ // chama o menu de comados.
-            
-            // Se o último comando utilizado nao foi o de alterar para o modo de comando...
-            if(buffer[0] != '!' || buffer[1] != 'c') {
-                                
-                if(!menuComando(buffer)){
-                    
-                    exit(0);
-                }                
-            }                        
-        }else{ // Modo de envio de mesagem...
-            
-            // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
-            if(buffer[0] != '!'|| buffer[1] != 'm') {
-                
-                menuMensagem(buffer, &idSocket);                                                           
-            }
-        }
-        free(buffer);
-    }
-    free(buffer);
-    free(alteraModo);    
-}
-
 void addUserRemoto(char *nick, int *sock){
     
     size_t len = strlen(nick)+1;
@@ -291,14 +195,10 @@ void *limiteAtingido (void *socketCliente){
     
     // enviando mensagem de aviso.
     char *msgLimite = "50:Limite de jogadres atingido. Por favor tente novamente mais tarde";
-
-    // enviando confirmação de pronto para receber nome...
-    char *buffer, *donoThread, ac = 'S';                
     write(idSocket, msgLimite, strlen(msgLimite) + 1);
 
     //Free the socket pointer
     close(*(int *)socketCliente);
-    printf("fechando conexão com cliente...\n");
 }
 
 void *escutaCliente(void *socketCliente){
@@ -400,31 +300,41 @@ void fechaConexoes(){
     free(listaLogin);
 }
 
-void enviarCartas(){
+void enviarCartas() {
 
     // Chamando uma função para embaralhar cartas.
-    embaralhar ();
+    embaralhar (baralho);
     // Aplicando função de distribuir cartas.
-    distribuirCarta ();
-    int numeroJogador = 0;
+    distribuirCartas (jogadores, baralho);
+    int numeroJogador, numeroCarta;
     // Enquanto todos os jogadores não estiverem com suas cartas.
-    while (numeroJogador < 4){
+    for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
         
         // Envie as cartas e o valor das cartas.
-        enviarStr (jogadores[numeroJogador].socket, jogadores[numeroJogador].mao);
+        for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
+            
+            // Enviando o nome da carta.
+            enviarStr (jogadores[numeroJogador].socket, 
+                jogadores[numeroJogador].mao[numeroCarta].nome);
+            // Enviando o valor da carta.
+            enviarStr (jogadores[numeroJogador].socket, 
+                (char *) &jogadores[numeroJogador].mao[numeroCarta].valor);
+        }
     }
 }
 
 void controleJogo(){    
 
     // Construindo baralho.
-    construirBaralho ();
+    construirBaralho (baralho);
+    // armazena o valor da aposta corrente na mesa.
+    int valorRodada;
 
     // Enquanto não houver vencedores.
     while (1){
 
         // Enviando as cartas para os jogadores.
-        enviarCartas();
+        enviarCartas ();
 
         int turnos = 0, vezJogador;
         // Iniciando rodada.
