@@ -95,73 +95,7 @@ void menuOperacao007(char *userNick, int idSocket){
 
 }
 
-void menuOperacao(char *userNick, int idSocket){
-    
-    char *buffer;
-    char *alteraModo = calloc(sizeof(char),3);
-    alteraModo[0] = '!';
-    alteraModo[1] = 'c';
-    printf("\n\n\tCarregando configurações...\n\n");
-    // Menu de comandos.
-    int loop = 1;
-    while(loop){
-        
-        if(alteraModo[0] == '!' && alteraModo[1] == 'c'){
-            
-            printf("$ ");
-        }else{
-            
-            printf("> ");
-        }
-        buffer = calloc(sizeof(char),2048);
-        scanf("%2048[^\n]s", buffer);
-        __fpurge(stdin);
-                                
-        // Identifica o princípio de um possível comando de alteração de modo.
-        if (buffer[0] == '!' && buffer[1] == 'c') {
-            
-            system("clear");
-            // Altera pro modo de comando.            
-            printf("\n\nModo de comando.\n\n");
-            alteraModo[0] = '!';
-            alteraModo[1] = 'c';
-            
-            // Altera para o modo de mensagem.    
-        } else if (buffer[0] == '!' && buffer[1] == 'm') {
-            
-            system("clear");
-            printf("\n\nModo de mensagem.\n\n");
-            alteraModo[0] = '!';
-            alteraModo[1] = 'm';
-        }        
-        
-        // Se estiver no mode de comandos...
-        if(alteraModo[0] == '!' && alteraModo[1] == 'c'){ // chama o menu de comados.
-            
-            // Se o último comando utilizado nao foi o de alterar para o modo de comando...
-            if(buffer[0] != '!' || buffer[1] != 'c') {
-                                
-                if(menuComando(buffer) == 2){
-                    
-                    close(idSocket);
-                    exit(0);
-                }                
-            }                        
-        }else{ // Modo de envio de mesagem...
-            
-            // Se o ultimo comando utilizado não foi o de alterar para o modo de mensagem...
-            if(buffer[0] != '!'|| buffer[1] != 'm') {
-                
-                menuMensagem(buffer, userNick, idSocket);                                                               
-            }
-        }
-        free(buffer);
-    }
-    free(buffer);
-    free(alteraModo);    
-}
-
-int abreConexao( ){
+void abreConexao( ){
         
     struct sockaddr_in servidor;
     //Create socket
@@ -169,7 +103,7 @@ int abreConexao( ){
     if (jogadorCliente.socket == -1){
         
         printf("Erro ao criar socket cliente...\n");
-        return jogadorCliente.socket;
+        return;
     } 
         
     char *ip = malloc(sizeof(char)*16);    
@@ -269,7 +203,7 @@ int abreConexao( ){
     
     free(nick);
     printf("Login cadastrado...\n");
-    return jogadorCliente.socket;
+    return;
 }
 
 void visualizarCarta(){
@@ -296,9 +230,9 @@ void jogar(){
             jogadorCliente.mao[k].nome[0] = 0;
             jogadorCliente.mao[k].nome[1] = 0;
             enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.mao[k].valor);
-            enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.numero);
+            //enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.numero);
             //TO-DO: Aqui deveria ser um return eu acredito.
-            break;
+            return;
         }
     }
     //TO-DO: Aqui deveria informar ao usuário que a carta não existe na mão dele.
@@ -318,7 +252,7 @@ void receberCartas (){
             return;
         }
         // Recebendo o valor da carta.
-        if (recebeStr (jogadorCliente.socket, (char *) &jogadorCliente.mao[numeroCarta]) < 0){
+        if (recebeStr (jogadorCliente.socket, (char *) &jogadorCliente.mao[numeroCarta].valor) < 0){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }

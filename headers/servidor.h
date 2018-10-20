@@ -3,6 +3,10 @@
 
 #include "../headers/usuario.h"
 
+// Variável utilizada para contabilizar o numero de conexões,
+// estabelecidas no sistema.
+int qtdeConexoes;
+
 // Estrutura que comporta os dados sobre todos os jogadores 
 // de uma partida (cartas, valor das cartas, nome, id e socket_fd).
 Jogador jogadores[4];
@@ -22,15 +26,6 @@ Carta baralho[40];
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 
 int menuComando(char *buffer);
 
-// Função para delegar o buffer a função de estraiMenssagem para processamento
-// e delegação dos dados processados para a função de enviar mesagem.
-void menuMenssagem(char *buffer, int *idSocket);
-
-// Menu de interação do usuário hospede do servidor.
-// Nesta função estão reunidas as funções de gerenciamento de 
-// usuário e também o mesageiro para o hospede do server.
-void menuOperacao(char *senha);
-
 // Insere os dados dos usuários via socket.
 void addUserRemoto(char *nick, int *sock);
 
@@ -38,25 +33,15 @@ void addUserRemoto(char *nick, int *sock);
 // Responsável por repassar as mesagens para os demais usuários,
 // Receber solicitações de login.
 // Gerenciamento de conexões externas.
-void escutaSolicitacao();
+void escutaSolicitacao(char *senha);
 
 // Informa a um jogador que sua conexão com o server não pode ser 
 // estabelecida devido o limite dos jogadores ter sido atingido.
-void *limiteAtingido (void *socketCliente);
+void limiteAtingido (int idSocket);
 
 // Recebe as mensagens de um cliente e repassa elas aos demais 
 // logados no chat.
 void *escutaCliente(void *idSocket);
-
-// Similar a enviar mensagem porem envia um bloco com size
-// do login, login e o buffer.
-void enviarBloco(char *buffer, char *login, int sock);
-
-// envia mensagem através de um socket aberto.
-void enviarMensagem(char *buffer, int socket);
-
-// Abre conexão local...
-int abreConexaoLocal(char **userNick, char *senha);
 
 // Encerra os socket quando o servidor é terminado...
 void fechaConexoes();
@@ -64,4 +49,9 @@ void fechaConexoes();
 // Envia as cartas dos jogadores do servidor para o cliente.
 void enviarCartas();
 
+// A partir desta função o fluxo do jogo é controlado.
+// Os sinais de bloqueio e de permissão para jogar são 
+// enviados para os players. Além de toda contabilização
+// de pontos e também do exercimento das regras do jogo.
+void controleJogo();
 #endif

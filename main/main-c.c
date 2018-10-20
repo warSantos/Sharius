@@ -2,8 +2,8 @@
 
 int main(){       
                        
-    // Abrindo conexão com o servidor...
-    jogadorCliente.socket = abreConexao(&jogadorCliente.nick);        
+    // Abrindo conexão com o servidor.
+    abreConexao();
     
     if(jogadorCliente.socket == -1){
         
@@ -19,8 +19,8 @@ int main(){
         return 1;
     }
     
-    // menu de administração do cliente.
-    menuOperacao(jogadorCliente.nick, jogadorCliente.socket);
+    //TO-DO: Chamar função de operação.
+
     pthread_join(t, NULL);
     
     // Falta melhorar a função de fechar conexões...

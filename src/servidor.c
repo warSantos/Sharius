@@ -49,18 +49,12 @@ void addUserRemoto(char *nick, int *sock){
     listaLogin->tamanho++;    
 }
 
-// Versão para uso real
-void escutaSolicitacao(void *password){
+void escutaSolicitacao(char *senha){
         
-    char *senha = (char *)password;
-    // enquanto o main estiver ativo.
-    // pensando em possivelmente passar um parâmetro que indica termino
-    // para esta função.
-    
     int socketLocal, socketCliente, sizeSockaddr, *novoSocket;
     struct sockaddr_in servidor, cliente;
     
-    // Criando um socket para tcp no sistema.
+    // Criando um socket para receber fluxo tcp de dados.
     // AF_INET tipo de conexão sobre IP para redes.
     // SOCK_STREAM protocolo com controle de erros.
     // 0 seleção do protocolo TCP
@@ -90,13 +84,12 @@ void escutaSolicitacao(void *password){
     listen(socketLocal, 4);
     
     sizeSockaddr = sizeof(struct sockaddr_in);
-    
-    int qtdeConexoes = 0;
     // Esperando por conexões.
     
     while(1){
-        
+                
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
+        //TO-DO: tratar melhor a possibilidade de erro neste caso.
         if(socketCliente < 0){
             
             break;
@@ -114,7 +107,7 @@ void escutaSolicitacao(void *password){
             while(tentativas < 3){
                             
                 // recebendo a senha.
-                recebeStr(socketCliente, &senhaTemp);            
+                recebeStr(socketCliente, &senhaTemp);
                 tentativas++;
                 char ok;
                 if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
@@ -145,40 +138,19 @@ void escutaSolicitacao(void *password){
                 }                   
                 ok = 'N';
                 write(socketCliente, &ok, 1);
-            }        
-                            
-            pthread_t threadCliente;
-            novoSocket = malloc(sizeof(int));
-            *novoSocket = socketCliente;     
-            
+            }
+            // Assimilando um file_descripor de socket para o cliente.
+
             // Adicionando usuário a lista.
             pthread_mutex_lock(&lista);                
             addUserRemoto(nick, novoSocket);        
             pthread_mutex_unlock(&lista);
-            
-            if(pthread_create(&threadCliente, NULL, escutaCliente, (void *) novoSocket)){
-                
-                printf("Erro ao criar a thread.\n");
-                removerUsuario(nick);
-                return;
-            }
+
             free(nick);
         } else { // Se o limite de conexões foi atingido.
-            // Informe ao jogador que não é mais possível sua participação.            
+            // Informe ao jogador que não é mais possível sua participação.
             
-            pthread_t threadCliente;
-            novoSocket = malloc(sizeof(int));
-            *novoSocket = socketCliente;
-            
-            // Adicionando usuário a lista.
-            pthread_mutex_lock(&lista);            
-            pthread_mutex_unlock(&lista);
-            
-            if(pthread_create(&threadCliente, NULL, limiteAtingido, (void *) novoSocket)){
-                
-                printf("Erro ao criar a thread.\n");                
-                return;
-            }
+            limiteAtingido (socketCliente);
         }
         qtdeConexoes++;
     }    
@@ -188,17 +160,14 @@ void escutaSolicitacao(void *password){
     }
 }
 
-void *limiteAtingido (void *socketCliente){
-
-    int idSocket = *(int*)socketCliente, read_size;    
-    //int read_size;
+void limiteAtingido (int idSocket){
     
     // enviando mensagem de aviso.
     char *msgLimite = "50:Limite de jogadres atingido. Por favor tente novamente mais tarde";
-    write(idSocket, msgLimite, strlen(msgLimite) + 1);
+    enviarStr (idSocket, msgLimite);
 
     //Free the socket pointer
-    close(*(int *)socketCliente);
+    close(idSocket);
 }
 
 void *escutaCliente(void *socketCliente){
@@ -237,16 +206,17 @@ void *escutaCliente(void *socketCliente){
 
                 // não enviar para o mesmo que recebeu.
                 if (strcmp(aux->nick, donoThread)) {
-
-                    enviarBloco(buffer, donoThread, *aux->socket);
+                    
+                    //TO-DO: Substituir para enviar mesa.
+                    //enviarBloco(buffer, donoThread, *aux->socket);
                     qtdeMsg++;
                 }
                 aux = aux->prox;
             }
 
             if(!qtdeMsg){
-                
-                enviarBloco("Não há outros usuários no chat.", "SERVIDOR", idSocket);
+                //TO-DO: Substituir para enviar mesa.
+                //enviarBloco("Não há outros usuários no chat.", "SERVIDOR", idSocket);
             }
             qtdeMsg = 0;
             
@@ -255,12 +225,12 @@ void *escutaCliente(void *socketCliente){
             // passando o nick específico para pesquisa.
             aux = pesquisarNick(bloco->comando);
             if (aux != NULL) {
-                                
+                //TO-DO: Substituir para enviar mesa.
                 enviarBloco(buffer, donoThread, *aux->socket);
                 
             }else{
                 
-                // Retorna mesagem de erro.               
+                //TO-DO: Substituir para enviar mesa.     
                 enviarBloco("Este usuário não esta no chat.", "SERVIDOR", idSocket);
             }
         }  
@@ -285,6 +255,7 @@ void *escutaCliente(void *socketCliente){
     return 0;        
 }
 
+//TO-DO: Refazer função de fechar conexões.
 void fechaConexoes(){
         
     if(!listaVazia()){
@@ -310,7 +281,7 @@ void enviarCartas() {
     // Enquanto todos os jogadores não estiverem com suas cartas.
     for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
         
-        // Envie as cartas e o valor das cartas.
+        // Para cada carta sorteada para mão do jogador.
         for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
             
             // Enviando o nome da carta.
@@ -323,7 +294,7 @@ void enviarCartas() {
     }
 }
 
-void controleJogo(){    
+void controleJogo(){
 
     // Construindo baralho.
     construirBaralho (baralho);

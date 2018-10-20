@@ -84,21 +84,11 @@ void imprimirLista();
 // Remove usuário da lista do server.
 int removerUsuario(char *nick);
 
-// Utiliza socket da função escultaSolicitação para enviar mensagem.
-void enviarMensagem(char *buffer, int idSocket);
-
 // Envia o o tamanho e a string nick
 void enviarStr(int idSocket, char *str);
 
 // Recebe uma string e o seu tamanho.
 int recebeStr(int idSocket, char *dest);
-
-// Similar a enviar mensagem porem envia um bloco com size
-// do login, login e o buffer.
-void enviarBloco(char *buffer, char *login, int sock);
-
-// recebe mensagens em blocos com size login, login e buffer.
-int recebeBloco(char **buffer, char **nickEmissor, int idSocket);
 
 // Fica escutando as conexões na porta do serviço e
 // recebe as mensagem do cliente e as imprimi na tela.

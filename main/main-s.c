@@ -13,20 +13,12 @@ int main(){
     scanf("%15[^\n]s", senha);
     __fpurge(stdin);
     
-    pthread_t t;
-    if(pthread_create(&t, NULL, (void *) escutaSolicitacao, (void *) senha)){    
-        
-        printf("Erro na inicialiazação do servidor de inicialização...\n");
-        return 1;
-    }
-
-    pthread_join(t, NULL);
+    // Inicializando a variável que contabiliza o número de 
+    // conexões estabelecidas.
+    qtdeConexoes = 0;
+    escutaSolicitacao (senha);
 
     // Servidor envia as cartas para os jogadores.
-    
-    // Função para controle de fluxo da partida.
-
-    pthread_exit(&t);
     
     return 0;
 }
