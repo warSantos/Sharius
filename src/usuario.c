@@ -232,7 +232,7 @@ void enviarStr(int idSocket, char *str){
     write(idSocket, str, retInt(lenght));    
 }
 
-int recebeStr(int idSocket, char **donoThread){
+int recebeStr(int idSocket, char *dest){
         
     char *lenght = malloc(4);    
     
@@ -245,13 +245,9 @@ int recebeStr(int idSocket, char **donoThread){
     }    
     
     // recebendo a string.
-    *donoThread = malloc(len);
-    read = recv(idSocket, *donoThread, len, 0);
-    
-    if(read <= 0){
-                
-        return read;
-    }    
+    *dest = malloc(len);
+    read = recv(idSocket, *dest, len, 0);
+
     return read;
 }
 

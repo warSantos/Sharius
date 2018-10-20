@@ -36,10 +36,12 @@ void menuMenssagem(char *buffer, char *userNick, int idSocket);
 void menuOperacao(char *userNick, int idSocket);
 
 // Abre conexão inicial com o servidor...
-int abreConexao(char **userNick);
+int abreConexao();
 
 void menu(int valorRodada);
 
 void menuMensagem(char *buffer, int valorRodada);
+
+void receberCartas ();
 
 #endif

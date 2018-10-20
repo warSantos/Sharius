@@ -161,15 +161,15 @@ void menuOperacao(char *userNick, int idSocket){
     free(alteraModo);    
 }
 
-int abreConexao(char **userNick){
+int abreConexao( ){
         
-    struct sockaddr_in servidor;         
+    struct sockaddr_in servidor;
     //Create socket
-    int retSocket = socket(AF_INET , SOCK_STREAM , 0);
-    if (retSocket == -1){
+    jogadorCliente.socket = socket(AF_INET , SOCK_STREAM , 0);
+    if (jogadorCliente.socket == -1){
         
         printf("Erro ao criar socket cliente...\n");
-        return retSocket;
+        return jogadorCliente.socket;
     } 
         
     char *ip = malloc(sizeof(char)*16);    
@@ -197,10 +197,10 @@ int abreConexao(char **userNick){
     
     //Busca conexão com o servidor...
     
-    if (connect(retSocket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+    if (connect(jogadorCliente.socket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
-        return retSocket;
+        return jogadorCliente.socket;
     }                    
     
     // Cria usuário.
@@ -217,10 +217,10 @@ int abreConexao(char **userNick){
         __fpurge(stdin);                                
         
         // enviando senha.
-        enviarStr(retSocket, resposta);
+        enviarStr(jogadorCliente.socket, resposta);
         
         // Recebendo confiramção.
-        recv(retSocket, &ok, sizeof (char), 0);
+        recv(jogadorCliente.socket, &ok, sizeof (char), 0);
         
                 
         if (ok == 'S') { // se receber acesso autorizado.
@@ -233,7 +233,7 @@ int abreConexao(char **userNick){
     if(tentativas == 3){
         
         printf("Conexão perdida.\n\n");
-        close(retSocket);
+        close(jogadorCliente.socket);
         return -1;
     }
     printf("\n\n");
@@ -246,10 +246,10 @@ int abreConexao(char **userNick){
         nick = criaNick();        
         
         // enviando nick.
-        enviarStr(retSocket, nick);
+        enviarStr(jogadorCliente.socket, nick);
         
         // recebendo confirmação...
-        recv(retSocket, &ok, 1, 0);
+        recv(jogadorCliente.socket, &ok, 1, 0);
         if(ok == 'S'){
             
             break;
@@ -259,17 +259,17 @@ int abreConexao(char **userNick){
     
     // Recebendo confirmação de preparo para receber nome...
     char ac;
-    recv(retSocket, &ac, 1, 0);
+    recv(jogadorCliente.socket, &ac, 1, 0);
     
     // enviando login para a thread de escutaCliente.
-    enviarStr(retSocket, nick);
+    enviarStr(jogadorCliente.socket, nick);
     
-    *userNick = malloc(sizeof(char)* (strlen(nick)+1));
-    strncpy(*userNick, nick, (strlen(nick)+1));
+    jogadorCliente.nick = malloc(sizeof(char)* (strlen(nick)+1));
+    strncpy(jogadorCliente.nick, nick, (strlen(nick)+1));
     
     free(nick);
     printf("Login cadastrado...\n");
-    return retSocket;
+    return jogadorCliente.socket;
 }
 
 void visualizarCarta(){
@@ -285,26 +285,42 @@ void jogar(){
 
     char resposta[3];
     printf("\n");
-    scanf("%s",resposta);
+    scanf("%2[^\n]s",resposta);
     int k;
     for(k = 0;k < 3; k++){
         
         if(jogadorCliente.mao[k].nome[0] == resposta[0] 
             && jogadorCliente.mao[k].nome[1] == resposta[1]){
-            enviarStr(retSocket,jogadorCliente.mao[k].nome);
-            //strcpy( ,jogadorCliente.mao[k].nome);
+            
+            enviarStr(jogadorCliente.socket, jogadorCliente.mao[k].nome);
             jogadorCliente.mao[k].nome[0] = 0;
             jogadorCliente.mao[k].nome[1] = 0;
-            enviarStr(retSocket,(char *) &jogadorCliente[j].mao[k].valor);
-             //= jogadorCliente[j].mao[k].valor;
-            // = jogadorCliente[j].numero;
-            enviarStr(retSocket,(char *) &jogadorCliente[j].numero);
-            // adicionar código de enviar carta.
+            enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.mao[k].valor);
+            enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.numero);
+            //TO-DO: Aqui deveria ser um return eu acredito.
             break;
         }
     }
+    //TO-DO: Aqui deveria informar ao usuário que a carta não existe na mão dele.
 }
 
 void aumentoValor(){
 
+}
+
+void receberCartas (){
+
+    int numeroCarta;
+    for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
+        // Recebendo as cartas do jogador (carta por carta).
+        if (recebeStr (jogadorCliente.socket, jogadorCliente.mao[numeroCarta].nome) < 0){
+            printf ("Erro: falha ao receber as cartas.\n");
+            return;
+        }
+        // Recebendo o valor da carta.
+        if (recebeStr (jogadorCliente.socket, (char *) &jogadorCliente.mao[numeroCarta]) < 0){
+            printf ("Erro: falha ao receber as cartas.\n");
+            return;
+        }
+    }
 }
