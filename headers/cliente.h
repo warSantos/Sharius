@@ -38,4 +38,8 @@ void menuOperacao(char *userNick, int idSocket);
 // Abre conexão inicial com o servidor...
 int abreConexao(char **userNick);
 
+void menu(int valorRodada);
+
+void menuMensagem(char *buffer, int valorRodada);
+
 #endif

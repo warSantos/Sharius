@@ -27,7 +27,7 @@ void ajudaComando(){
     printf("\n\tquit - encerra conexão com logins e deleta sala.\n");        
 }
 
-void menu(){
+void menu(int valorRodada){
     
     printf(" 00 - Jogar Carta ");
     if(valorRodada == 2){
@@ -36,19 +36,19 @@ void menu(){
     if (valorRodada == 4){
         printf("02 - Pedir seis\n");
     }
-    if(valorRodadda == 8){
+    if(valorRodada == 8){
         printf("03 - Pedir nove\n");
     }
-    if(valorRodadda == 10){
+    if(valorRodada == 10){
         printf("04 - Pedir Jogo\n");
     }
     printf("10 - help\n");
 
 }
 
-void menuMensagem(char *buffer, char *userNick, int idSocket){
+void menuMensagem(char *buffer, int valorRodada){
     
-    // Comando vai ser utilizado com identificador de usuário por padão é (all).
+    // TO-DO verificar se a função extrair vai servir para este trabalho.
     Comando *bloco = extraiMensagem(buffer);
     if(!bloco->lenghtParametro){
         
@@ -79,7 +79,7 @@ void menuMensagem(char *buffer, char *userNick, int idSocket){
         printf("Opção inválida, por favor digite novamente.\n");
         //menuOperacao
     }
-    enviarStr(idSocket, buffer);
+    enviarStr(jogadorCliente.socket, buffer);
 }
 
 void menuOperacao007(char *userNick, int idSocket){
@@ -90,7 +90,7 @@ void menuOperacao007(char *userNick, int idSocket){
         buffer = calloc(sizeof(char),20);
         scanf("%s",buffer);
         __fpurge(stdin);
-        menuMensagem(buffer,userNick,idSocket);
+        menuMensagem(buffer, jogadorCliente);
     }
 
 }
@@ -276,7 +276,7 @@ void visualizarCarta(){
     int i;
     for(i = 0; i < 3; i++){
         if(jogadorCliente.mao[i].nome[0] != 0){
-            printf("%c%c\n",jogadorCliente[j].mao[q].nome[0],jogadorCliente[j].mao[q].nome[1] );
+            printf("%s\n",jogadorCliente.mao[i].nome);
         }
     }                
 }
@@ -293,8 +293,8 @@ void jogar(){
             && jogadorCliente.mao[k].nome[1] == resposta[1]){
             
             strcpy( ,jogadorCliente.mao[k].nome);
-            jogadorCliente.mao[k].nome[0] = '0';
-            jogadorCliente.mao[k].nome[1] = '0';
+            jogadorCliente.mao[k].nome[0] = 0;
+            jogadorCliente.mao[k].nome[1] = 0;
              = jogadorCliente[j].mao[k].valor;
              = jogadorCliente[j].numero;
             // adicionar código de enviar carta.
