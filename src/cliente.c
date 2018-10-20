@@ -291,12 +291,14 @@ void jogar(){
         
         if(jogadorCliente.mao[k].nome[0] == resposta[0] 
             && jogadorCliente.mao[k].nome[1] == resposta[1]){
-            
-            strcpy( ,jogadorCliente.mao[k].nome);
+            enviarStr(retSocket,jogadorCliente.mao[k].nome);
+            //strcpy( ,jogadorCliente.mao[k].nome);
             jogadorCliente.mao[k].nome[0] = 0;
             jogadorCliente.mao[k].nome[1] = 0;
-             = jogadorCliente[j].mao[k].valor;
-             = jogadorCliente[j].numero;
+            enviarStr(retSocket,(char *) &jogadorCliente[j].mao[k].valor);
+             //= jogadorCliente[j].mao[k].valor;
+            // = jogadorCliente[j].numero;
+            enviarStr(retSocket,(char *) &jogadorCliente[j].numero);
             // adicionar código de enviar carta.
             break;
         }
