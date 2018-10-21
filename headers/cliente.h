@@ -37,12 +37,14 @@ void menu(int valorRodada);
 
 void menuMensagem(char *buffer, int valorRodada);
 
+void menuTruco(char *comando);
+
 void receberCartas ();
 
 void jogar();
 
 void aumentoValor();
 
-void recebeMensagem();
+void recebeMensagem(char *comando);
 
 #endif
