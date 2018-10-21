@@ -10,7 +10,7 @@
 #include "../headers/usuario.h"
 
 Jogador jogadorCliente;
-
+Mesa mesaCliente;
 /*
  * 
  * Módulo cliente responsável por enviar mensagens para o servidor.
@@ -47,4 +47,9 @@ void aumentoValor();
 
 void recebeMensagem(char *comando);
 
+void receberMesa();
+
+void visualizarMesa();
+
+void visualizarCarta();
 #endif

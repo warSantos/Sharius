@@ -116,6 +116,10 @@ void menuOperacao(int valorRodada){
     int loop = 1;
     
     while(loop){
+        sleep(10);
+        receberMesa();
+        visualizarCarta();
+        visualizarMesa();
         comando = calloc(sizeof(char),10);
         recebeMensagem(comando);
         //se foi pedido vai ser mandado para menu truco para ver se vc aceita ,recusa ou aumenta o valor do truco;
@@ -258,6 +262,14 @@ void visualizarCarta(){
     }
     printf("\n");               
 }
+void visualizarMesa(){
+    int i;
+    printf("Mesa\n");
+    for(i=0;i < mesaCliente.tamMesa;i++){
+           printf("%s \t",mesaCliente.cartas[i].nome ); 
+    }
+    printf("\n");
+}
 
 void jogar(){
     printf("Escolha a carta que voce vai jogar\n");
@@ -321,6 +333,7 @@ void recebeMensagem(char *comando){
         return;
     }
     memcpy(&comando,msg->msg,msg->lenght);
+    free(msg);
     // Enquanto não acabar o jogo.
     // TO-DO: Refazer função de receber mensagem
     // ate o nome seria bom alterar.
@@ -331,4 +344,24 @@ void recebeMensagem(char *comando){
     //fechando a conexão
     //printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
     //close(jogadorCliente.socket);        
+}
+void receberMesa(){
+
+    Mensagem *msg;
+    int i,tamMesa = 0;
+    for (i = 0;i< 4; i++){
+        msg = recebeStr(jogadorCliente.socket);
+        if(msg->bytes_read < 0){
+            printf("Erro:falha ao receber a mensagem.\n");
+            return;
+        }
+        if(msg->lenght >  0 ){
+            memcpy (mesaCliente.cartas[i].nome,msg->msg,msg->lenght);
+            tamMesa++;
+        }
+        else if(msg->lenght == 0){
+            mesaCliente.tamMesa = tamMesa;
+            return;
+        }
+    }
 }
