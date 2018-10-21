@@ -14,6 +14,8 @@ typedef struct comando {
     int lenghtParametro;
 } Comando;
 
+#define stage(M) printf ("Passo: %d", M);
+
 // faz casting de size_t para char.
 char *retChar(int t);
 

@@ -51,15 +51,18 @@ void addUserRemoto(char *nick, int *sock){
 
 void escutaSolicitacao(char *senha){
         
-    int socketLocal, socketCliente, sizeSockaddr, *novoSocket;
+    int socketLocal, socketCliente, sizeSockaddr;
     struct sockaddr_in servidor, cliente;
+    
+    pthread_mutex_init(&qtdeConexoesMutex, NULL);
+    pthread_t threadsId[4];
     
     // Criando um socket para receber fluxo tcp de dados.
     // AF_INET tipo de conexão sobre IP para redes.
     // SOCK_STREAM protocolo com controle de erros.
     // 0 seleção do protocolo TCP
     socketLocal = socket(AF_INET, SOCK_STREAM, 0);
-    
+
     if(socketLocal == -1){
         
         printf("Erro ao criar socket local.\n");
@@ -79,17 +82,24 @@ void escutaSolicitacao(char *senha){
         fechaConexoes();
         close(socketLocal);       
         exit(1);
-    }    
+    }
+    
     // Limitando o número de conexões que o servidor vai aceitar para 4 conexões.
     listen(socketLocal, 4);
     
     sizeSockaddr = sizeof(struct sockaddr_in);
-    Mensagem *msg;
+    Mensagem *args = malloc (sizeof(Mensagem));
+    // Encapsulando os argumentos necessarios na função de cadastrar usuario
+    // reutilizando a estrutura de enviar mensagem.
+    args->msg = senha;
+    args->lenght = strlen (senha);
 
     // Esperando por conexões.
     while(1){
-                
+
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
+        qtdeConexoes++;
+        printf ("Inicia aqui as conexões.\n");
         //TO-DO: tratar melhor a possibilidade de erro neste caso.
         if(socketCliente < 0){
             
@@ -97,69 +107,104 @@ void escutaSolicitacao(char *senha){
         }
         // Se o limite de conexões não foi atingido.
         if (qtdeConexoes < 4){
-            
-            // Capturando senha do cliente.
-            int tentativas = 0;
-            while(tentativas < 3){
-                            
-                // recebendo a senha.
-                msg = recebeStr(socketCliente);
-                tentativas++;
-                char ok;
-                if(!strncmp(senha, msg->msg, strlen(senha))){
-                    
-                    ok = 'S';
-                    write(socketCliente, &ok, 1);
-                    free (msg);
-                    break;
-                }
-                ok = 'N';
-                write(socketCliente, &ok, 1);
-                free (msg);
+            // Chama a thread para tratar o cadastro dos clientes.
+            args->bytes_read = socketCliente;
+            if (pthread_create(&threadsId[qtdeConexoes], NULL,
+                cadastrarUsuarios, (void *) args)){
+                printf ("Erro ao criar thread para cadastrar usuário.\n");
             }
-            
-            char *nick;
-            Link aux;
-            while(1){
-
-                msg = recebeStr(socketCliente);     
-                if(msg->bytes_read <= 0){
-                    // TO-DO: Tratar melhor a mensagem de 
-                    // erro deste local e o procedimento a se fazer.
-                    close(socketCliente);
-                }                       
-                aux = pesquisarNick(nick);                    
-                char ok;
-                if (aux == NULL) { // se login nao existir
-                    
-                    ok = 'S';
-                    write(socketCliente, &ok, 1);
-                    free (msg);
-                    break;
-                }
-                ok = 'N';
-                write(socketCliente, &ok, 1);
-                free (msg);
-            }
-            // Assimilando um file_descripor de socket para o cliente.
-
-            // Adicionando usuário a lista.
-            pthread_mutex_lock(&lista);                
-            addUserRemoto(nick, novoSocket);        
-            pthread_mutex_unlock(&lista);
-
-            free(nick);
         } else { // Se o limite de conexões foi atingido.
             // Informe ao jogador que não é mais possível sua participação.
             
             limiteAtingido (socketCliente);
         }
-        qtdeConexoes++;
-    }    
+    }
+    pthread_mutex_destroy (&qtdeConexoesMutex);
     if(socketCliente < 0){
         
         printf("Falha na função accpet.\n");
     }
+}
+
+void *cadastrarUsuarios (void *args){
+
+    /*
+    * Nesta função utiliza-se a estrutura mensagem (senhaESocket) para comportar 
+    * parâmetros para chamar passa-los através da função phtread_create.
+    * portanto os parâmetros estão configurados da seguinte forma.
+    * senhaESocket->bytes_read: socket do cliente.
+    * senhaESocket->lenght: tamanho da senha.
+    * senhaESocket->msg: a senha do servidor.
+    */
+
+    Mensagem *senhaESocket = (Mensagem *) args, *msg;
+    
+    
+    int idJogador, socketCliente = senhaESocket->bytes_read;
+    int lenght = senhaESocket->lenght;
+    char *senha = senhaESocket->msg;
+        
+    pthread_mutex_lock (&qtdeConexoesMutex);
+    printf ("socketCliente: %d\n", socketCliente);
+    printf ("qtdeConexao: %d\n", qtdeConexoes);
+    idJogador = qtdeConexoes;
+    qtdeConexoes++;
+    pthread_mutex_unlock (&qtdeConexoesMutex);
+
+    // Capturando senha do cliente.
+    int tentativas = 0;
+    while(tentativas < 3){
+
+        // recebendo a senha.
+        msg = recebeStr(socketCliente);
+        tentativas++;
+        char ok;
+        if(!strncmp(senha, msg->msg, lenght)){
+            
+            ok = 'S';
+            write(socketCliente, &ok, 1);
+            free (msg);
+            break;
+        }
+        ok = 'N';
+        write(socketCliente, &ok, 1);
+        free (msg);
+    }
+    
+    char *nick;
+    Link aux;
+    while(1){
+
+        msg = recebeStr(socketCliente);     
+        if(msg->bytes_read <= 0){
+            // TO-DO: Tratar melhor a mensagem de 
+            // erro deste local e o procedimento a se fazer.
+            close(socketCliente);
+            pthread_mutex_lock (&qtdeConexoesMutex);
+            qtdeConexoes--;
+            pthread_mutex_unlock (&qtdeConexoesMutex);
+            return NULL;
+        }
+        aux = pesquisarNick(nick);               
+        char ok;
+        if (aux == NULL) { // se login nao existir
+            
+            ok = 'S';
+            write(socketCliente, &ok, 1);
+            free (msg);
+            break;
+        }
+        ok = 'N';
+        write(socketCliente, &ok, 1);
+        free (msg);
+    }
+    // Assimilando um file_descripor de socket para o cliente.
+
+    // Adicionando usuário a lista.
+    pthread_mutex_lock(&lista);                
+    //addUserRemoto(nick, socketCliente);        
+    pthread_mutex_unlock(&lista);
+    free(nick);
 }
 
 void limiteAtingido (int idSocket){
@@ -173,7 +218,7 @@ void limiteAtingido (int idSocket){
 }
 
 void *escutaCliente(void *socketCliente){
-/*    
+    /*    
     //Id de ientificação do cliente que utiliza a função
     // Podem ser várias threads desta liberadas
     // Logo o idSocket de cada chamada da função escutaCliente 
@@ -254,7 +299,8 @@ void *escutaCliente(void *socketCliente){
     //Free the socket pointer
     close(*(int *)socketCliente);
     printf("fechando conexão com cliente...\n");
-    return 0;        */
+    return 0;
+    */
 }
 
 //TO-DO: Refazer função de fechar conexões.

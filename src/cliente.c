@@ -97,7 +97,7 @@ void menuOperacao007(int valorRodada){
 
 }
 
-void abreConexao( ){
+void abreConexao(){
         
     struct sockaddr_in servidor;
     //Create socket
@@ -269,7 +269,7 @@ void receberCartas (){
     }
 }
 
-void recebeMensagem(){
+void jogo(){
     
     // Enquanto não acabar o jogo.
     // TO-DO: Refazer função de receber mensagem

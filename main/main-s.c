@@ -3,8 +3,8 @@
 int main(){
     
     // Iniciando o ponterio descritor com lista de usuários no server.
-    listaLogin = iniciarLista();
-    pthread_mutex_init(&lista, NULL);
+    //listaLogin = iniciarLista();
+    //pthread_mutex_init(&lista, NULL);
     
     // Cria conexão inicial com clientes e fornece uma thread de
     // recebimento de menagem para o cliente.

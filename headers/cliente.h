@@ -43,6 +43,6 @@ void jogar();
 
 void aumentoValor();
 
-void recebeMensagem();
+void jogo();
 
 #endif

@@ -7,6 +7,10 @@
 // estabelecidas no sistema.
 int qtdeConexoes;
 
+// Váriável utilizada para criar zonas críticas e sobre
+// a variável qtdeConexoes.
+pthread_mutex_t qtdeConexoesMutex;
+
 // Estrutura que comporta os dados sobre todos os jogadores 
 // de uma partida (cartas, valor das cartas, nome, id e socket_fd).
 Jogador jogadores[4];
@@ -34,6 +38,9 @@ void addUserRemoto(char *nick, int *sock);
 // Receber solicitações de login.
 // Gerenciamento de conexões externas.
 void escutaSolicitacao(char *senha);
+
+
+void *cadastrarUsuarios (void *args);
 
 // Informa a um jogador que sua conexão com o server não pode ser 
 // estabelecida devido o limite dos jogadores ter sido atingido.
