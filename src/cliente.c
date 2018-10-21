@@ -5,16 +5,8 @@
 void ajudaMensagem(){
         
     printf("\n\tAjuda.\n\n");
-    printf("\n\t!c altera para o modo de comando.\n\n");    
-    printf("\n\tPor padrão ao se conectar a uma sala suas mensagens são enviadas");
-    printf("\n\tpara todos usuários onlines na sala.");
-    printf("\n\n\tPara enviar mensagens em particular adicione @ antes do nick\n");
-    printf("\tdo receptor.");
-    printf("\n\n\t> @FULANO MENSSAGEM...\n\n");    
-    printf("\tTODA mesagem iniciada por @ será comprendido como uma mensagem privada.\n");
-    printf("\tEntão evite iniciar mesagens com @ com destino para broadcast (todos na sala).\n");
-    printf("\n\t-clear - limpa o bufferscreen (tela).");
-    printf("\n\t-list - imprimi lista de usuários ativos.");    
+    printf("00 - jogar Carta , habilita voce joga sua carta na mesa\n");  
+    printf("01 - truco\n");
 }
 
 void ajudaComando(){
@@ -31,68 +23,119 @@ void menu(int valorRodada){
     
     printf(" 00 - Jogar Carta ");
     if(valorRodada == 2){
-        printf("01 - Pedir truco\n");
+        printf("02 - Pedir truco\n");
     }
     if (valorRodada == 4){
-        printf("02 - Pedir seis\n");
+        printf("03 - Pedir seis\n");
     }
     if(valorRodada == 8){
-        printf("03 - Pedir nove\n");
+        printf("04 - Pedir nove\n");
     }
     if(valorRodada == 10){
-        printf("04 - Pedir Jogo\n");
+        printf("05 - Pedir Jogo\n");
     }
-    printf("10 - help\n");
 
 }
-
+//opções jogador pode fazer
 void menuMensagem(char *buffer, int valorRodada){
     
-    // TO-DO verificar se a função extrair vai servir para este trabalho.
-    Comando *bloco = extraiMensagem(buffer);
-    if(!bloco->lenghtParametro){
-        
-        return;
-    }
-    else if(!strncmp(bloco->parametro,"00" , 3)){
+    
+    // jogar a carta comando 00
+    if(!strncmp(buffer,"00" , 3)){
         jogar();
     }
-    //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
-    else if(!strncmp(bloco->parametro, "01", 3) && valorRodada == 2 ){
-        aumentoValor();
+    //pedir truco 01
+    else if(!strncmp(buffer, "01", 3) && valorRodada == 2 ){
+        enviarStr(jogadorCliente.socket,(char *) &"01");
         return;
-    }else if(!strncmp(bloco->parametro, "02", 3 && valorRodada == 4)){
-        aumentoValor();
+    // pedir seis 02
+    }else if(!strncmp(buffer, "02", 3) && valorRodada == 4){
+        enviarStr(jogadorCliente.socket,(char *) &"02");
         return;
-    }else if(!strncmp(bloco->parametro,"03", 3) && valorRodada == 8){
-        aumentoValor();
+    // pedir nove 03
+    }else if(!strncmp(buffer,"03", 3) && valorRodada == 8){
+        enviarStr(jogadorCliente.socket,(char *) &"03");
         return;
-    }else if(!strncmp(bloco->parametro,"04",3) && valorRodada == 10 ){
-        aumentoValor();
+    //pedir doze 04
+    }else if(!strncmp(buffer,"04",3) && valorRodada == 10 ){
+        enviarStr(jogadorCliente.socket,(char *) &"04");
         return;
-    }else if(!strncmp(bloco->parametro,"05",3)){
-        
-        return;
-    }else if(!strncmp(bloco->parametro,"06",3)){
+    //recusar aposta
+    }else if(!strncmp(buffer,"05",3)){
+        enviarStr(jogadorCliente.socket,(char *) &"05");
         return;
     }else{
         printf("Opção inválida, por favor digite novamente.\n");
-        //menuOperacao
+        menuMensagem(buffer,valorRodada);
     }
     enviarStr(jogadorCliente.socket, buffer);
 }
+//menuTruco se caso o jogar for trucado caira aki
+void menuTruco(char *comando){
+    char *resposta;
+    resposta = calloc(sizeof(char),10);
+    if(!strncmp(comando,"01",3)){
+        printf("02 - Aumentar para seis\n");
+    }
+    else if(!strncmp(comando,"02",3)){
+        printf("03 - Aumentar para nove\n");
+    }
+    else if(!strncmp(comando,"03",3)){
+        printf("04 - Aumentar para doze\n");
+    }
+    printf("05 - Recusar a aposta\n");
+    printf("06 - Aceitar a aposta\n");
+    scanf("%s",resposta);
+    __fpurge(stdin);
+    if(!strncmp(resposta,"02",3)){
+        enviarStr(jogadorCliente.socket,(char *) &"02");
+        return;
+    }
+    else if(!strncmp(resposta,"03",3)){
+        enviarStr(jogadorCliente.socket,(char *) &"03");
+        return;
+    }
+    else if(!strncmp(resposta,"04",3)){
+        enviarStr(jogadorCliente.socket,(char *) &"04");
+        return;
+    }
+    else if(!strncmp(resposta,"05",3)){
+        enviarStr(jogadorCliente.socket,(char *) &"05");
+        return;
+    }
+    else if(!strncmp(resposta,"06",3)){
+        enviarStr(jogadorCliente.socket,(char *) &"06");
+        return;
+    }
 
-void menuOperacao007(int valorRodada){
+}
+
+void menuOperacao(int valorRodada){
     
-    char *buffer;
-    menu(valorRodada);
+    char *buffer,*comando;
     int loop = 1;
     
     while(loop){
+        sleep(10);
+        receberMesa();
+        visualizarCarta();
+        visualizarMesa();
+        comando = calloc(sizeof(char),10);
+        recebeMensagem(comando);
+        //se foi pedido vai ser mandado para menu truco para ver se vc aceita ,recusa ou aumenta o valor do truco;
+        if(!strncmp(comando,"01",3)||!strncmp(comando,"02",3) || !strncmp(comando,"03",3) || !strncmp(comando,"04",3)){
+            menuTruco(comando);
+        }
+        else if(!strncmp(comando,"00",3)){
+        menu(valorRodada);
         buffer = calloc(sizeof(char),20);
         scanf("%s",buffer);
         __fpurge(stdin);
-        //menuMensagem(buffer, jogadorCliente);
+        menuMensagem(buffer, valorRodada);
+        }
+        else{
+            printf("Vez de outro jogador , espere sua vez\n");
+        }
     }
 
 }
@@ -211,38 +254,47 @@ void abreConexao(){
 
 void visualizarCarta(){
     int i;
+    printf("Cartas\n");
     for(i = 0; i < 3; i++){
         if(jogadorCliente.mao[i].nome[0] != 0){
-            printf("%s\n",jogadorCliente.mao[i].nome);
+            printf("%s \t",jogadorCliente.mao[i].nome);
         }
-    }                
+    }
+    printf("\n");               
+}
+void visualizarMesa(){
+    int i;
+    printf("Mesa\n");
+    for(i=0;i < mesaCliente.tamMesa;i++){
+           printf("%s \t",mesaCliente.cartas[i].nome ); 
+    }
+    printf("\n");
 }
 
 void jogar(){
-
+    printf("Escolha a carta que voce vai jogar\n");
     char resposta[3];
     printf("\n");
     scanf("%2[^\n]s",resposta);
     int k;
+    // loop de comparar a carta que o player escolheu com a mao
     for(k = 0;k < 3; k++){
-        
+        // if que compara se tem esta carta na mao
         if(jogadorCliente.mao[k].nome[0] == resposta[0] 
-            && jogadorCliente.mao[k].nome[1] == resposta[1]){
-            
+            && jogadorCliente.mao[k].nome[1] == resposta[1]){            
             enviarStr(jogadorCliente.socket, jogadorCliente.mao[k].nome);
             jogadorCliente.mao[k].nome[0] = 0;
             jogadorCliente.mao[k].nome[1] = 0;
             enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.mao[k].valor);
-            //enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.numero);
-            //TO-DO: Aqui deveria ser um return eu acredito.
+            enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.numero);
             return;
-        }
+            //TO-DO: Aqui deveria ser um return eu acredito.
+       }
     }
+    printf("Voce nao tem esta carta\n");
+    // se o cara nao tem a carta a função é chamada denovo 
+    jogar();
     //TO-DO: Aqui deveria informar ao usuário que a carta não existe na mão dele.
-}
-
-void aumentoValor(){
-
 }
 
 void receberCartas (){
@@ -267,18 +319,49 @@ void receberCartas (){
         }
         memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
     }
+    //dei free por via da duvidas
+    free(msg);
 }
 
 void jogo(){
     
+    Mensagem *msg;
+    // Recebendo comando do servidor.
+    msg = recebeStr(jogadorCliente.socket);
+    if(msg->bytes_read < 0){
+        printf("Erro:falha ao receber a mensagem.\n");
+        return;
+    }
+    //memcpy(&comando,msg->msg,msg->lenght);
+    free(msg);
     // Enquanto não acabar o jogo.
     // TO-DO: Refazer função de receber mensagem
     // ate o nome seria bom alterar.
-    while (1){
+    //while (1){
 
-    }
+    //}
     
     //fechando a conexão
-    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
-    close(jogadorCliente.socket);        
+    //printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
+    //close(jogadorCliente.socket);        
+}
+void receberMesa(){
+
+    Mensagem *msg;
+    int i,tamMesa = 0;
+    for (i = 0;i< 4; i++){
+        msg = recebeStr(jogadorCliente.socket);
+        if(msg->bytes_read < 0){
+            printf("Erro:falha ao receber a mensagem.\n");
+            return;
+        }
+        if(msg->lenght >  0 ){
+            memcpy (mesaCliente.cartas[i].nome,msg->msg,msg->lenght);
+            tamMesa++;
+        }
+        else if(msg->lenght == 0){
+            mesaCliente.tamMesa = tamMesa;
+            return;
+        }
+    }
 }

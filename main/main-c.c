@@ -9,7 +9,7 @@ int main(){
         
         printf("Falha ao criar conexão com o servidor.\n");
         return 1;
-    }      
+    }
     
     // Mantendo conexão ativa e controlando o  fluxo do jogo.
     jogo ();

@@ -29,6 +29,7 @@ typedef struct{
 // da rodada.
 typedef struct{
 	int numeroJogador;
+	int tamMesa;
 	Carta cartas[4];
 } Mesa;
 
