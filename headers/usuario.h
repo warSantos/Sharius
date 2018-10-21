@@ -45,6 +45,18 @@ Descritor *listaLogin;
 // devido a estar em uma thread separada.
 int signal;
 
+// Estrutura destinada a comportar os dados referentes a uma mensagem
+// enviada a partir do protocolo tcp. Todo o texto enviado é armazenado
+// no vetor *msg. O tamanho da mensagem em lenght e o retorno das funções
+// read utilizadas nos processos de leitura armazenados em read_bytes.
+typedef struct mensagem {
+
+    char *msg;
+    int lenght;
+    int bytes_read;
+} Mensagem;
+
+
 /*
  * Lista de comandos.
  *      
@@ -87,13 +99,9 @@ int removerUsuario(char *nick);
 // Envia o o tamanho e a string nick
 void enviarStr(int idSocket, char *str);
 
-// Recebe uma string e o seu tamanho.
-int recebeStr(int idSocket, char *dest);
-
-// Fica escutando as conexões na porta do serviço e
-// recebe as mensagem do cliente e as imprimi na tela.
-// parecido com o servidor de mensagem no módulo servidor
-// porém nao redireciona mensagens...
-void recebeMensagem(void *idSocket);
+// Realiza leitura de um socket definido pelo inteiro idSocket
+// e retorna os dados escritos neste socket e metadados sobre 
+// os dados escritos através da estrutura Mensagem.
+Mensagem *recebeStr(int idSocket);
 
 #endif

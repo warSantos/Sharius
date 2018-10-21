@@ -7,11 +7,9 @@ int main(){
     
     if(jogadorCliente.socket == -1){
         
-        printf("Falha ao criar conexão com o servidor remoto...\n");
+        printf("Falha ao criar conexão com o servidor.\n");
         return 1;
-    }
-    
-    // Iniciando servidor para recebimento de mensagem.    
+    }      
     pthread_t t;
     if(pthread_create(&t, NULL, (void *) recebeMensagem, (void *) &jogadorCliente.socket)){    
         

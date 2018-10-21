@@ -54,7 +54,7 @@ void menuMensagem(char *buffer, int valorRodada){
         
         return;
     }
-    else if(!strncpm(bloco->parametro,"00" , 3)){
+    else if(!strncmp(bloco->parametro,"00" , 3)){
         jogar();
     }
     //printf("valor de retorno %d\n", strncmp(bloco->parametro, "-help", 6));
@@ -82,15 +82,17 @@ void menuMensagem(char *buffer, int valorRodada){
     enviarStr(jogadorCliente.socket, buffer);
 }
 
-void menuOperacao007(char *userNick, int idSocket){
+void menuOperacao007(int valorRodada){
+    
     char *buffer;
-    menu();
+    menu(valorRodada);
     int loop = 1;
+    
     while(loop){
         buffer = calloc(sizeof(char),20);
         scanf("%s",buffer);
         __fpurge(stdin);
-        menuMensagem(buffer, jogadorCliente);
+        //menuMensagem(buffer, jogadorCliente);
     }
 
 }
@@ -134,7 +136,7 @@ void abreConexao( ){
     if (connect(jogadorCliente.socket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
-        return jogadorCliente.socket;
+        return;
     }                    
     
     // Cria usuário.
@@ -154,9 +156,10 @@ void abreConexao( ){
         enviarStr(jogadorCliente.socket, resposta);
         
         // Recebendo confiramção.
+        // TO-DO: padronizar tudo para (read, write) ou (send, recv).
+        // TO-DO: utilizar somente recebeStr e enviarStr.
         recv(jogadorCliente.socket, &ok, sizeof (char), 0);
         
-                
         if (ok == 'S') { // se receber acesso autorizado.
                          // sai do loop e vai para criação de usuário.
             break;
@@ -168,7 +171,7 @@ void abreConexao( ){
         
         printf("Conexão perdida.\n\n");
         close(jogadorCliente.socket);
-        return -1;
+        return;
     }
     printf("\n\n");
     // criando usuário.
@@ -245,16 +248,37 @@ void aumentoValor(){
 void receberCartas (){
 
     int numeroCarta;
+    Mensagem *msg;
     for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
+        
+        msg = recebeStr (jogadorCliente.socket);
         // Recebendo as cartas do jogador (carta por carta).
-        if (recebeStr (jogadorCliente.socket, jogadorCliente.mao[numeroCarta].nome) < 0){
+        if (msg->bytes_read < 0){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
+        memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, 3);        
+        
         // Recebendo o valor da carta.
-        if (recebeStr (jogadorCliente.socket, (char *) &jogadorCliente.mao[numeroCarta].valor) < 0){
+        msg = recebeStr (jogadorCliente.socket);
+        if (msg->bytes_read < 0){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
+        memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
     }
+}
+
+void recebeMensagem(){
+    
+    // Enquanto não acabar o jogo.
+    // TO-DO: Refazer função de receber mensagem
+    // ate o nome seria bom alterar.
+    while (1){
+
+    }
+    
+    //fechando a conexão
+    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
+    close(jogadorCliente.socket);        
 }

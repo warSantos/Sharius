@@ -39,4 +39,10 @@ void menuMensagem(char *buffer, int valorRodada);
 
 void receberCartas ();
 
+void jogar();
+
+void aumentoValor();
+
+void recebeMensagem();
+
 #endif

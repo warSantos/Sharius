@@ -84,8 +84,9 @@ void escutaSolicitacao(char *senha){
     listen(socketLocal, 4);
     
     sizeSockaddr = sizeof(struct sockaddr_in);
+    Mensagem *msg;
+
     // Esperando por conexões.
-    
     while(1){
                 
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
@@ -96,36 +97,35 @@ void escutaSolicitacao(char *senha){
         }
         // Se o limite de conexões não foi atingido.
         if (qtdeConexoes < 4){
-
-            // Criando uma thread para um cliente.
-            // A nova thread ficara responsável por enviar as mensagens do cliente
-            // mantendo a conexão até o término da execução.                
             
             // Capturando senha do cliente.
-            int tentativas = 0; 
-            char *senhaTemp;
+            int tentativas = 0;
             while(tentativas < 3){
                             
                 // recebendo a senha.
-                recebeStr(socketCliente, &senhaTemp);
+                msg = recebeStr(socketCliente);
                 tentativas++;
                 char ok;
-                if(!strncmp(senhaTemp, senha, strlen(senhaTemp))){
+                if(!strncmp(senha, msg->msg, strlen(senha))){
                     
                     ok = 'S';
                     write(socketCliente, &ok, 1);
-                    free(senhaTemp);
+                    free (msg);
                     break;
                 }
                 ok = 'N';
                 write(socketCliente, &ok, 1);
-            }                
+                free (msg);
+            }
+            
             char *nick;
             Link aux;
             while(1){
-                        
-                if(recebeStr(socketCliente, &nick) <= 0){
-                                    
+
+                msg = recebeStr(socketCliente);     
+                if(msg->bytes_read <= 0){
+                    // TO-DO: Tratar melhor a mensagem de 
+                    // erro deste local e o procedimento a se fazer.
                     close(socketCliente);
                 }                       
                 aux = pesquisarNick(nick);                    
@@ -134,10 +134,12 @@ void escutaSolicitacao(char *senha){
                     
                     ok = 'S';
                     write(socketCliente, &ok, 1);
+                    free (msg);
                     break;
-                }                   
+                }
                 ok = 'N';
                 write(socketCliente, &ok, 1);
+                free (msg);
             }
             // Assimilando um file_descripor de socket para o cliente.
 
@@ -171,7 +173,7 @@ void limiteAtingido (int idSocket){
 }
 
 void *escutaCliente(void *socketCliente){
-    
+/*    
     //Id de ientificação do cliente que utiliza a função
     // Podem ser várias threads desta liberadas
     // Logo o idSocket de cada chamada da função escutaCliente 
@@ -191,8 +193,8 @@ void *escutaCliente(void *socketCliente){
         return 0;
     }
     
-    // recebe mensagens do cliente.
     Link aux;
+    // recebe mensagens do cliente.
     short int qtdeMsg = 0;
     while((read_size = recebeStr(idSocket, &buffer)) > 0){
           
@@ -226,12 +228,12 @@ void *escutaCliente(void *socketCliente){
             aux = pesquisarNick(bloco->comando);
             if (aux != NULL) {
                 //TO-DO: Substituir para enviar mesa.
-                enviarBloco(buffer, donoThread, *aux->socket);
+                //enviarBloco(buffer, donoThread, *aux->socket);
                 
             }else{
                 
                 //TO-DO: Substituir para enviar mesa.     
-                enviarBloco("Este usuário não esta no chat.", "SERVIDOR", idSocket);
+                //enviarBloco("Este usuário não esta no chat.", "SERVIDOR", idSocket);
             }
         }  
         free(bloco);
@@ -252,7 +254,7 @@ void *escutaCliente(void *socketCliente){
     //Free the socket pointer
     close(*(int *)socketCliente);
     printf("fechando conexão com cliente...\n");
-    return 0;        
+    return 0;        */
 }
 
 //TO-DO: Refazer função de fechar conexões.
