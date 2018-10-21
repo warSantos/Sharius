@@ -343,7 +343,7 @@ void enviarCartas() {
 }
 
 void controleJogo(){
-
+    int vencedorDaRodada;
     // Construindo baralho.
     construirBaralho (baralho);
     // armazena o valor da aposta corrente na mesa.
@@ -363,6 +363,16 @@ void controleJogo(){
             while (vezJogador < 4){
 
             }
+        }
+        vencedorDaRodada = vencedorRodada(mesa);
+        if(vencedorDaRodada == 1 || vencedorDaRodada == 3){
+            printf("Dupla 1 ganhou a rodada\n");
+        }
+        else if(vencedorDaRodada == 2 || vencedorDaRodada == 4){
+            printf("Dupla 2 ganhou a rodada\n");
+        }
+        else{
+            printf("Empatou\n");
         }
     }
 }

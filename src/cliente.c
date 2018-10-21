@@ -121,7 +121,7 @@ void menuOperacao(int valorRodada){
         visualizarCarta();
         visualizarMesa();
         comando = calloc(sizeof(char),10);
-        recebeMensagem(comando);
+        comando = recebeStr(jogadorCliente.socket);
         //se foi pedido vai ser mandado para menu truco para ver se vc aceita ,recusa ou aumenta o valor do truco;
         if(!strncmp(comando,"01",3)||!strncmp(comando,"02",3) || !strncmp(comando,"03",3) || !strncmp(comando,"04",3)){
             menuTruco(comando);

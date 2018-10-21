@@ -138,13 +138,13 @@ int vencerRodada(Mesa mesa){
 			
 			aux = mesa.cartas[i].valor;
 			printf("%i\n",mesa.cartas[i].valor);
-			aux2 = mesa.numeroJogador;
-			printf("%i\n",mesa.numeroJogador);
+			aux2 = mesa.numeroJogador[i];
+			printf("%i\n",mesa.numeroJogador[i]);
 		}
 		else if(mesa.cartas[i].valor == aux){
 			
-			if((aux2 % 2) == 0 && (mesa.numeroJogador % 2) != 0 
-				|| (aux2 % 2) != 0 && (mesa.numeroJogador %2) == 0){
+			if((aux2 % 2) == 0 && (mesa.numeroJogador[i] % 2) != 0 
+				|| (aux2 % 2) != 0 && (mesa.numeroJogador[i] %2) == 0){
 				aux2 = 5;
 			}
 		}
