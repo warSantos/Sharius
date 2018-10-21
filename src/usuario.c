@@ -232,97 +232,23 @@ void enviarStr(int idSocket, char *str){
     write(idSocket, str, retInt(lenght));    
 }
 
-int recebeStr(int idSocket, char *dest){
+Mensagem *recebeStr(int idSocket){
         
-    char *lenght = malloc(4);    
+    Mensagem *msg = malloc (sizeof(Mensagem));
+    char *lenght = malloc(4);
     
     // recebendo o tamanho da string.
-    int read = recv(idSocket, lenght, 4, 0);  
-    int len = retInt(lenght);        
-    if(read <= 0){
-                
-        return read;
+    msg->bytes_read = recv(idSocket, lenght, 4, 0);
+    if(msg->bytes_read <= 0){
+
+        msg->msg = NULL;
+        msg->lenght = 0;       
+        return msg;
     }    
-    
+    msg->lenght = retInt(lenght);
     // recebendo a string.
-    *dest = malloc(len);
-    read = recv(idSocket, *dest, len, 0);
-
-    return read;
-}
-
-void enviarBloco(char *buffer, char *login, int sock){
-
-    // enviando o tamanho do size login do emissor.
-    int len = strlen(login) + 1;
-    char *lenght = retChar(len);        
-    
-    write(sock , lenght , 4);
-    
-    // enviando o nick    
-    write(sock, login, len);
-    
-    // enviando a mensagem.
-    write(sock, buffer, 2048);   
-}
-
-int recebeBloco(char** buffer, char** nickEmissor, int idSocket){
-                
-    int read_size;
-    *buffer = malloc(sizeof(char)*2048);
-    // Recebendo o size do login.
-        
-    char *lenght = malloc(4);
-    read_size = recv(idSocket, lenght, 4, 0);
-    if (read_size <= 0) {
-
-        return read_size;
-    }
-
-    int len = retInt(lenght);
-    *nickEmissor = malloc(len);
-
-    // Recebendo o login.
-    read_size = recv(idSocket, *nickEmissor, len, 0);
-    if (read_size <= 0) {
-
-        return read_size;
-    }
-
-    // Recebendo a mensagem.
-    read_size = recv(idSocket, *buffer, 2048, 0);
-        
-    return read_size;
-}
-
-void recebeMensagem(void *socketServer){
-    
-    //Id de ientificação do cliente que utiliza a função
-    // Podem ser várias threads desta liberadas
-    // Logo o idSocket de cada chamada da função escutaCliente 
-    // é diferente é um socket diferente.
-    printf("Servidor de mensagens pronto...\n\n");
-    
-    int read_size;    
-    int idSocket = *(int*) socketServer;
-    char *buffer, *userNick;    
-    // recebe mensagens enviadas pelo servidor para o cliente.
-    while((read_size = recebeBloco(&buffer, &userNick, idSocket)) > 0){
-                        
-        // extraindo mensagem do buffer recebido.
-        Comando *bloco = extraiMensagem(buffer);        
-        printf(ANSI_COLOR_RED "@%s -:> %s" ANSI_COLOR_RESET "\n",userNick, bloco->parametro);       
-    }            
-    if(read_size == 0){
-        
-        puts("Desconectando...");
-        fflush(stdout);        
-    }else if(read_size == -1){
-        
-        perror("recv failed");
-    }
-         
-    //fechando a conexão
-    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
-    close(idSocket);        
+    msg->msg = malloc(msg->lenght);
+    msg->bytes_read = recv(idSocket, msg->msg, msg->lenght, 0);
+    free (lenght);
+    return msg;
 }

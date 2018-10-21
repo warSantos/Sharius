@@ -46,7 +46,7 @@ void menuMensagem(char *buffer, int valorRodada){
         return;
     }
     // jogar a carta comando 00
-    else if(!strncpm(bloco->parametro,"00" , 3)){
+     else if(!strncmp(bloco->parametro,"00" , 3)){
         jogar();
     }
     //pedir truco 01
@@ -76,22 +76,23 @@ void menuMensagem(char *buffer, int valorRodada){
     enviarStr(jogadorCliente.socket, buffer);
 }
 
-void menuOperacao(char *userNick, int idSocket){
+
+void menuOperacao(int valorRodada){
+    
     char *buffer;
-    menu();
+    menu(valorRodada);
     int loop = 1;
+    
     while(loop){
         buffer = calloc(sizeof(char),20);
         scanf("%s",buffer);
         __fpurge(stdin);
-        menuMensagem(buffer, jogadorCliente);
+        //menuMensagem(buffer, jogadorCliente);
     }
 
 }
 
-
-
-int abreConexao( ){
+void abreConexao( ){
         
     struct sockaddr_in servidor;
     //Create socket
@@ -99,7 +100,7 @@ int abreConexao( ){
     if (jogadorCliente.socket == -1){
         
         printf("Erro ao criar socket cliente...\n");
-        return jogadorCliente.socket;
+        return;
     } 
         
     char *ip = malloc(sizeof(char)*16);    
@@ -130,7 +131,7 @@ int abreConexao( ){
     if (connect(jogadorCliente.socket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
-        return jogadorCliente.socket;
+        return;
     }                    
     
     // Cria usuário.
@@ -150,9 +151,10 @@ int abreConexao( ){
         enviarStr(jogadorCliente.socket, resposta);
         
         // Recebendo confiramção.
+        // TO-DO: padronizar tudo para (read, write) ou (send, recv).
+        // TO-DO: utilizar somente recebeStr e enviarStr.
         recv(jogadorCliente.socket, &ok, sizeof (char), 0);
         
-                
         if (ok == 'S') { // se receber acesso autorizado.
                          // sai do loop e vai para criação de usuário.
             break;
@@ -164,7 +166,7 @@ int abreConexao( ){
         
         printf("Conexão perdida.\n\n");
         close(jogadorCliente.socket);
-        return -1;
+        return;
     }
     printf("\n\n");
     // criando usuário.
@@ -199,7 +201,7 @@ int abreConexao( ){
     
     free(nick);
     printf("Login cadastrado...\n");
-    return jogadorCliente.socket;
+    return;
 }
 
 void visualizarCarta(){
@@ -231,7 +233,7 @@ void jogar(){
             enviarStr(jogadorCliente.socket,(char *) &jogadorCliente.numero);
             return;
             //TO-DO: Aqui deveria ser um return eu acredito.
-        }
+       }
     }
     printf("Voce nao tem esta carta\n");
     // se o cara nao tem a carta a função é chamada denovo 
@@ -242,16 +244,37 @@ void jogar(){
 void receberCartas (){
 
     int numeroCarta;
+    Mensagem *msg;
     for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
+        
+        msg = recebeStr (jogadorCliente.socket);
         // Recebendo as cartas do jogador (carta por carta).
-        if (recebeStr (jogadorCliente.socket, jogadorCliente.mao[numeroCarta].nome) < 0){
+        if (msg->bytes_read < 0){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
+        memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, 3);        
+        
         // Recebendo o valor da carta.
-        if (recebeStr (jogadorCliente.socket, (char *) &jogadorCliente.mao[numeroCarta]) < 0){
+        msg = recebeStr (jogadorCliente.socket);
+        if (msg->bytes_read < 0){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
+        memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
     }
+}
+
+void recebeMensagem(){
+    
+    // Enquanto não acabar o jogo.
+    // TO-DO: Refazer função de receber mensagem
+    // ate o nome seria bom alterar.
+    while (1){
+
+    }
+    
+    //fechando a conexão
+    printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
+    close(jogadorCliente.socket);        
 }

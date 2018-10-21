@@ -30,18 +30,19 @@ int menuComando(char *buffer);
 // e delegação dos dados processados para a função de enviar mesagem.
 void menuMenssagem(char *buffer, char *userNick, int idSocket);
 
-// Menu de interação do usuário hospede do servidor.
-// Nesta função estão reunidas as funções de gerenciamento de 
-// usuário e também o mesageiro para o hospede do server.
-void menuOperacao(char *userNick, int idSocket);
-
 // Abre conexão inicial com o servidor...
-int abreConexao();
+void abreConexao();
 
 void menu(int valorRodada);
 
 void menuMensagem(char *buffer, int valorRodada);
 
 void receberCartas ();
+
+void jogar();
+
+void aumentoValor();
+
+void recebeMensagem();
 
 #endif
