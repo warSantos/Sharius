@@ -91,7 +91,7 @@ void enviarMensagem(char *buffer, int idSocket);
 void enviarStr(int idSocket, char *str);
 
 // Recebe uma string e o seu tamanho.
-int recebeStr(int idSocket, char **donoThread);
+int recebeStr(int idSocket, char *dest);
 
 // Similar a enviar mensagem porem envia um bloco com size
 // do login, login e o buffer.

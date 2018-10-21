@@ -20,6 +20,7 @@ int main(){
     }
     
     // menu de administração do cliente.
+    receberCartas();
     menuOperacao(jogadorCliente.nick, jogadorCliente.socket);
     pthread_join(t, NULL);
     
