@@ -302,7 +302,7 @@ void jogo(){
         return;
     }
     printf (msg->msg);
-    free(msg);    
+    free(msg);
     // Enquanto não acabar o jogo.
     while (1){
         receberCartas ();
@@ -328,17 +328,9 @@ void receberCartas (){
             return;
         }
         memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, msg->lenght);
-        // Recebendo o valor da carta.
-        msg = recebeStr (jogadorCliente.socket);
-        if (msg->bytes_read < 0){
-            printf ("Erro: falha ao receber as cartas.\n");
-            return;
-        }
-        //memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
-        jogadorCliente.mao[numeroCarta].valor = atoi (msg->msg);
-        printf ("Carta: %s\n", msg->msg);
-        printf ("Valor: %d\n", *(int*)msg->msg);
-        free(msg);
+        // Recebendo o valor da carta.        
+        jogadorCliente.mao[numeroCarta].valor = recebeInt (jogadorCliente.socket);
+        //free(msg);
     }
 }
 

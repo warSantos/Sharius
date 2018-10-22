@@ -49,7 +49,7 @@ void enviarInt (int idSocket, int valor){
 u_int32_t recebeInt (int idSocket){
 
     u_int32_t v;
-    if(recv(idSocket, &v, sizeof(u_int32_t), 0) <= 0){
+    if(recv(idSocket, &v, sizeof(u_int32_t), 0) < 0){
         return -1;
     }
     return ntohl (v);
@@ -72,8 +72,7 @@ Mensagem *recebeStr(int idSocket){
     Mensagem *msg = malloc (sizeof(Mensagem));
     
     // recebendo o tamanho da string.
-    msg->bytes_read = recv(idSocket, &msg->lenght, 
-        sizeof(u_int32_t), 0);
+    msg->lenght = recebeInt (idSocket);
     if(msg->bytes_read < 0){
 
         msg->msg = NULL;
