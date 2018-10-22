@@ -19,7 +19,6 @@ typedef struct{
 typedef struct{
 	int numero;
 	int socket;
-	char *nick;
 	Carta mao[3];
 } Jogador;
 

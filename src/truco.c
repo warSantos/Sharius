@@ -130,9 +130,9 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 }
 
 int vencerRodada(Mesa mesa){
-
+	
 	int aux=0,aux2,i;
-	for(i = 0; i < 4; i++){
+	/*for(i = 0; i < 4; i++){
 		
 		if(mesa.cartas[i].valor > aux ){
 			
@@ -148,7 +148,7 @@ int vencerRodada(Mesa mesa){
 				aux2 = 5;
 			}
 		}
-	}
+	}*/
 	return aux2;
 }
 int vencTurno(int pontosRodada[2]){
