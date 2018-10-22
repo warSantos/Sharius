@@ -243,12 +243,8 @@ void enviarCartas() {
             enviarStr (jogadores[numeroJogador].socket,
                 jogadores[numeroJogador].mao[numeroCarta].nome);
             // Enviando o valor da carta.
-            char valor[8];
-            sprintf (valor, "%d", jogadores[numeroJogador].mao[numeroCarta].valor);
-            enviarStr (jogadores[numeroJogador].socket, valor);
-            //printf ("Carta: %s\n", jogadores[numeroJogador].mao[numeroCarta].nome);
-            //printf ("Valor: %d\n", jogadores[numeroJogador].mao[numeroCarta].valor);
-            //free (valor);
+            enviarInt (jogadores[numeroJogador].socket, 
+                jogadores[numeroJogador].mao[numeroCarta].valor);
         }
     }
 }

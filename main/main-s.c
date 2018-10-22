@@ -1,6 +1,6 @@
 #include "../headers/servidor.h"
 
-int main(){    
+int main(){
     
     int socketLocal;
     pthread_t servidorCheio;

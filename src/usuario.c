@@ -39,37 +39,48 @@ char *criaIp(){
 
 /* FUNÇÕES PARA TRABALHO COM SOCKETS! */
 
+void enviarInt (int idSocket, int valor){
+
+    // convertendo o valor do inteiro para rede.
+    u_int32_t v = htonl (valor);
+    write (idSocket, &v, sizeof(u_int32_t));
+}
+
+u_int32_t recebeInt (int idSocket){
+
+    u_int32_t v;
+    if(recv(idSocket, &v, sizeof(u_int32_t), 0) < 0){
+        return -1;
+    }
+    return ntohl (v);
+}
+
 void enviarStr(int idSocket, char *str){
-    
-    int len = strlen(str) + 1;
-    printf ("str: %s\n", str);
-    printf ("Len: %d\n", len);
-    char *lenght = retChar(len);
+
+    // Obtendo o tamanho da string.
+    u_int32_t lenght = strlen(str) + 1;
+
     // enviando o tamanho da string.
-    write(idSocket, lenght, 4);
+    enviarInt (idSocket, lenght);
     
     // enviando a string.
-    write(idSocket, str, retInt(lenght));
-    free (lenght); 
+    write(idSocket, str, lenght);
 }
 
 Mensagem *recebeStr(int idSocket){
         
     Mensagem *msg = malloc (sizeof(Mensagem));
-    char *lenght = malloc(4);
     
     // recebendo o tamanho da string.
-    msg->bytes_read = recv(idSocket, lenght, 4, 0);
+    msg->lenght = recebeInt (idSocket);
     if(msg->bytes_read < 0){
 
         msg->msg = NULL;
-        msg->lenght = 0;       
+        msg->lenght = 0;
         return msg;
     }    
-    msg->lenght = retInt(lenght);
     // recebendo a string.
     msg->msg = malloc(msg->lenght);
     msg->bytes_read = recv(idSocket, msg->msg, msg->lenght, 0);
-    free (lenght);
     return msg;
 }
