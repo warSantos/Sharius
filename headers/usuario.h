@@ -22,7 +22,7 @@
 typedef struct mensagem {
 
     char *msg;
-    int lenght;
+    uint32_t lenght;
     int bytes_read;
 } Mensagem;
 
@@ -40,6 +40,10 @@ typedef struct mensagem {
 
 // Retorna string "ip" no formato exigido pelo padrão do endereço.
 char *criaIp();
+
+void enviarInt (int idSocket, int valor);
+
+u_int32_t recebeInt (int idSocket);
 
 // Envia o o tamanho e a string nick
 void enviarStr(int idSocket, char *str);
