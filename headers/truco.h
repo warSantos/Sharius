@@ -32,6 +32,8 @@ typedef struct{
 	Carta cartas[4];
 } Mesa;
 
+#define QTDE_JOGADORES 1
+
 void construirBaralho(Carta *baralho);
 
 void embaralhar(Carta *baralho);

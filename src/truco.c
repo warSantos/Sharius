@@ -119,12 +119,14 @@ void embaralhar(Carta *baralho){
 }
 
 void distribuirCartas(Jogador *jogadores, Carta *baralho){
-	int i=0,j=0,k=0;
-	for(i = 0; i < 4; i++){
+	
+	int i,j;
+	// Para cada jogador.
+	for(i = 0; i < QTDE_JOGADORES; i++){
+		// Para cada carta do jogador i.
 		for(j = 0; j < 3; j++){
-			strcpy(jogadores[i].mao[j].nome, baralho[k].nome);
-			jogadores[i].mao[j].valor = baralho[k].valor;
-			k++;
+			strcpy(jogadores[i].mao[j].nome, baralho[i*j].nome);
+			jogadores[i].mao[j].valor = baralho[i*j].valor;
 		}
 	}
 }

@@ -7,10 +7,10 @@
 
 char *criaIp(){
     
-    char *ip = (char *) malloc(sizeof(char) * 16);    
-    
+    //char *ip = (char *) malloc(sizeof(char) * 16);    
+    char *ip = "127.0.0.1";
     while (1) {
-
+        
         printf("Endereços IP devem estar da seguinte forma: 192.168.0.100 .\n");
         printf("Digite o endereço: ");
         scanf("%15[^\n]s", ip);

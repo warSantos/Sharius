@@ -15,7 +15,7 @@ int main(){
         return 1;
     }
     */
-    
+    controleJogo ();
     // Servidor envia as cartas para os jogadores.
     while (1){
         sleep (1);
