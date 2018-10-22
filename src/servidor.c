@@ -28,29 +28,15 @@ void ajudaComando(){
     printf("\n\tremove - remove um usuário.\n\n");    
 }
 
-void addUserRemoto(char *nick, int *sock){
+void escutaSolicitacao(){
     
-    size_t len = strlen(nick)+1;
-    Link aux = malloc(sizeof(Login));
-    aux->nick = malloc(sizeof(char) * len);
-    aux->socket = sock;
-    strncpy(aux->nick, nick, len);
-    // Caso seja a primeira inserção de um usuário na lista.
-    if(listaVazia()){
-        
-        listaLogin->primeiro = aux;
-        listaLogin->ultimo = aux;
-        aux->prox = NULL;          
-    }else{
-    
-        listaLogin->ultimo->prox = aux;
-        listaLogin->ultimo = aux;
-    }
-    listaLogin->tamanho++;    
-}
+    // Cria conexão inicial com clientes e fornece uma thread de
+    // recebimento de menagem para o cliente.
+    char *senha = malloc(sizeof(char)*16);
+    printf("Digite a senha de gerenciamento: ");
+    scanf("%15[^\n]s", senha);
+    __fpurge(stdin);
 
-void escutaSolicitacao(char *senha){
-        
     int socketLocal, socketCliente, sizeSockaddr;
     struct sockaddr_in servidor, cliente;
     
@@ -110,7 +96,7 @@ void escutaSolicitacao(char *senha){
             // Chama a thread para tratar o cadastro dos clientes.
             args->bytes_read = socketCliente;
             if (pthread_create(&threadsId[qtdeConexoes], NULL,
-                cadastrarUsuarios, (void *) args)){
+                autenticaUsuarios, (void *) args)){
                 printf ("Erro ao criar thread para cadastrar usuário.\n");
             }
         } else { // Se o limite de conexões foi atingido.
@@ -126,7 +112,7 @@ void escutaSolicitacao(char *senha){
     }
 }
 
-void *cadastrarUsuarios (void *args){
+void *autenticaUsuarios (void *args){
 
     /*
     * Nesta função utiliza-se a estrutura mensagem (senhaESocket) para comportar 
@@ -170,41 +156,6 @@ void *cadastrarUsuarios (void *args){
         write(socketCliente, &ok, 1);
         free (msg);
     }
-    
-    char *nick;
-    Link aux;
-    while(1){
-
-        msg = recebeStr(socketCliente);     
-        if(msg->bytes_read <= 0){
-            // TO-DO: Tratar melhor a mensagem de 
-            // erro deste local e o procedimento a se fazer.
-            close(socketCliente);
-            pthread_mutex_lock (&qtdeConexoesMutex);
-            qtdeConexoes--;
-            pthread_mutex_unlock (&qtdeConexoesMutex);
-            return NULL;
-        }
-        aux = pesquisarNick(nick);               
-        char ok;
-        if (aux == NULL) { // se login nao existir
-            
-            ok = 'S';
-            write(socketCliente, &ok, 1);
-            free (msg);
-            break;
-        }
-        ok = 'N';
-        write(socketCliente, &ok, 1);
-        free (msg);
-    }
-    // Assimilando um file_descripor de socket para o cliente.
-
-    // Adicionando usuário a lista.
-    pthread_mutex_lock(&lista);                
-    //addUserRemoto(nick, socketCliente);        
-    pthread_mutex_unlock(&lista);
-    free(nick);
 }
 
 void limiteAtingido (int idSocket){
@@ -305,18 +256,7 @@ void *escutaCliente(void *socketCliente){
 
 //TO-DO: Refazer função de fechar conexões.
 void fechaConexoes(){
-        
-    if(!listaVazia()){
-        
-        Link aux = listaLogin->primeiro;
-        while(aux != NULL){
 
-            shutdown(*aux->socket, 2);
-            removerUsuario(aux->nick);
-            aux = aux->prox;
-        }        
-    }
-    free(listaLogin);
 }
 
 void enviarCartas() {
@@ -343,7 +283,7 @@ void enviarCartas() {
 }
 
 void controleJogo(){
-    int vencedorDaRodada;
+    int vencedorDaRodada,pontosRodada[2] = {0,0};
     // Construindo baralho.
     construirBaralho (baralho);
     // armazena o valor da aposta corrente na mesa.
@@ -363,16 +303,16 @@ void controleJogo(){
             while (vezJogador < 4){
 
             }
-        }
-        vencedorDaRodada = vencedorRodada(mesa);
-        if(vencedorDaRodada == 1 || vencedorDaRodada == 3){
-            printf("Dupla 1 ganhou a rodada\n");
-        }
-        else if(vencedorDaRodada == 2 || vencedorDaRodada == 4){
-            printf("Dupla 2 ganhou a rodada\n");
-        }
-        else{
-            printf("Empatou\n");
+            vencedorDaRodada = vencerRodada(mesa);
+            if(vencedorDaRodada == 1 || vencedorDaRodada == 3){
+                printf("Dupla 1 ganhou a rodada\n");
+            }
+            else if(vencedorDaRodada == 2 || vencedorDaRodada == 4){
+                printf("Dupla 2 ganhou a rodada\n");
+            }
+            else{
+                printf("Empatou\n");
+            }
         }
     }
 }

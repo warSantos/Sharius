@@ -15,11 +15,13 @@ pthread_mutex_t qtdeConexoesMutex;
 // de uma partida (cartas, valor das cartas, nome, id e socket_fd).
 Jogador jogadores[4];
 
-// Esta estrutura comportas as catas disponíveis para o jogo, 
+// Esta estrutura comportas as cartas disponíveis para o jogo, 
 // declarada como global para que deste modo evite reconstrução
 // do baralho.
 Carta baralho[40];
 
+// Esta estrutura comporta as cartas que estão na mesa
+Mesa mesa;
 /*
  *
  * Menu de comandos do Servidor.
@@ -30,17 +32,14 @@ Carta baralho[40];
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 
 int menuComando(char *buffer);
 
-// Insere os dados dos usuários via socket.
-void addUserRemoto(char *nick, int *sock);
-
 // Fica aguardando conexões e envio de mesagens.
 // Responsável por repassar as mesagens para os demais usuários,
 // Receber solicitações de login.
 // Gerenciamento de conexões externas.
-void escutaSolicitacao(char *senha);
+void escutaSolicitacao();
 
 
-void *cadastrarUsuarios (void *args);
+void *autenticaUsuarios (void *args);
 
 // Informa a um jogador que sua conexão com o server não pode ser 
 // estabelecida devido o limite dos jogadores ter sido atingido.

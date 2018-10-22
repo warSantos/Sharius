@@ -23,6 +23,7 @@ typedef struct{
 	Carta mao[3];
 } Jogador;
 
+int valorJogo[2] = {0,0};
 // Estrutura destinada a armazenar o estado da mesa de truco
 // durante a rodada. Possui o identificador de quem ganhou a
 // última rodada (numeroJogador) e possui as jogadas cartas 

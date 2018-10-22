@@ -151,6 +151,34 @@ int vencerRodada(Mesa mesa){
 	}
 	return aux2;
 }
+int vencTurno(int pontosRodada[2]){
+	int i;
+	if(pontosRodada[0] == 2 && pontosRodada[1] < 2){
+		printf("Dupla 1 ganhou o turno\n");
+		valorJogo[0] = valorJogo[0] + valorRodada;
+		return 0;
+	}
+	else if(pontosRodada[0] < 2 && pontosRodada[1] == 2){
+		printf("Dupla 2 ganhou o turno\n");
+		valorJogo[1] = valorJogo[1] + valorRodada;
+		return 0;
+	}
+	else if(pontosRodada[0] == 3 && pontosRodada[1] ==2){
+		printf("Dupla 1 ganhou o turno\n")
+		valorJogo[0] = valorJogo[0] + valorRodada; 
+		return 0;
+	}
+	else if(pontosRodada[0] == 2 && pontosRodada[1] == 3){
+		printf("Dupla 2 ganhou o turno\n");
+		valorJogo[1] = valorJogo[1] + valorRodada;
+		return 0;
+	}
+	else if(pontosRodada[0] == 3 && pontosRodada[1] == 3){
+		printf("Empatou o turno\n");
+		return 0;
+	}
+	return 1;
+}
 int vencjogo(){
 
 }

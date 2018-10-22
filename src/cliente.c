@@ -216,38 +216,6 @@ void abreConexao(){
         close(jogadorCliente.socket);
         return;
     }
-    printf("\n\n");
-    // criando usuário.
-    
-    char *nick;   
-    
-    while(1){
-                
-        nick = criaNick();        
-        
-        // enviando nick.
-        enviarStr(jogadorCliente.socket, nick);
-        
-        // recebendo confirmação...
-        recv(jogadorCliente.socket, &ok, 1, 0);
-        if(ok == 'S'){
-            
-            break;
-        }
-        printf("Este login já esta em uso.\n\n");
-    }        
-    
-    // Recebendo confirmação de preparo para receber nome...
-    char ac;
-    recv(jogadorCliente.socket, &ac, 1, 0);
-    
-    // enviando login para a thread de escutaCliente.
-    enviarStr(jogadorCliente.socket, nick);
-    
-    jogadorCliente.nick = malloc(sizeof(char)* (strlen(nick)+1));
-    strncpy(jogadorCliente.nick, nick, (strlen(nick)+1));
-    
-    free(nick);
     printf("Login cadastrado...\n");
     return;
 }
