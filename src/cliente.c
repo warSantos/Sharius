@@ -155,7 +155,7 @@ void abreConexao(){
      * do endereço ip ja informado.
     */
     Mensagem *msg = malloc (sizeof(Mensagem));
-    msg->msg = malloc(sizeof(char)*16);
+    /*msg->msg = malloc(sizeof(char)*16);
     while(1){
         
         printf("Digite o ip do servidor: ");
@@ -165,7 +165,8 @@ void abreConexao(){
             
             break;
         }
-    }
+    }*/
+    msg->msg = "127.0.0.1";
     // Definindo IP do servidor...
     servidor.sin_addr.s_addr = inet_addr(msg->msg);
     // Definindo o tipo de protocolo...
@@ -185,17 +186,17 @@ void abreConexao(){
     int tentativas = 0;
     char ok;
     while(tentativas < 3){                
-        
+        /*
         //Recebendo senha.
         char *resposta = malloc(sizeof(char)*16);
         printf("Senha de acesso: ");
         
         scanf("%15[^\n]s", resposta);
         __fpurge(stdin);                                
-        
+        */
         // enviando senha.
+        char *resposta = "123";
         enviarStr(jogadorCliente.socket, resposta);
-        
         // Recebendo confiramção.
         // TO-DO: padronizar tudo para (read, write) ou (send, recv).
         // TO-DO: utilizar somente recebeStr e enviarStr.
@@ -291,8 +292,31 @@ void jogar(){
     //TO-DO: Aqui deveria informar ao usuário que a carta não existe na mão dele.
 }
 
+void jogo(){
+    
+    Mensagem *msg;
+    // Recebendo mensagem inicial de inicio de partida.
+    msg = recebeStr(jogadorCliente.socket);
+    if(msg->bytes_read < 0){
+        printf("Erro:falha ao receber a mensagem.\n");
+        return;
+    }
+    printf (msg->msg);
+    free(msg);    
+    // Enquanto não acabar o jogo.
+    while (1){
+        receberCartas ();
+        //sleep (1);
+        break;
+    }
+    //fechando a conexão
+    //printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
+    close(jogadorCliente.socket);
+}
+
 void receberCartas (){
 
+    printf ("Recebendo cartas.\n");
     int numeroCarta;
     Mensagem *msg;
     for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
@@ -303,39 +327,19 @@ void receberCartas (){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
-        memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, 3);
+        memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, msg->lenght);
         // Recebendo o valor da carta.
         msg = recebeStr (jogadorCliente.socket);
         if (msg->bytes_read < 0){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
-        memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
-        printf ("Carta: %s", msg->msg);
-        printf ("Valor: %s", msg->msg);
+        //memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
+        jogadorCliente.mao[numeroCarta].valor = atoi (msg->msg);
+        printf ("Carta: %s\n", msg->msg);
+        printf ("Valor: %d\n", *(int*)msg->msg);
         free(msg);
     }
-}
-
-void jogo(){
-    
-    Mensagem *msg;
-    // Recebendo comando do servidor.
-    msg = recebeStr(jogadorCliente.socket);
-    if(msg->bytes_read < 0){
-        printf("Erro:falha ao receber a mensagem.\n");
-        return;
-    }
-    printf (msg->msg);
-    //memcpy(&comando,msg->msg,msg->lenght);
-    free(msg);
-    // Enquanto não acabar o jogo.
-    while (1){
-        sleep (3);
-    }
-    //fechando a conexão
-    //printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
-    close(jogadorCliente.socket);
 }
 
 void receberMesa(){

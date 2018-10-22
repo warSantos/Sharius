@@ -42,13 +42,15 @@ char *criaIp(){
 void enviarStr(int idSocket, char *str){
     
     int len = strlen(str) + 1;
+    printf ("str: %s\n", str);
+    printf ("Len: %d\n", len);
     char *lenght = retChar(len);
-    
     // enviando o tamanho da string.
     write(idSocket, lenght, 4);
     
     // enviando a string.
-    write(idSocket, str, retInt(lenght));    
+    write(idSocket, str, retInt(lenght));
+    free (lenght); 
 }
 
 Mensagem *recebeStr(int idSocket){
@@ -58,7 +60,7 @@ Mensagem *recebeStr(int idSocket){
     
     // recebendo o tamanho da string.
     msg->bytes_read = recv(idSocket, lenght, 4, 0);
-    if(msg->bytes_read <= 0){
+    if(msg->bytes_read < 0){
 
         msg->msg = NULL;
         msg->lenght = 0;       
