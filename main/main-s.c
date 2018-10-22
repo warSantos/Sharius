@@ -17,9 +17,9 @@ int main(){
     */
     controleJogo ();
     // Servidor envia as cartas para os jogadores.
-    while (1){
+    /*while (1){
         sleep (1);
         printf ("Servidor ON.\n");
-    }
+    }*/
     return 0;
 }

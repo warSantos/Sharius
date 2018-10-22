@@ -23,7 +23,6 @@ Carta baralho[40];
 // Esta estrutura comporta as cartas que estão na mesa
 Mesa mesa;
 
-int valorJogo[2] = {0,0};
 /*
  *
  * Menu de comandos do Servidor.

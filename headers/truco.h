@@ -33,6 +33,10 @@ typedef struct{
 	Carta cartas[4];
 } Mesa;
 
+int valorJogo[2] = {0,0};
+
+int valorRodada;
+
 void construirBaralho(Carta *baralho);
 
 void embaralhar(Carta *baralho);

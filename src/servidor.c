@@ -32,10 +32,11 @@ void escutaSolicitacao(){
     
     // Cria conexão inicial com clientes e fornece uma thread de
     // recebimento de menagem para o cliente.
-    char *senha = malloc(sizeof(char)*16);
+    char *senha = "123";
+    /*char *senha = malloc(sizeof(char)*16);
     printf("Digite a senha de gerenciamento: ");
     scanf("%15[^\n]s", senha);
-    __fpurge(stdin);
+    __fpurge(stdin);*/
 
     int socketLocal, socketCliente, sizeSockaddr, i;
     struct sockaddr_in servidor, cliente;
@@ -220,25 +221,34 @@ void *limiteAtingido (){
 //TO-DO: Refazer função de fechar conexões.
 void fechaConexoes(){
 
+    int i;
+    for (i = 0; i < QTDE_JOGADORES; ++i){
+        close(jogadores[i].socket);
+    }
 }
 
 void enviarCartas() {
 
+    printf ("Enviando cartas.\n");
     // Chamando uma função para embaralhar cartas.
     embaralhar (baralho);
     // Aplicando função de distribuir cartas.
     distribuirCartas (jogadores, baralho);
     int numeroJogador, numeroCarta;
     // Enquanto todos os jogadores não estiverem com suas cartas.
-    for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
+    for (numeroJogador = 0; numeroJogador <= QTDE_JOGADORES; numeroJogador++){
         // Para cada carta sorteada para mão do jogador.
         for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
             // Enviando o nome da carta.
             enviarStr (jogadores[numeroJogador].socket,
                 jogadores[numeroJogador].mao[numeroCarta].nome);
             // Enviando o valor da carta.
-            enviarStr (jogadores[numeroJogador].socket,
-                (char *) &jogadores[numeroJogador].mao[numeroCarta].valor);
+            char valor[8];
+            sprintf (valor, "%d", jogadores[numeroJogador].mao[numeroCarta].valor);
+            enviarStr (jogadores[numeroJogador].socket, valor);
+            //printf ("Carta: %s\n", jogadores[numeroJogador].mao[numeroCarta].nome);
+            //printf ("Valor: %d\n", jogadores[numeroJogador].mao[numeroCarta].valor);
+            //free (valor);
         }
     }
 }
@@ -253,22 +263,24 @@ void controleJogo(){
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    int valorRodada;
+    int valorRodada;    
     // Enquanto não houver vencedores.
     while (1){
         
         // Enviando as cartas para os jogadores.
+        sleep (2);
         enviarCartas ();
-        sleep(100);
+        sleep(2);
         valorRodada = 2;    
         // Iniciando rodada.
         for(turnos = 0; turnos < 3; turnos++){
             
-            // Enviando sinais de permissão para os jogadores.
+            /*// Enviando sinais de permissão para os jogadores.
             while (vezJogador < 4){
                 
-            }
+            }*/
         }
+        break;
     }
          
     //Free the socket pointer
@@ -334,9 +346,11 @@ void controleJogo(){
             else if(vencedorDaRodada == 2 || vencedorDaRodada == 4){
                 printf("Dupla 2 ganhou a rodada\n");
             }
-            else{
+            else{d
                 printf("Empatou\n");
             }
         }
     }
+    fechaConexoes();
+
 }
