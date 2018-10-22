@@ -282,7 +282,6 @@ void controleJogo(){
             for (jogadas = 0; jogadas < 4; jogadas++){                
                 
                 if (mesaJogo->tamMesa > 0){
-                    //TO-DO: envia mesa para os jogadores.
                     enviarMesa();
                 }                
                 // Envia sinal de permissao para o jogador.
@@ -291,16 +290,22 @@ void controleJogo(){
                 msg = recebeStr (jogadores[vezJogador].socket);                
                 // Se for a solicitacao de jogar uma carta.
                 if (!strncmp (msg->msg, "00", msg->lenght)){
-                
+                    // TO-DO: Receber carta dos jogador e adiciona la da mesa.
+
                 // Se for solicitação de aumento de aposta.
                 }else if (!strncmp (msg->msg, "01", msg->lenght)){
-                                                
+                    // TO-DO: Enviar a solicitação para todos jogadores verem.
+                    // TO-DO: Enviar configuração de bloqueio para o jogador para
+                    // força-lo a responder a solicitação.
+                    // TO-DO: passar o sinal de permissão para o proximo jogador.                                        
                 }// Se for uma aceitação de aumento de aposta.
                 else if (!strncmp (msg->msg, "02", msg->lenght)){
-
+                    // TO-DO: Aumentar a variavael valorRodada.
+                    // Enviar sinal de truco aceito para todos menos para quem
+                    // confirmou.
                 }// Se for um recuso de aumento de aposta.
                 else if (!strncmp (msg->msg, "03", msg->lenght)){
-
+                    // TO-DO: Aumentar os pontos da dupla vencedora.
                 }
             }
         }
