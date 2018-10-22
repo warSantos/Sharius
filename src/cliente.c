@@ -107,7 +107,6 @@ void menuTruco(char *comando){
         enviarStr(jogadorCliente.socket,(char *) &"06");
         return;
     }
-
 }
 
 void menuOperacao(int valorRodada){
@@ -258,15 +257,21 @@ void visualizarCarta(){
     printf("\n");               
 }
 void visualizarMesa(){
-    int i;
+    
+    int i, tamanhoMesa;
+    Mensagem *msg;
     printf("Mesa\n");
-    for(i=0;i < mesaCliente.tamMesa;i++){
-           printf("%s \t",mesaCliente.cartas[i].nome ); 
+    tamanhoMesa = recebeInt (jogadorCliente.socket);
+    for(i = 0; i < tamanhoMesa; i++){
+        msg = recebeStr(jogadorCliente.socket);
+        printf (msg->msg);
+        free (msg);
     }
     printf("\n");
 }
 
 void jogar(){
+
     printf("Escolha a carta que voce vai jogar\n");
     char resposta[3];
     printf("\n");
@@ -328,29 +333,7 @@ void receberCartas (){
             return;
         }
         memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, msg->lenght);
-        // Recebendo o valor da carta.        
+        // Recebendo o valor da carta.
         jogadorCliente.mao[numeroCarta].valor = recebeInt (jogadorCliente.socket);
-        //free(msg);
-    }
-}
-
-void receberMesa(){
-
-    Mensagem *msg;
-    int i,tamMesa = 0;
-    for (i = 0;i< 4; i++){
-        msg = recebeStr(jogadorCliente.socket);
-        if(msg->bytes_read < 0){
-            printf("Erro:falha ao receber a mensagem.\n");
-            return;
-        }
-        if(msg->lenght >  0 ){
-            memcpy (mesaCliente.cartas[i].nome,msg->msg,msg->lenght);
-            tamMesa++;
-        }
-        else if(msg->lenght == 0){
-            mesaCliente.tamMesa = tamMesa;
-            return;
-        }
     }
 }

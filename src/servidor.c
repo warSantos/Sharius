@@ -255,28 +255,69 @@ void controleJogo(){
     construirBaralho (baralho);
     // armazena o valor da aposta corrente na mesa.
     // Enviando sinal de partida iniciada (teste).
-    int turnos, vezJogador;
+    int turnos, vezJogador, jogadas;
+    int valorRodada, placarJogo[2] = {0,0};
+    Mensagem *msg;
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    int valorRodada;    
+    vezJogador = 0;
     // Enquanto não houver vencedores.
+    mesaJogo = calloc (1, sizeof(Mesa));
     while (1){
         
-        // Enviando as cartas para os jogadores.
         sleep (2);
         enviarCartas ();
         sleep(2);
-        valorRodada = 2;    
+        valorRodada = 2;
+        if (placarJogo[0] == 10){
+            //TO-DO: Enviar sinal de mao de 10.
+        }else if(placarJogo[1] == 10){
+            //TO-DO: Enviar sinal de mao de 10.
+        }
         // Iniciando rodada.
         for(turnos = 0; turnos < 3; turnos++){
             
-            /*// Enviando sinais de permissão para os jogadores.
-            while (vezJogador < 4){
+            // Enviando sinais de permissão para os jogadores.
+            for (jogadas = 0; jogadas < 4; jogadas++){                
                 
-            }*/
+                if (mesaJogo->tamMesa > 0){
+                    //TO-DO: envia mesa para os jogadores.
+                    enviarMesa();
+                }                
+                // Envia sinal de permissao para o jogador.
+                enviarStr (jogadores[vezJogador].socket, "00");
+                // Recebe resposta do jogador da vez.
+                msg = recebeStr (jogadores[vezJogador].socket);                
+                // Se for a solicitacao de jogar uma carta.
+                if (!strncmp (msg->msg, "00", msg->lenght)){
+                
+                // Se for solicitação de aumento de aposta.
+                }else if (!strncmp (msg->msg, "01", msg->lenght)){
+                                                
+                }// Se for uma aceitação de aumento de aposta.
+                else if (!strncmp (msg->msg, "02", msg->lenght)){
+
+                }// Se for um recuso de aumento de aposta.
+                else if (!strncmp (msg->msg, "03", msg->lenght)){
+
+                }
+            }
         }
         break;
     }
     fechaConexoes();
+}
+
+void enviarMesa (){
+    
+    int carta, jogador;
+    for (jogador = 0; jogador < QTDE_JOGADORES; jogador++){
+        // Enviando o tamanho da mesa.
+        enviarInt (jogadores[jogador].socket, mesaJogo->tamMesa);
+        for (carta = 0; carta < mesaJogo->tamMesa; carta++){           
+            // Enviando o nome da carta para os jogadores.
+            enviarStr (jogadores[jogador].socket, mesaJogo->cartas[carta].nome);            
+        }
+    }
 }
