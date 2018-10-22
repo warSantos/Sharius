@@ -24,7 +24,10 @@ Jogador jogadores[4];
 // do baralho.
 Carta baralho[40];
 
-Mesa mesa;
+
+// Armazena as cartas de uma rodada.
+Mesa *mesaJogo;
+
 
 /*
  *
