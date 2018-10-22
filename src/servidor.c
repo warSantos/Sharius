@@ -41,6 +41,7 @@ void escutaSolicitacao(){
     struct sockaddr_in servidor, cliente;
     
     pthread_mutex_init(&qtdeConexoesMutex, NULL);
+    pthread_mutex_init(&iniciarPartida, NULL);
     pthread_t threadsId[4];
     
     // Criando um socket para receber fluxo tcp de dados.
@@ -81,35 +82,77 @@ void escutaSolicitacao(){
     args->lenght = strlen (senha);
 
     // Esperando por conexões.
-    while(1){
+    while(qtdeConexoes < 4){
 
-        socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, (socklen_t *) &sizeSockaddr);
-        qtdeConexoes++;
+        socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, 
+            (socklen_t *) &sizeSockaddr);
         printf ("Inicia aqui as conexões.\n");
         //TO-DO: tratar melhor a possibilidade de erro neste caso.
         if(socketCliente < 0){
             
-            break;
+            close(socketCliente);
         }
-        // Se o limite de conexões não foi atingido.
-        if (qtdeConexoes < 4){
-            // Chama a thread para tratar o cadastro dos clientes.
-            args->bytes_read = socketCliente;
-            if (pthread_create(&threadsId[qtdeConexoes], NULL,
-                autenticaUsuarios, (void *) args)){
-                printf ("Erro ao criar thread para cadastrar usuário.\n");
-            }
-        } else { // Se o limite de conexões foi atingido.
-            // Informe ao jogador que não é mais possível sua participação.
-            
-            limiteAtingido (socketCliente);
+        // Chama a thread para tratar o cadastro dos clientes.
+        args->bytes_read = socketCliente;
+        if (pthread_create(&threadsId[qtdeConexoes], NULL,
+            autenticaUsuarios, (void *) args)){
+            printf ("Erro ao criar thread para cadastrar usuário.\n");
         }
     }
+    printf ("Iniciando preparos para partida.\n");
     pthread_mutex_destroy (&qtdeConexoesMutex);
-    if(socketCliente < 0){
+}
+
+void *limiteAtingido (){
+    
+    // Criando um socket para receber fluxo tcp de dados.
+    // AF_INET tipo de conexão sobre IP para redes.
+    // SOCK_STREAM protocolo com controle de erros.
+    // 0 seleção do protocolo TCP
+    int socketLocal, socketCliente, sizeSockaddr;
+    struct sockaddr_in servidor, cliente;
+    
+    socketLocal = socket(AF_INET, SOCK_STREAM, 0);
+
+    if(socketLocal == -1){
         
-        printf("Falha na função accpet.\n");
+        printf("Erro ao criar socket local.\n");
+        //TO-DO: Tratar retorno desta função de melhor forma.
+        return NULL;
     }
+        
+    servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
+    servidor.sin_addr.s_addr = htonl(INADDR_ANY);
+    servidor.sin_port = htons(40001); // Setando a porta em que rodara o processo.       
+    
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
+    
+    // Criando link entre a estrutura servidor ao ID do socketLocal.
+    if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
+        
+        printf("Erro no bind.\n");
+        fechaConexoes();
+        close(socketLocal);
+        exit(1);
+    }
+    
+    // Limitando o número de conexões que o servidor vai aceitar para 4 conexões.
+    listen(socketLocal, 4);
+    
+    sizeSockaddr = sizeof(struct sockaddr_in);
+    
+    // Enquanto o jogo não acabar.
+    while (1){
+        socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, 
+            (socklen_t *) &sizeSockaddr);
+        // enviando mensagem de aviso.
+        char *msgLimite = "50:Limite de jogadres atingido. Por favor tente novamente mais tarde";
+        enviarStr (socketCliente, msgLimite);
+
+        // Fechando o socket
+        close(socketCliente);
+    }
+    return NULL;
 }
 
 void *autenticaUsuarios (void *args){
@@ -124,15 +167,14 @@ void *autenticaUsuarios (void *args){
     */
 
     Mensagem *senhaESocket = (Mensagem *) args, *msg;
-    
-    
+        
     int idJogador, socketCliente = senhaESocket->bytes_read;
     int lenght = senhaESocket->lenght;
     char *senha = senhaESocket->msg;
         
     pthread_mutex_lock (&qtdeConexoesMutex);
     printf ("socketCliente: %d\n", socketCliente);
-    printf ("qtdeConexao: %d\n", qtdeConexoes);
+    printf ("qtdeConexoes: %d\n", qtdeConexoes);
     idJogador = qtdeConexoes;
     qtdeConexoes++;
     pthread_mutex_unlock (&qtdeConexoesMutex);
@@ -147,6 +189,7 @@ void *autenticaUsuarios (void *args){
         char ok;
         if(!strncmp(senha, msg->msg, lenght)){
             
+            // Enviando signal de confirmação de acesso para o cliente.
             ok = 'S';
             write(socketCliente, &ok, 1);
             free (msg);
@@ -156,16 +199,67 @@ void *autenticaUsuarios (void *args){
         write(socketCliente, &ok, 1);
         free (msg);
     }
+    if (tentativas == 3){
+        // TO-DO: retornar mensagem de erro para o usuario.
+        close (socketCliente);
+    }else if (qtdeConexoes > 4){
+        // TO-DO: informar que o usuario demorou para fazer o cadastro
+        // e então perdeu sua vaga.
+        close (socketCliente);
+    }
 }
 
-void limiteAtingido (int idSocket){
-    
-    // enviando mensagem de aviso.
-    char *msgLimite = "50:Limite de jogadres atingido. Por favor tente novamente mais tarde";
-    enviarStr (idSocket, msgLimite);
+void controleJogo(){
 
-    //Free the socket pointer
-    close(idSocket);
+    // Construindo baralho.
+    construirBaralho (baralho);
+    // armazena o valor da aposta corrente na mesa.
+    int valorRodada;
+
+    // Enquanto não houver vencedores.
+    while (1){
+
+        // Enviando as cartas para os jogadores.
+        enviarCartas ();
+
+        int turnos = 0, vezJogador;
+        // Iniciando rodada.
+        while(turnos < 3){
+            
+            // Enviando sinais de permissão para os jogadores.
+            while (vezJogador < 4){
+
+            }
+        }
+    }
+}
+
+//TO-DO: Refazer função de fechar conexões.
+void fechaConexoes(){
+
+}
+
+void enviarCartas() {
+
+    // Chamando uma função para embaralhar cartas.
+    embaralhar (baralho);
+    // Aplicando função de distribuir cartas.
+    distribuirCartas (jogadores, baralho);
+    int numeroJogador, numeroCarta;
+    // Enquanto todos os jogadores não estiverem com suas cartas.
+    for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
+        
+        // Para cada carta sorteada para mão do jogador.
+        for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
+            
+            // Enviando o nome da carta.
+            enviarStr (jogadores[numeroJogador].socket, 
+                jogadores[numeroJogador].mao[numeroCarta].nome);
+            // Enviando o valor da carta.
+            enviarStr (jogadores[numeroJogador].socket, 
+                (char *) &jogadores[numeroJogador].mao[numeroCarta].valor);
+        }
+    }
 }
 
 void *escutaCliente(void *socketCliente){
@@ -252,57 +346,4 @@ void *escutaCliente(void *socketCliente){
     printf("fechando conexão com cliente...\n");
     return 0;
     */
-}
-
-//TO-DO: Refazer função de fechar conexões.
-void fechaConexoes(){
-
-}
-
-void enviarCartas() {
-
-    // Chamando uma função para embaralhar cartas.
-    embaralhar (baralho);
-    // Aplicando função de distribuir cartas.
-    distribuirCartas (jogadores, baralho);
-    int numeroJogador, numeroCarta;
-    // Enquanto todos os jogadores não estiverem com suas cartas.
-    for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
-        
-        // Para cada carta sorteada para mão do jogador.
-        for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
-            
-            // Enviando o nome da carta.
-            enviarStr (jogadores[numeroJogador].socket, 
-                jogadores[numeroJogador].mao[numeroCarta].nome);
-            // Enviando o valor da carta.
-            enviarStr (jogadores[numeroJogador].socket, 
-                (char *) &jogadores[numeroJogador].mao[numeroCarta].valor);
-        }
-    }
-}
-
-void controleJogo(){
-
-    // Construindo baralho.
-    construirBaralho (baralho);
-    // armazena o valor da aposta corrente na mesa.
-    int valorRodada;
-
-    // Enquanto não houver vencedores.
-    while (1){
-
-        // Enviando as cartas para os jogadores.
-        enviarCartas ();
-
-        int turnos = 0, vezJogador;
-        // Iniciando rodada.
-        while(turnos < 3){
-            
-            // Enviando sinais de permissão para os jogadores.
-            while (vezJogador < 4){
-
-            }
-        }
-    }
 }

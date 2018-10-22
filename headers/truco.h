@@ -19,7 +19,6 @@ typedef struct{
 typedef struct{
 	int numero;
 	int socket;
-	char *nick;
 	Carta mao[3];
 } Jogador;
 
@@ -28,7 +27,7 @@ typedef struct{
 // última rodada (numeroJogador) e possui as jogadas cartas 
 // da rodada.
 typedef struct{
-	int numeroJogador;
+	int numeroJogador[4];
 	int tamMesa;
 	Carta cartas[4];
 } Mesa;

@@ -149,40 +149,38 @@ void abreConexao(){
         
         printf("Erro ao criar socket cliente...\n");
         return;
-    } 
-        
-    char *ip = malloc(sizeof(char)*16);    
+    }   
+    /*
+     * Reutilização da estrutura mensagem para retornar valor
+     * do endereço ip ja informado.
+    */
+    Mensagem *msg = malloc (sizeof(Mensagem));
+    msg->msg = malloc(sizeof(char)*16);
     while(1){
         
         printf("Digite o ip do servidor: ");
-        scanf("%15[^\n]s", ip);
+        scanf("%15[^\n]s", msg->msg);
         __fpurge(stdin);
-        if(!verificaIp(ip)){
+        if(!verificaIp(msg->msg)){
             
             break;
         }
-    }        
-    
+    }
     // Definindo IP do servidor...
-    servidor.sin_addr.s_addr = inet_addr(ip);
-    
+    servidor.sin_addr.s_addr = inet_addr(msg->msg);
     // Definindo o tipo de protocolo...
     servidor.sin_family = AF_INET;
-    
     // Define a porta em que esta ativo o serviço no servidor...
     servidor.sin_port = htons(40001);
-    
     memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
     
-    //Busca conexão com o servidor...
-    
+    //Busca conexão com o servidor.
     if (connect(jogadorCliente.socket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
                 
         perror("Erro. conexão não estabelecida...");
+        //return NULL;
         return;
-    }                    
-    
-    // Cria usuário.
+    }
     // Recebe mensagem de autenticação.
     int tentativas = 0;
     char ok;
@@ -203,8 +201,10 @@ void abreConexao(){
         // TO-DO: utilizar somente recebeStr e enviarStr.
         recv(jogadorCliente.socket, &ok, sizeof (char), 0);
         
-        if (ok == 'S') { // se receber acesso autorizado.
-                         // sai do loop e vai para criação de usuário.
+        // Se o acesso for permitido receba a nova porta para o 
+        // onde o server fara o fluxo do jogo.
+        if(ok == 'S'){
+            
             break;
         }        
         printf("Senha errada.\n");
@@ -216,8 +216,34 @@ void abreConexao(){
         close(jogadorCliente.socket);
         return;
     }
-    printf("Login cadastrado...\n");
-    return;
+    printf("Por favor aguarde o inicio da partida.\n");
+    //return msg;
+}
+
+void reconecta(char *ip){
+
+    struct sockaddr_in servidor;
+    //Create socket
+    jogadorCliente.socket = socket(AF_INET , SOCK_STREAM , 0);
+    if (jogadorCliente.socket == -1){
+        
+        printf("Erro ao criar socket cliente.\n");
+        return;
+    }
+    // Definindo IP do servidor...
+    servidor.sin_addr.s_addr = inet_addr(ip);
+    // Definindo o tipo de protocolo...
+    servidor.sin_family = AF_INET;
+    // Define a porta em que esta ativo o serviço no servidor...
+    servidor.sin_port = htons(40002);
+    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
+    
+    //Busca conexão com o servidor.
+    if (connect(jogadorCliente.socket, (struct sockaddr *)&servidor , sizeof(servidor)) < 0){
+                
+        perror("Erro. conexão não estabelecida.\n");
+        return;
+    }
 }
 
 void visualizarCarta(){

@@ -1,17 +1,25 @@
 #include "../headers/servidor.h"
 
-int main(){
+int main(){    
     
-    // Iniciando o ponterio descritor com lista de usuários no server.
-    //listaLogin = iniciarLista();
-    //pthread_mutex_init(&lista, NULL);
-    
+    int socketLocal;
+    pthread_t servidorCheio;
     // Inicializando a variável que contabiliza o número de 
     // conexões estabelecidas.
     qtdeConexoes = 0;
     escutaSolicitacao ();
-
-    // Servidor envia as cartas para os jogadores.
+    /*
+    // TO-DO: Cria thread de resposta servidor cheio.    
+    if(pthread_create (&servidorCheio, NULL, limiteAtingido, NULL)){
+        printf ("Falha ao criar thread: limiteAtingido.\n");
+        return 1;
+    }
+    */
     
+    // Servidor envia as cartas para os jogadores.
+    while (1){
+        sleep (1);
+        printf ("Servidor ON.\n");
+    }
     return 0;
 }
