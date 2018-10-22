@@ -37,7 +37,7 @@ void escutaSolicitacao(){
     scanf("%15[^\n]s", senha);
     __fpurge(stdin);
 
-    int socketLocal, socketCliente, sizeSockaddr;
+    int socketLocal, socketCliente, sizeSockaddr, i;
     struct sockaddr_in servidor, cliente;
     
     pthread_mutex_init(&qtdeConexoesMutex, NULL);
@@ -82,11 +82,11 @@ void escutaSolicitacao(){
     args->lenght = strlen (senha);
 
     // Esperando por conexões.
-    while(qtdeConexoes < 4){
+    while(qtdeConexoes < QTDE_JOGADORES){
 
         socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, 
             (socklen_t *) &sizeSockaddr);
-        printf ("Inicia aqui as conexões.\n");
+        printf ("Conexão com cliente: %d iniciada.\n", qtdeConexoes);
         //TO-DO: tratar melhor a possibilidade de erro neste caso.
         if(socketCliente < 0){
             
@@ -99,8 +99,70 @@ void escutaSolicitacao(){
             printf ("Erro ao criar thread para cadastrar usuário.\n");
         }
     }
-    printf ("Iniciando preparos para partida.\n");
-    pthread_mutex_destroy (&qtdeConexoesMutex);
+    // Aguardando as threads de cadastro finalizar.
+    for (i = 0; i <= QTDE_JOGADORES; i++){
+        pthread_join (threadsId[i], NULL);
+    }
+    close (socketLocal);
+    pthread_mutex_destroy (&qtdeConexoesMutex);    
+}
+
+void *autenticaUsuarios (void *args){
+
+    /*
+    * Nesta função utiliza-se a estrutura mensagem (senhaESocket) para comportar 
+    * parâmetros para chamar passa-los através da função phtread_create.
+    * portanto os parâmetros estão configurados da seguinte forma.
+    * senhaESocket->bytes_read: socket do cliente.
+    * senhaESocket->lenght: tamanho da senha.
+    * senhaESocket->msg: a senha do servidor.
+    */
+
+    Mensagem *senhaESocket = (Mensagem *) args, *msg;
+        
+    int idJogador, socketCliente = senhaESocket->bytes_read;
+    int lenght = senhaESocket->lenght;
+    char *senha = senhaESocket->msg;
+        
+    pthread_mutex_lock (&qtdeConexoesMutex);
+    idJogador = qtdeConexoes;
+    qtdeConexoes++;
+    pthread_mutex_unlock (&qtdeConexoesMutex);
+
+    // Capturando senha do cliente.
+    int tentativas = 0;
+    while(tentativas < 3){
+
+        // recebendo a senha.
+        msg = recebeStr(socketCliente);
+        tentativas++;
+        char ok;
+        if(!strncmp(senha, msg->msg, lenght)){
+            
+            // Enviando signal de confirmação de acesso para o cliente.
+            ok = 'S';
+            write(socketCliente, &ok, 1);
+            jogadores[idJogador].numero = idJogador;
+            jogadores[idJogador].socket = socketCliente;
+            free (msg);
+            return NULL;
+        }
+        ok = 'N';
+        write(socketCliente, &ok, 1);
+        free (msg);
+    }
+    if (tentativas == 3){
+        // TO-DO: retornar mensagem de erro para o usuario.
+        close (socketCliente);        
+    }else if (qtdeConexoes > QTDE_JOGADORES){
+        // TO-DO: informar que o usuario demorou para fazer o cadastro
+        // e então perdeu sua vaga.
+        close (socketCliente);
+    }
+    // Se a conexão não for aceita.
+    pthread_mutex_lock (&qtdeConexoesMutex);
+    qtdeConexoes--;
+    pthread_mutex_unlock (&qtdeConexoesMutex);
 }
 
 void *limiteAtingido (){
@@ -155,85 +217,6 @@ void *limiteAtingido (){
     return NULL;
 }
 
-void *autenticaUsuarios (void *args){
-
-    /*
-    * Nesta função utiliza-se a estrutura mensagem (senhaESocket) para comportar 
-    * parâmetros para chamar passa-los através da função phtread_create.
-    * portanto os parâmetros estão configurados da seguinte forma.
-    * senhaESocket->bytes_read: socket do cliente.
-    * senhaESocket->lenght: tamanho da senha.
-    * senhaESocket->msg: a senha do servidor.
-    */
-
-    Mensagem *senhaESocket = (Mensagem *) args, *msg;
-        
-    int idJogador, socketCliente = senhaESocket->bytes_read;
-    int lenght = senhaESocket->lenght;
-    char *senha = senhaESocket->msg;
-        
-    pthread_mutex_lock (&qtdeConexoesMutex);
-    printf ("socketCliente: %d\n", socketCliente);
-    printf ("qtdeConexoes: %d\n", qtdeConexoes);
-    idJogador = qtdeConexoes;
-    qtdeConexoes++;
-    pthread_mutex_unlock (&qtdeConexoesMutex);
-
-    // Capturando senha do cliente.
-    int tentativas = 0;
-    while(tentativas < 3){
-
-        // recebendo a senha.
-        msg = recebeStr(socketCliente);
-        tentativas++;
-        char ok;
-        if(!strncmp(senha, msg->msg, lenght)){
-            
-            // Enviando signal de confirmação de acesso para o cliente.
-            ok = 'S';
-            write(socketCliente, &ok, 1);
-            free (msg);
-            break;
-        }
-        ok = 'N';
-        write(socketCliente, &ok, 1);
-        free (msg);
-    }
-    if (tentativas == 3){
-        // TO-DO: retornar mensagem de erro para o usuario.
-        close (socketCliente);
-    }else if (qtdeConexoes > 4){
-        // TO-DO: informar que o usuario demorou para fazer o cadastro
-        // e então perdeu sua vaga.
-        close (socketCliente);
-    }
-}
-
-void controleJogo(){
-
-    // Construindo baralho.
-    construirBaralho (baralho);
-    // armazena o valor da aposta corrente na mesa.
-    int valorRodada;
-
-    // Enquanto não houver vencedores.
-    while (1){
-
-        // Enviando as cartas para os jogadores.
-        enviarCartas ();
-
-        int turnos = 0, vezJogador;
-        // Iniciando rodada.
-        while(turnos < 3){
-            
-            // Enviando sinais de permissão para os jogadores.
-            while (vezJogador < 4){
-
-            }
-        }
-    }
-}
-
 //TO-DO: Refazer função de fechar conexões.
 void fechaConexoes(){
 
@@ -248,105 +231,51 @@ void enviarCartas() {
     int numeroJogador, numeroCarta;
     // Enquanto todos os jogadores não estiverem com suas cartas.
     for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
-        
         // Para cada carta sorteada para mão do jogador.
         for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
-            
             // Enviando o nome da carta.
-            enviarStr (jogadores[numeroJogador].socket, 
+            enviarStr (jogadores[numeroJogador].socket,
                 jogadores[numeroJogador].mao[numeroCarta].nome);
             // Enviando o valor da carta.
-            enviarStr (jogadores[numeroJogador].socket, 
+            enviarStr (jogadores[numeroJogador].socket,
                 (char *) &jogadores[numeroJogador].mao[numeroCarta].valor);
         }
     }
 }
 
-void *escutaCliente(void *socketCliente){
-    /*    
-    //Id de ientificação do cliente que utiliza a função
-    // Podem ser várias threads desta liberadas
-    // Logo o idSocket de cada chamada da função escutaCliente 
-    // é diferente é um socket diferente.
-    
-    int idSocket = *(int*)socketCliente, read_size;    
-    //int read_size;
-    
-    // enviando confirmação de pronto para receber nome...
-    char *buffer, *donoThread, ac = 'S';                
-    write(idSocket, &ac, 1);    
-    
-    // recebendo o nome do dono da thread.
-    if(recebeStr(idSocket, &donoThread) <= 0){
-    
-        printf("Erro ao receber nome na thread de escuta individual.\n");
-        return 0;
+void controleJogo(){
+
+    // Construindo baralho.
+    construirBaralho (baralho);
+    // armazena o valor da aposta corrente na mesa.
+    // Enviando sinal de partida iniciada (teste).
+    int turnos, vezJogador;
+    for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
+        enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    
-    Link aux;
-    // recebe mensagens do cliente.
-    short int qtdeMsg = 0;
-    while((read_size = recebeStr(idSocket, &buffer)) > 0){
-          
-        // extraindo cliente para envio.
-        Comando *bloco = extraiMensagem(buffer);        
-        // Repassa para broadcast.
-        if(!strncmp(bloco->comando, "all", 4)) {
-            
-            aux = listaLogin->primeiro;
-            while (aux != NULL) {
-
-                // não enviar para o mesmo que recebeu.
-                if (strcmp(aux->nick, donoThread)) {
-                    
-                    //TO-DO: Substituir para enviar mesa.
-                    //enviarBloco(buffer, donoThread, *aux->socket);
-                    qtdeMsg++;
-                }
-                aux = aux->prox;
-            }
-
-            if(!qtdeMsg){
-                //TO-DO: Substituir para enviar mesa.
-                //enviarBloco("Não há outros usuários no chat.", "SERVIDOR", idSocket);
-            }
-            qtdeMsg = 0;
-            
-        }else{ // Enviando mensagem unicast.
-
-            // passando o nick específico para pesquisa.
-            aux = pesquisarNick(bloco->comando);
-            if (aux != NULL) {
-                //TO-DO: Substituir para enviar mesa.
-                //enviarBloco(buffer, donoThread, *aux->socket);
-                
-            }else{
-                
-                //TO-DO: Substituir para enviar mesa.     
-                //enviarBloco("Este usuário não esta no chat.", "SERVIDOR", idSocket);
-            }
-        }  
-        free(bloco);
-    }            
-    if(read_size == 0){
-                
-        pthread_mutex_lock(&lista);
-        // Possível local para implantação de mutex.        
-        removerUsuario(donoThread);                    
-        pthread_mutex_unlock(&lista);
-        fflush(stdout);
+    int valorRodada;
+    // Enquanto não houver vencedores.
+    while (1){
         
-    }else if(read_size == -1){
-        
-        perror("Falha no recv...\n\n");
+        // Enviando as cartas para os jogadores.
+        enviarCartas ();
+        sleep(100);
+        valorRodada = 2;    
+        // Iniciando rodada.
+        for(turnos = 0; turnos < 3; turnos++){
+            
+            // Enviando sinais de permissão para os jogadores.
+            while (vezJogador < 4){
+                
+            }
+        }
     }
          
     //Free the socket pointer
     close(*(int *)socketCliente);
     printf("fechando conexão com cliente...\n");
     return 0;
-    */
-
+  
 }
 
 //TO-DO: Refazer função de fechar conexões.

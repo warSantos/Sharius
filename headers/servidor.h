@@ -11,10 +11,6 @@ int qtdeConexoes;
 // a variável qtdeConexoes.
 pthread_mutex_t qtdeConexoesMutex;
 
-// Variável utilizada para sinalizar para o server o momento de
-// iniciar partida.
-pthread_mutex_t iniciarPartida;
-
 // Estrutura que comporta os dados sobre todos os jogadores 
 // de uma partida (cartas, valor das cartas, nome, id e socket_fd).
 Jogador jogadores[4];
@@ -26,6 +22,8 @@ Carta baralho[40];
 
 // Esta estrutura comporta as cartas que estão na mesa
 Mesa mesa;
+
+int valorJogo[2] = {0,0};
 /*
  *
  * Menu de comandos do Servidor.
@@ -47,7 +45,7 @@ void *autenticaUsuarios (void *args);
 
 // Informa a um jogador que sua conexão com o server não pode ser 
 // estabelecida devido o limite dos jogadores ter sido atingido.
-void *limiteAtingido ();
+void limiteAtingido (int idSocket);
 
 // Recebe as mensagens de um cliente e repassa elas aos demais 
 // logados no chat.

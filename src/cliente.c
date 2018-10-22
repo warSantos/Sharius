@@ -186,9 +186,9 @@ void abreConexao(){
     char ok;
     while(tentativas < 3){                
         
-        // Recebendo senha do teclado.
+        //Recebendo senha.
         char *resposta = malloc(sizeof(char)*16);
-        printf("Senha de acesso: ");       
+        printf("Senha de acesso: ");
         
         scanf("%15[^\n]s", resposta);
         __fpurge(stdin);                                
@@ -303,8 +303,7 @@ void receberCartas (){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
-        memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, 3);        
-        
+        memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, 3);
         // Recebendo o valor da carta.
         msg = recebeStr (jogadorCliente.socket);
         if (msg->bytes_read < 0){
@@ -312,9 +311,10 @@ void receberCartas (){
             return;
         }
         memcpy (&jogadorCliente.mao[numeroCarta].valor, msg->msg, msg->lenght);
+        printf ("Carta: %s", msg->msg);
+        printf ("Valor: %s", msg->msg);
+        free(msg);
     }
-    //dei free por via da duvidas
-    free(msg);
 }
 
 void jogo(){
@@ -326,19 +326,18 @@ void jogo(){
         printf("Erro:falha ao receber a mensagem.\n");
         return;
     }
+    printf (msg->msg);
     //memcpy(&comando,msg->msg,msg->lenght);
     free(msg);
     // Enquanto não acabar o jogo.
-    // TO-DO: Refazer função de receber mensagem
-    // ate o nome seria bom alterar.
-    //while (1){
-
-    //}
-    
+    while (1){
+        sleep (3);
+    }
     //fechando a conexão
     //printf(ANSI_COLOR_RED "Servidor inoperante..." ANSI_COLOR_RESET " \n");
-    //close(jogadorCliente.socket);        
+    close(jogadorCliente.socket);
 }
+
 void receberMesa(){
 
     Mensagem *msg;

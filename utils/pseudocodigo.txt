@@ -4,8 +4,7 @@ Enquanto o nenhuma equipe ganhar o jogo
 
     Servidor embaralha as cartas.
     Servidor distribui as cartas entre os jogadores.
-    Servidor envia as cartas para os jogadores.
-    Servidor recebe confirmação de envio das cartas.
+    Servidor envia as cartas para os jogadores.    
 
     Se não tiver uma ordem de qual jogador iniciar.
         então sorteie.
