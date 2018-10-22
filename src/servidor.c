@@ -263,7 +263,9 @@ void controleJogo(){
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    int valorRodada;    
+    int valorRodada,resultadoRodada,resultadoTurno;
+    int placarTurno[2] = {0,0}; 
+    int placarJogo[2] = {0,0};   
     // Enquanto não houver vencedores.
     while (1){
         
@@ -279,78 +281,40 @@ void controleJogo(){
             while (vezJogador < 4){
                 
             }*/
+            resultadoRodada = vencerRodada(mesa);
+            if(resultadoRodada == 1 || resultadoRodada == 3){
+                printf("Dupla 1 ganhou a rodada\n");
+                placarTurno[0] = placarTurno[0] + 1; 
+            }
+            else if(resultadoRodada == 2 || resultadoRodada == 4){
+                printf("Dupla 2 ganhou a rodada\n");
+                placarTurno[1] = placarTurno[1] + 1;
+            }
+            else if(resultadoRodada == 5 ){
+                printf("Empate : proxima rodada decidira quem ganhará\n");
+                placarTurno[0] = placarTurno[0] + 1;
+                placarTurno[1] = placarTurno[1] + 1;
+            }
         }
+        resultadoTurno = vencerTurno(placarTurno);
+        if(resultadoTurno == 1){
+            printf("Dupla 1 ganhou o Turno\n");
+            placarJogo[0] = placarJogo[0] + valorRodada; 
+
+        }
+        else if(resultadoTurno == 2){
+            printf("Dupla 2 ganhou o Turno\n");
+            placarJogo[1] = placarJogo[1] + valorRodada;
+        }
+        else if(resultadoTurno == 3){
+            printf("Empate\n");
+        }
+
+        if(placarJogo[0] > 10 || placarJogo[1] > 10){
+            break;
+        }
+
         break;
     }
-         
-    //Free the socket pointer
-    close(*(int *)socketCliente);
-    printf("fechando conexão com cliente...\n");
-    return 0;
-  
-}
-
-//TO-DO: Refazer função de fechar conexões.
-void fechaConexoes(){
-
-}
-
-void enviarCartas() {
-
-    // Chamando uma função para embaralhar cartas.
-    embaralhar (baralho);
-    // Aplicando função de distribuir cartas.
-    distribuirCartas (jogadores, baralho);
-    int numeroJogador, numeroCarta;
-    // Enquanto todos os jogadores não estiverem com suas cartas.
-    for (numeroJogador = 0; numeroJogador < 4; numeroJogador++){
-        
-        // Para cada carta sorteada para mão do jogador.
-        for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
-            
-            // Enviando o nome da carta.
-            enviarStr (jogadores[numeroJogador].socket, 
-                jogadores[numeroJogador].mao[numeroCarta].nome);
-            // Enviando o valor da carta.
-            enviarStr (jogadores[numeroJogador].socket, 
-                (char *) &jogadores[numeroJogador].mao[numeroCarta].valor);
-        }
-    }
-}
-
-void controleJogo(){
-    int vencedorDaRodada,pontosRodada[2] = {0,0};
-    // Construindo baralho.
-    construirBaralho (baralho);
-    // armazena o valor da aposta corrente na mesa.
-    int valorRodada;
-
-    // Enquanto não houver vencedores.
-    while (1){
-
-        // Enviando as cartas para os jogadores.
-        enviarCartas ();
-
-        int turnos = 0, vezJogador;
-        // Iniciando rodada.
-        while(turnos < 3){
-            
-            // Enviando sinais de permissão para os jogadores.
-            while (vezJogador < 4){
-
-            }
-            vencedorDaRodada = vencerRodada(mesa);
-            if(vencedorDaRodada == 1 || vencedorDaRodada == 3){
-                printf("Dupla 1 ganhou a rodada\n");
-            }
-            else if(vencedorDaRodada == 2 || vencedorDaRodada == 4){
-                printf("Dupla 2 ganhou a rodada\n");
-            }
-            else{d
-                printf("Empatou\n");
-            }
-        }
-    }
     fechaConexoes();
-
 }

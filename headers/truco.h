@@ -19,7 +19,6 @@ typedef struct{
 typedef struct{
 	int numero;
 	int socket;
-	char *nick;
 	Carta mao[3];
 } Jogador;
 
@@ -33,9 +32,7 @@ typedef struct{
 	Carta cartas[4];
 } Mesa;
 
-int valorJogo[2] = {0,0};
-
-int valorRodada;
+#define QTDE_JOGADORES 1
 
 void construirBaralho(Carta *baralho);
 

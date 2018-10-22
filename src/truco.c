@@ -135,7 +135,7 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 int vencerRodada(Mesa mesa){
 	
 	int aux=0,aux2,i;
-	/*for(i = 0; i < 4; i++){
+	for(i = 0; i < 4; i++){
 		
 		if(mesa.cartas[i].valor > aux ){
 			
@@ -151,36 +151,32 @@ int vencerRodada(Mesa mesa){
 				aux2 = 5;
 			}
 		}
-	}*/
+	}
 	return aux2;
 }
-int vencTurno(int pontosRodada[2]){
-	int i;
-	if(pontosRodada[0] == 2 && pontosRodada[1] < 2){
-		printf("Dupla 1 ganhou o turno\n");
-		valorJogo[0] = valorJogo[0] + valorRodada;
-		return 0;
+int vencerTurno(int placarRodada[2]){
+	int aux;
+	if(placarRodada[0] == 2 && placarRodada[1] < 2){
+		aux = 1;
+		return aux;
 	}
-	else if(pontosRodada[0] < 2 && pontosRodada[1] == 2){
-		printf("Dupla 2 ganhou o turno\n");
-		valorJogo[1] = valorJogo[1] + valorRodada;
-		return 0;
+	else if(placarRodada[0] < 2 && placarRodada[1] == 2){
+		aux = 2;
+		return aux;
 	}
-	else if(pontosRodada[0] == 3 && pontosRodada[1] ==2){
-		printf("Dupla 1 ganhou o turno\n");
-		valorJogo[0] = valorJogo[0] + valorRodada; 
-		return 0;
+	else if(placarRodada[0] == 3 && placarRodada[1] == 2 ){
+		aux = 1;
+		return aux;
 	}
-	else if(pontosRodada[0] == 2 && pontosRodada[1] == 3){
-		printf("Dupla 2 ganhou o turno\n");
-		valorJogo[1] = valorJogo[1] + valorRodada;
-		return 0;
+	else if(placarRodada[0] == 2 && placarRodada[1] == 3){
+		aux = 2;
+		return aux;
 	}
-	else if(pontosRodada[0] == 3 && pontosRodada[1] == 3){
-		printf("Empatou o turno\n");
-		return 0;
+	else if(placarRodada[0] == 3 && placarRodada[1] == 3){
+		aux = 3;
+		return aux;
 	}
-	return 1;
+
 }
 int vencjogo(){
 
