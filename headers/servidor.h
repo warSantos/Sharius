@@ -60,6 +60,8 @@ void enviarCartas();
 // Envia as cartas que estão na mesa para os jogadores.
 void enviarMesa ();
 
+void enviarSinalMesaVazia ();
+
 // A partir desta função o fluxo do jogo é controlado.
 // Os sinais de bloqueio e de permissão para jogar são 
 // enviados para os players. Além de toda contabilização

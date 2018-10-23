@@ -202,7 +202,7 @@ void controleJogo(){
     construirBaralho (baralho);
     // armazena o valor da aposta corrente na mesa.
     // Enviando sinal de partida iniciada (teste).
-    int turnos, vezJogador, jogadas;
+    int turnos, vezJogador = 0, jogadas;
     int valorRodada, resultadoRodada, resultadoTurno;
     int placarTurno[2] = {0,0};
     int placarJogo[2] = {0,0};
@@ -218,6 +218,7 @@ void controleJogo(){
     while (1){
         
         sleep (2);
+        // Enviando cartas para os jogadores.
         enviarCartas ();
         sleep(2);
         valorRodada = 2;
@@ -230,25 +231,37 @@ void controleJogo(){
         for(turnos = 0; turnos < 3; turnos++){
             
             // Enviando sinais de permissão para os jogadores.
-            for (jogadas = 0; jogadas < 4; jogadas++){                
+            for (jogadas = 0; jogadas < QTDE_JOGADORES; jogadas++){                
                 
+                // Se existir cartas na mesa envie.
                 if (mesaJogo->tamMesa > 0){
                     enviarMesa();
-                }                
+                }else{ // Se não, envie sinal de mesa vazia.
+                    enviarSinalMesaVazia ();
+                }
                 // Envia sinal de permissao para o jogador.
                 enviarStr (jogadores[vezJogador].socket, "00");
                 // Recebe resposta do jogador da vez.
-                msg = recebeStr (jogadores[vezJogador].socket);                
+                msg = recebeStr (jogadores[vezJogador].socket);
                 // Se for a solicitacao de jogar uma carta.
                 if (!strncmp (msg->msg, "00", msg->lenght)){
-                    // TO-DO: Receber carta dos jogador e adiciona la da mesa.
-
+                    // TO-DO: Falta testar.
+                    // Recebendo o nome da carta.
+                    msg = recebeStr (jogadores[vezJogador].socket);
+                    // Adicionando carta a mesa.
+                    strncpy (mesaJogo->cartas[mesaJogo->tamMesa].nome, msg->msg, 3);
+                    // Recebendo o valor da carta.
+                    mesaJogo->cartas[mesaJogo->tamMesa].valor = recebeInt (jogadores[vezJogador].socket);                    
+                    // Registrando qual jogador jogou qual carta.
+                    mesaJogo->numeroJogador[mesaJogo->tamMesa] = vezJogador;
+                    // Aumentando a quantidade de cartas na mesa.
+                    mesaJogo->tamMesa++;
                 // Se for solicitação de aumento de aposta.
                 }else if (!strncmp (msg->msg, "01", msg->lenght)){
                     // TO-DO: Enviar a solicitação para todos jogadores verem.
-                    // TO-DO: Enviar configuração de bloqueio para o jogador para
+                    // TO-DO: Enviar configuração de bloqueio para o jogador para.
                     // força-lo a responder a solicitação.
-                    // TO-DO: passar o sinal de permissão para o proximo jogador.                                        
+                    // TO-DO: passar o sinal de permissão para o proximo jogador.                                       
                 }// Se for uma aceitação de aumento de aposta.
                 else if (!strncmp (msg->msg, "02", msg->lenght)){
                     // TO-DO: Aumentar a variavael valorRodada.
@@ -305,5 +318,14 @@ void enviarMesa (){
             // Enviando o nome da carta para os jogadores.
             enviarStr (jogadores[jogador].socket, mesaJogo->cartas[carta].nome);            
         }
+    }
+}
+
+void enviarSinalMesaVazia (){
+
+    int jogador;
+    for (jogador = 0; jogador < QTDE_JOGADORES; jogador++){
+        // Enviando o tamanho da mesa.
+        enviarStr (jogadores[jogador].socket, "10");
     }
 }

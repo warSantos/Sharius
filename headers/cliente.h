@@ -37,7 +37,7 @@ void menu(int valorRodada);
 
 void menuMensagem(char *buffer, int valorRodada);
 
-void menuTruco(char *comando);
+void menuTruco(int valorRodada);
 
 void receberCartas ();
 
@@ -46,8 +46,6 @@ void jogar();
 void aumentoValor();
 
 void jogo();
-
-void receberMesa();
 
 void visualizarMesa();
 
