@@ -135,24 +135,48 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 int vencerRodada(Mesa mesa){
 	
 	int aux=0,aux2,i;
-	/*for(i = 0; i < 4; i++){
+	for(i = 0; i < 4; i++){
 		
 		if(mesa.cartas[i].valor > aux ){
 			
 			aux = mesa.cartas[i].valor;
 			printf("%i\n",mesa.cartas[i].valor);
-			aux2 = mesa.numeroJogador;
-			printf("%i\n",mesa.numeroJogador);
+			aux2 = mesa.numeroJogador[i];
+			printf("%i\n",mesa.numeroJogador[i]);
 		}
 		else if(mesa.cartas[i].valor == aux){
 			
-			if((aux2 % 2) == 0 && (mesa.numeroJogador % 2) != 0 
-				|| (aux2 % 2) != 0 && (mesa.numeroJogador %2) == 0){
+			if((aux2 % 2) == 0 && (mesa.numeroJogador[i] % 2) != 0 
+				|| (aux2 % 2) != 0 && (mesa.numeroJogador[i] %2) == 0){
 				aux2 = 5;
 			}
 		}
-	}*/
+	}
 	return aux2;
+}
+int vencerTurno(int placarRodada[2]){
+	int aux;
+	if(placarRodada[0] == 2 && placarRodada[1] < 2){
+		aux = 1;
+		return aux;
+	}
+	else if(placarRodada[0] < 2 && placarRodada[1] == 2){
+		aux = 2;
+		return aux;
+	}
+	else if(placarRodada[0] == 3 && placarRodada[1] == 2 ){
+		aux = 1;
+		return aux;
+	}
+	else if(placarRodada[0] == 2 && placarRodada[1] == 3){
+		aux = 2;
+		return aux;
+	}
+	else if(placarRodada[0] == 3 && placarRodada[1] == 3){
+		aux = 3;
+		return aux;
+	}
+
 }
 int vencjogo(){
 

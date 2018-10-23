@@ -29,7 +29,7 @@ typedef struct{
 typedef struct{
 	int numeroJogador[4];
 	int tamMesa;
-	Carta cartas[4];
+	Carta cartas[4 ];
 } Mesa;
 
 #define QTDE_JOGADORES 1

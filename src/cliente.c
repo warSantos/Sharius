@@ -42,6 +42,7 @@ void menuMensagem(char *buffer, int valorRodada){
     
     // jogar a carta comando 00
     if(!strncmp(buffer,"00" , 3)){
+        enviarStr(jogadorCliente,(char *) && "00");
         jogar();
     }
     //pedir truco 01

@@ -261,7 +261,9 @@ void controleJogo(){
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    vezJogador = 0;
+    int valorRodada,resultadoRodada,resultadoTurno;
+    int placarTurno[2] = {0,0}; 
+    int placarJogo[2] = {0,0};   
     // Enquanto não houver vencedores.
     mesaJogo = calloc (1, sizeof(Mesa));
     while (1){
@@ -308,7 +310,39 @@ void controleJogo(){
                     // TO-DO: Aumentar os pontos da dupla vencedora.
                 }
             }
+            resultadoRodada = vencerRodada(mesaJogo);
+            if(resultadoRodada == 1 || resultadoRodada == 3){
+                printf("Dupla 1 ganhou a rodada\n");
+                placarTurno[0] = placarTurno[0] + 1; 
+            }
+            else if(resultadoRodada == 2 || resultadoRodada == 4){
+                printf("Dupla 2 ganhou a rodada\n");
+                placarTurno[1] = placarTurno[1] + 1;
+            }
+            else if(resultadoRodada == 5 ){
+                printf("Empate : proxima rodada decidira quem ganhará\n");
+                placarTurno[0] = placarTurno[0] + 1;
+                placarTurno[1] = placarTurno[1] + 1;
+            }
         }
+        resultadoTurno = vencerTurno(placarTurno);
+        if(resultadoTurno == 1){
+            printf("Dupla 1 ganhou o Turno\n");
+            placarJogo[0] = placarJogo[0] + valorRodada; 
+
+        }
+        else if(resultadoTurno == 2){
+            printf("Dupla 2 ganhou o Turno\n");
+            placarJogo[1] = placarJogo[1] + valorRodada;
+        }
+        else if(resultadoTurno == 3){
+            printf("Empate\n");
+        }
+
+        if(placarJogo[0] > 10 || placarJogo[1] > 10){
+            break;
+        }
+
         break;
     }
     fechaConexoes();
