@@ -39,31 +39,30 @@ void menu(int valorRodada){
 //opções jogador pode fazer
 void menuMensagem(char *buffer, int valorRodada){
     
-    
     // jogar a carta comando 00
     if(!strncmp(buffer,"00" , 3)){
-        enviarStr(jogadorCliente,(char *) && "00");
+        enviarStr(jogadorCliente.socket, "00");
         jogar();
     }
     //pedir truco 01
     else if(!strncmp(buffer, "01", 3) && valorRodada == 2 ){
-        enviarStr(jogadorCliente.socket,(char *) &"01");
+        enviarStr(jogadorCliente.socket, "01");
         return;
     // pedir seis 02
     }else if(!strncmp(buffer, "02", 3) && valorRodada == 4){
-        enviarStr(jogadorCliente.socket,(char *) &"02");
+        enviarStr(jogadorCliente.socket, "02");
         return;
     // pedir nove 03
     }else if(!strncmp(buffer,"03", 3) && valorRodada == 8){
-        enviarStr(jogadorCliente.socket,(char *) &"03");
+        enviarStr(jogadorCliente.socket, "03");
         return;
     //pedir doze 04
     }else if(!strncmp(buffer,"04",3) && valorRodada == 10 ){
-        enviarStr(jogadorCliente.socket,(char *) &"04");
+        enviarStr(jogadorCliente.socket, "04");
         return;
     //recusar aposta
     }else if(!strncmp(buffer,"05",3)){
-        enviarStr(jogadorCliente.socket,(char *) &"05");
+        enviarStr(jogadorCliente.socket, "05");
         return;
     }else{
         printf("Opção inválida, por favor digite novamente.\n");
@@ -119,7 +118,6 @@ void menuOperacao(int valorRodada){
         sleep(10);
         receberMesa();
         visualizarCarta();
-        visualizarMesa();
         comando = calloc(sizeof(char),10);
         //recebeMensagem(comando);
         //se foi pedido vai ser mandado para menu truco para ver se vc aceita ,recusa ou aumenta o valor do truco;

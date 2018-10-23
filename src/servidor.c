@@ -166,59 +166,6 @@ void *autenticaUsuarios (void *args){
     pthread_mutex_unlock (&qtdeConexoesMutex);
 }
 
-void *limiteAtingido (){
-    
-    // Criando um socket para receber fluxo tcp de dados.
-    // AF_INET tipo de conexão sobre IP para redes.
-    // SOCK_STREAM protocolo com controle de erros.
-    // 0 seleção do protocolo TCP
-    int socketLocal, socketCliente, sizeSockaddr;
-    struct sockaddr_in servidor, cliente;
-    
-    socketLocal = socket(AF_INET, SOCK_STREAM, 0);
-
-    if(socketLocal == -1){
-        
-        printf("Erro ao criar socket local.\n");
-        //TO-DO: Tratar retorno desta função de melhor forma.
-        return NULL;
-    }
-        
-    servidor.sin_family = AF_INET; // Atribuindo a familia de protocolos para Internet
-    servidor.sin_addr.s_addr = htonl(INADDR_ANY);
-    servidor.sin_port = htons(40001); // Setando a porta em que rodara o processo.       
-    
-    memset(servidor.sin_zero, 0, sizeof servidor.sin_zero);
-    
-    // Criando link entre a estrutura servidor ao ID do socketLocal.
-    if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
-        
-        printf("Erro no bind.\n");
-        fechaConexoes();
-        close(socketLocal);
-        exit(1);
-    }
-    
-    // Limitando o número de conexões que o servidor vai aceitar para 4 conexões.
-    listen(socketLocal, 4);
-    
-    sizeSockaddr = sizeof(struct sockaddr_in);
-    
-    // Enquanto o jogo não acabar.
-    while (1){
-        socketCliente = accept(socketLocal, (struct sockaddr *) &cliente, 
-            (socklen_t *) &sizeSockaddr);
-        // enviando mensagem de aviso.
-        char *msgLimite = "50:Limite de jogadres atingido. Por favor tente novamente mais tarde";
-        enviarStr (socketCliente, msgLimite);
-
-        // Fechando o socket
-        close(socketCliente);
-    }
-    return NULL;
-}
-
-//TO-DO: Refazer função de fechar conexões.
 void fechaConexoes(){
 
     int i;
@@ -256,14 +203,16 @@ void controleJogo(){
     // armazena o valor da aposta corrente na mesa.
     // Enviando sinal de partida iniciada (teste).
     int turnos, vezJogador, jogadas;
-    int valorRodada, placarJogo[2] = {0,0};
+    int valorRodada, resultadoRodada, resultadoTurno;
+    int placarTurno[2] = {0,0};
+    int placarJogo[2] = {0,0};
     Mensagem *msg;
+    
+    // Enviando mensagem inicial para jogadores (teste da conexão).
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    int valorRodada,resultadoRodada,resultadoTurno;
-    int placarTurno[2] = {0,0}; 
-    int placarJogo[2] = {0,0};   
+    
     // Enquanto não houver vencedores.
     mesaJogo = calloc (1, sizeof(Mesa));
     while (1){
@@ -338,11 +287,9 @@ void controleJogo(){
         else if(resultadoTurno == 3){
             printf("Empate\n");
         }
-
         if(placarJogo[0] > 10 || placarJogo[1] > 10){
             break;
         }
-
         break;
     }
     fechaConexoes();
