@@ -62,6 +62,8 @@ void enviarMesa ();
 
 void enviarSinalMesaVazia ();
 
+int proximoJogador (int vezJogador);
+
 // A partir desta função o fluxo do jogo é controlado.
 // Os sinais de bloqueio e de permissão para jogar são 
 // enviados para os players. Além de toda contabilização

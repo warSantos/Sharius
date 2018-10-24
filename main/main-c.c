@@ -12,7 +12,7 @@ int main(){
     }
     
     // Mantendo conexão ativa e controlando o  fluxo do jogo.
-    jogo ();
+    menuOperacao(2);
     
     return 0;
 }

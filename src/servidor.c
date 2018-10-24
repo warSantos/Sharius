@@ -184,6 +184,8 @@ void enviarCartas() {
     int numeroJogador, numeroCarta;
     // Enquanto todos os jogadores não estiverem com suas cartas.
     for (numeroJogador = 0; numeroJogador <= QTDE_JOGADORES; numeroJogador++){
+        // Envie o sinal de envio das cartas para os jogadores.
+        enviarStr (jogadores[numeroJogador].socket, "12");
         // Para cada carta sorteada para mão do jogador.
         for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
             // Enviando o nome da carta.
@@ -212,7 +214,7 @@ void controleJogo(){
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
-    
+    vezJogador = 0;
     // Enquanto não houver vencedores.
     mesaJogo = calloc (1, sizeof(Mesa));
     while (1){
@@ -220,27 +222,27 @@ void controleJogo(){
         sleep (2);
         // Enviando cartas para os jogadores.
         enviarCartas ();
-        sleep(2);
+        sleep(1);
         valorRodada = 2;
         if (placarJogo[0] == 10){
             //TO-DO: Enviar sinal de mao de 10.
         }else if(placarJogo[1] == 10){
             //TO-DO: Enviar sinal de mao de 10.
         }
+        printf ("Rodada.\n");
         // Iniciando rodada.
         for(turnos = 0; turnos < 3; turnos++){
-            
+            printf ("Turno: %d.\n", turnos);
             // Enviando sinais de permissão para os jogadores.
-            for (jogadas = 0; jogadas < QTDE_JOGADORES; jogadas++){                
-                
+            for (jogadas = 0; jogadas <= QTDE_JOGADORES; jogadas++){                
+                printf ("vezJogador: %d.\n", vezJogador);
                 // Se existir cartas na mesa envie.
                 if (mesaJogo->tamMesa > 0){
+                    printf ("Enviando mesa.\n");
                     enviarMesa();
-                }else{ // Se não, envie sinal de mesa vazia.
-                    enviarSinalMesaVazia ();
                 }
                 // Envia sinal de permissao para o jogador.
-                enviarStr (jogadores[vezJogador].socket, "00");
+                enviarStr (jogadores[vezJogador].socket, "10");
                 // Recebe resposta do jogador da vez.
                 msg = recebeStr (jogadores[vezJogador].socket);
                 // Se for a solicitacao de jogar uma carta.
@@ -270,8 +272,11 @@ void controleJogo(){
                 }// Se for um recuso de aumento de aposta.
                 else if (!strncmp (msg->msg, "03", msg->lenght)){
                     // TO-DO: Aumentar os pontos da dupla vencedora.
+                    
                 }
-            }
+                vezJogador = proximoJogador (vezJogador);
+                free (msg);
+            }/*
             resultadoRodada = vencerRodada(mesaJogo);
             if(resultadoRodada == 1 || resultadoRodada == 3){
                 printf("Dupla 1 ganhou a rodada\n");
@@ -285,8 +290,8 @@ void controleJogo(){
                 printf("Empate : proxima rodada decidira quem ganhará\n");
                 placarTurno[0] = placarTurno[0] + 1;
                 placarTurno[1] = placarTurno[1] + 1;
-            }
-        }
+            }*/            
+        }/*
         resultadoTurno = vencerTurno(placarTurno);
         if(resultadoTurno == 1){
             printf("Dupla 1 ganhou o Turno\n");
@@ -302,21 +307,31 @@ void controleJogo(){
         }
         if(placarJogo[0] > 10 || placarJogo[1] > 10){
             break;
-        }
-        break;
+        }*/
     }
     fechaConexoes();
+}
+
+int proximoJogador (int vezJogador){
+
+    if (vezJogador == QTDE_JOGADORES){
+        return 0;
+    }
+    vezJogador++;
+    return vezJogador;
 }
 
 void enviarMesa (){
     
     int carta, jogador;
-    for (jogador = 0; jogador < QTDE_JOGADORES; jogador++){
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
+        // Enviando código de envio de mesa.
+        enviarStr (jogadores[jogador].socket, "11");
         // Enviando o tamanho da mesa.
         enviarInt (jogadores[jogador].socket, mesaJogo->tamMesa);
         for (carta = 0; carta < mesaJogo->tamMesa; carta++){           
             // Enviando o nome da carta para os jogadores.
-            enviarStr (jogadores[jogador].socket, mesaJogo->cartas[carta].nome);            
+            enviarStr (jogadores[jogador].socket, mesaJogo->cartas[carta].nome);
         }
     }
 }
@@ -324,7 +339,7 @@ void enviarMesa (){
 void enviarSinalMesaVazia (){
 
     int jogador;
-    for (jogador = 0; jogador < QTDE_JOGADORES; jogador++){
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
         // Enviando o tamanho da mesa.
         enviarStr (jogadores[jogador].socket, "10");
     }
