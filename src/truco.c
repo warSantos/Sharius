@@ -135,7 +135,7 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 int vencerRodada(Mesa mesa){
 	
 	int aux=0,aux2,i;
-	for(i = 0; i < 4; i++){
+	for(i = 0; i < 2; i++){
 		
 		if(mesa.cartas[i].valor > aux ){
 			

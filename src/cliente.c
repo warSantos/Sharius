@@ -218,12 +218,18 @@ void menuOperacao (){
             // Receba as cartas do servidor.
             printf ("Recebendo cartas.\n");
             receberCartas ();
-            visualizarCarta ();
-        // Se for o envio do novo valor da rodada.
-        }else if (!strncmp(msg->msg, "13", 3)){
+            visualizarCarta ();        
+        }// Se for o envio do novo valor da rodada.
+        else if (!strncmp(msg->msg, "13", 3)){
             valorRodada = recebeInt (jogadorCliente.socket);
             printf ("Valor da rodada: %d.\n", valorRodada);
-        }else{
+        }// Se for o anuncio da dupla que venceu a partida.
+        else if (!strncmp(msg->msg, "14", 3)){
+            valorRodada = recebeInt (jogadorCliente.socket);
+            msg = recebeStr (jogadorCliente.socket);
+            printf (msg->msg);
+        }
+        else{
             printf("Vez de outro jogador, espere sua vez\n");
         }
     }

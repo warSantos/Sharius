@@ -304,18 +304,19 @@ void controleJogo(){
                 free (msg);
             }
             resultadoRodada = vencerRodada(mesaJogo);
-            if(resultadoRodada == 1 || resultadoRodada == 3){
-                printf("Dupla 1 ganhou a rodada\n");
-                placarTurno[0] = placarTurno[0] + 1; 
+            if(resultadoRodada == 0 || resultadoRodada == 2){
+                // TO-DO: enviar a mensagem para o jogadores.
+                enviarVencedorRodada (0, 2);
+                placarTurno[0]++;
             }
-            else if(resultadoRodada == 2 || resultadoRodada == 4){
-                printf("Dupla 2 ganhou a rodada\n");
-                placarTurno[1] = placarTurno[1] + 1;
+            else if(resultadoRodada == 1 || resultadoRodada == 3){
+                enviarVencedorRodada (1, 3);
+                placarTurno[1]++;
             }
             else if(resultadoRodada == 5 ){
                 printf("Empate : proxima rodada decidira quem ganhará\n");
-                placarTurno[0] = placarTurno[0] + 1;
-                placarTurno[1] = placarTurno[1] + 1;
+                placarTurno[0]++;
+                placarTurno[1]++;
             }
         }/*
         resultadoTurno = vencerTurno(placarTurno);
@@ -431,5 +432,18 @@ void enviarValorRodada (int valorRodada){
         enviarStr (jogadores[jogador].socket, "13");
         // Enviando o valor da rodada.
         enviarInt (jogadores[jogador].socket, valorRodada);
+    }
+}
+
+void enviarVencedorRodada (int j1, int j2){
+
+    int jogador;
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
+        // Não envie para o jogador que pediu o truco.        
+        // Envie sinal de anúncio de aumento de aposta.
+        enviarStr (jogadores[jogador].socket, "14");
+        char dupla[75];
+        sprintf (dupla, "A dupla %d e %d foi a vencedora da rodada.\n", j1, j2);
+        enviarStr (jogadores[jogador].socket, dupla);
     }
 }
