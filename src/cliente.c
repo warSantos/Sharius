@@ -101,7 +101,7 @@ void abreConexao(){
 }
 
 void menu(int valorRodada){
-    
+    printf ("ValorRodada %d.\n", valorRodada);
     printf("00 - Jogar Carta\n");
     if(valorRodada == 2){
         printf("01 - Pedir truco\n");
@@ -116,7 +116,7 @@ void menu(int valorRodada){
 }
 
 //opções jogador pode fazer
-void menuMensagem(char *buffer, int valorRodada){
+void menuMensagem(char *buffer){
     
     while (1){
         // jogar a carta comando 00
@@ -196,8 +196,7 @@ void menuOperacao (){
         else if (!strncmp(msg->msg, "02", 3)){
             int jogadorConfirmante =  recebeInt (jogadorCliente.socket);
             printf ("Jogador: %d, aceitou o aumento da aposta.\n", jogadorConfirmante);
-        }
-        // For um sinal de anúncio de aumento de aposta.
+        }// For um sinal de anúncio de aumento de aposta.
         else if (!strncmp(msg->msg, "04", 3)){
             int jogadorSolicitante = recebeInt (jogadorCliente.socket);
             printf ("Jogador: %d, acaba de solicitar aumento de aposta.\n", jogadorSolicitante);
@@ -208,7 +207,7 @@ void menuOperacao (){
             menu(valorRodada);
             scanf("%2[^\n]s", buffer);
             __fpurge(stdin);
-            menuMensagem(buffer, valorRodada);
+            menuMensagem(buffer);
         }// Se for um sinal de envio de mesa.
         else if (!strncmp(msg->msg, "11", 3)){
             // Recebendo as cartas na mesa do servidor.
@@ -224,13 +223,12 @@ void menuOperacao (){
             valorRodada = recebeInt (jogadorCliente.socket);
             printf ("Valor da rodada: %d.\n", valorRodada);
         }// Se for o anuncio da dupla que venceu a partida.
-        else if (!strncmp(msg->msg, "14", 3)){
-            valorRodada = recebeInt (jogadorCliente.socket);
+        else if (!strncmp(msg->msg, "14", 3)){            
             msg = recebeStr (jogadorCliente.socket);
             printf (msg->msg);
-        }
-        else{
-            printf("Vez de outro jogador, espere sua vez\n");
+        }else{
+            printf("Vez de outro jogador, espere sua vez.\n");
+            printf ("Mensagem: %s.\n", msg->msg);
         }
     }
     close(jogadorCliente.socket);

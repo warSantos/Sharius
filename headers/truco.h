@@ -40,6 +40,6 @@ void embaralhar(Carta *baralho);
 
 void distribuirCartas(Jogador *jogadores, Carta *baralho);
 
-int vencerRodada();
+int vencerRodada(Mesa *mesa);
 
 #endif

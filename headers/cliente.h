@@ -23,10 +23,6 @@ void ajudaMenssagem();
 // Função ajuda para menu de comando para usuário.
 void ajudaComando();
 
-// Função para delegar o buffer a função de estraiMenssagem para processamento
-// e delegação dos dados processados para a função de enviar mesagem.
-void menuMenssagem(char *buffer, char *userNick, int idSocket);
-
 // Abre conexão inicial com o servidor...
 void abreConexao();
 
@@ -34,7 +30,7 @@ void menuOperacao ();
 
 void menu(int valorRodada);
 
-void menuMensagem(char *buffer, int valorRodada);
+void menuMensagem(char *buffer);
 
 void menuTruco(int valorRodada);
 

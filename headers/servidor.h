@@ -68,6 +68,8 @@ void enviarValorRodada (int valorRodada);
 
 void enviarVencedorRodada (int j1, int j2);
 
+void enviarVencedorTurno (int j1, int j2);
+
 int jogadorAnterior (int vezJogador);
 
 int proximoJogador (int vezJogador);
