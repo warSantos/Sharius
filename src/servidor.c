@@ -185,7 +185,7 @@ void controleJogo(){
     int tentos[5] = {2, 4, 8, 10, 12};
     int placarTurno[2] = {0,0};
     int placarJogo[2] = {0,0};
-    int respostaAumento, jogadorSolicitante;
+    int respostaAumento, jogadoresAumento[2] = {0,0}, jogadorSolicitante;
     Mensagem *msg;
     
     // Enviando mensagem inicial para jogadores (teste da conexão).
@@ -252,22 +252,32 @@ void controleJogo(){
                         // Enviar a solicitação para todos jogadores verem a solicitação
                         // da mensagem e qual jogador pediu truco.
                         enviarAnuncioAumentoAposta (vezJogador);
-                        // Enviando resposta com nova solicitação para o solicitante anterior.
-                        int jogadorEsquerda = jogadorAnterior (vezJogador);
-                        enviarStr (jogadores[jogadorEsquerda].socket, "01");
-                        // Retornando a rodada para o jogador a esquerda do que pediu aumento de aposta.
-                        vezJogador = jogadorAnterior (jogadorSolicitante);
-                        //respostaAumento = 0;
+
+                        // Se o jogador que quiser aumentar a aposta for o jogador intimado inicialmente.
+                        if (jogadorSolicitante){
+                            enviarStr (jogadores[jogadoresAumento[0]].socket, "01");
+                            vezJogador = jogadorAnterior (vezJogador);
+                            vezJogador = jogadorAnterior (vezJogador);
+                            jogadorSolicitante = 0;
+                        }else{ // Se for o jogador que intimou inicialmente.
+                            enviarStr (jogadores[jogadoresAumento[1]].socket, "01");
+                            jogadorSolicitante = 1;
+                        }
                     }else {
                         respostaAumento = 1;
                         // Armazenando qual jogador iniciou aumento de aposta.
-                        jogadorSolicitante = vezJogador;
+                        jogadoresAumento[0] = vezJogador;
                         // Enviar a solicitação para todos jogadores verem a solicitação
                         // da mensagem e qual jogador pediu truco.
                         enviarAnuncioAumentoAposta (vezJogador);
                         // Enviando solicitação de truco para o jogador a direita.
                         int jogadorDireita = proximoJogador (vezJogador);
+                        // Armazenando qual jogador respondera ao aumento incial.
+                        jogadoresAumento[1] = jogadorDireita;
+                        // Enviando sinal de aumento de aposta para ele.
                         enviarStr (jogadores[jogadorDireita].socket, "01");
+                        // Configurando flag jogadorSolicitante.
+                        jogadorSolicitante = 1;
                     }
                     jogadas--;
                 }// Se for uma aceitação de aumento de aposta.
@@ -278,6 +288,12 @@ void controleJogo(){
                     valorRodada++;
                     // Atualize o valor de aposta dos jogadores.
                     enviarValorRodada (tentos[valorRodada]);
+                    // Se o jogador que respondeu este aumento foi o jogador intimado inicialmente.
+                    if (jogadorSolicitante){
+                        // Retorna ao jogador a esquerda do jogador que solicitou incialmente.
+                        vezJogador = jogadorAnterior (vezJogador);
+                        vezJogador = jogadorAnterior (vezJogador);
+                    }
                     respostaAumento = 0;
                     jogadas--;
                 }// Se for um recuso de aumento de aposta.
