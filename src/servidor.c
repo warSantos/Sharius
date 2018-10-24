@@ -195,9 +195,8 @@ void controleJogo(){
     vezJogador = 0;
     // Enquanto não houver vencedores.
     mesaJogo = calloc (1, sizeof(Mesa));
-    while (1){
-        
-        sleep (2);
+    while (1){        
+        sleep (1);
         // Enviando cartas para os jogadores.
         enviarCartas ();
         sleep(1);
@@ -289,11 +288,11 @@ void controleJogo(){
                     // Atualize o valor de aposta dos jogadores.
                     enviarValorRodada (tentos[valorRodada]);
                     // Se o jogador que respondeu este aumento foi o jogador intimado inicialmente.
-                    if (jogadorSolicitante){
+                    if (vezJogador == jogadoresAumento[1]){
                         // Retorna ao jogador a esquerda do jogador que solicitou incialmente.
-                        vezJogador = jogadorAnterior (vezJogador);
-                        vezJogador = jogadorAnterior (vezJogador);
+                        vezJogador = jogadorAnterior (vezJogador);   
                     }
+                    vezJogador = jogadorAnterior (vezJogador);
                     respostaAumento = 0;
                     jogadas--;
                 }// Se for um recuso de aumento de aposta.
@@ -303,7 +302,7 @@ void controleJogo(){
                 }
                 vezJogador = proximoJogador (vezJogador);
                 free (msg);
-            }/*
+            }
             resultadoRodada = vencerRodada(mesaJogo);
             if(resultadoRodada == 1 || resultadoRodada == 3){
                 printf("Dupla 1 ganhou a rodada\n");
@@ -317,7 +316,7 @@ void controleJogo(){
                 printf("Empate : proxima rodada decidira quem ganhará\n");
                 placarTurno[0] = placarTurno[0] + 1;
                 placarTurno[1] = placarTurno[1] + 1;
-            }*/            
+            }
         }/*
         resultadoTurno = vencerTurno(placarTurno);
         if(resultadoTurno == 1){
