@@ -174,30 +174,6 @@ void fechaConexoes(){
     }
 }
 
-void enviarCartas() {
-
-    printf ("Enviando cartas.\n");
-    // Chamando uma função para embaralhar cartas.
-    embaralhar (baralho);
-    // Aplicando função de distribuir cartas.
-    distribuirCartas (jogadores, baralho);
-    int numeroJogador, numeroCarta;
-    // Enquanto todos os jogadores não estiverem com suas cartas.
-    for (numeroJogador = 0; numeroJogador <= QTDE_JOGADORES; numeroJogador++){
-        // Envie o sinal de envio das cartas para os jogadores.
-        enviarStr (jogadores[numeroJogador].socket, "12");
-        // Para cada carta sorteada para mão do jogador.
-        for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
-            // Enviando o nome da carta.
-            enviarStr (jogadores[numeroJogador].socket,
-                jogadores[numeroJogador].mao[numeroCarta].nome);
-            // Enviando o valor da carta.
-            enviarInt (jogadores[numeroJogador].socket, 
-                jogadores[numeroJogador].mao[numeroCarta].valor);
-        }
-    }
-}
-
 void controleJogo(){
 
     // Construindo baralho.
@@ -206,8 +182,10 @@ void controleJogo(){
     // Enviando sinal de partida iniciada (teste).
     int turnos, vezJogador = 0, jogadas;
     int valorRodada, resultadoRodada, resultadoTurno;
+    int tentos[5] = {2, 4, 8, 10, 12};
     int placarTurno[2] = {0,0};
     int placarJogo[2] = {0,0};
+    int respostaAumento, jogadorSolicitante;
     Mensagem *msg;
     
     // Enviando mensagem inicial para jogadores (teste da conexão).
@@ -223,7 +201,7 @@ void controleJogo(){
         // Enviando cartas para os jogadores.
         enviarCartas ();
         sleep(1);
-        valorRodada = 2;
+        valorRodada = 0;
         if (placarJogo[0] == 10){
             //TO-DO: Enviar sinal de mao de 10.
         }else if(placarJogo[1] == 10){
@@ -231,10 +209,15 @@ void controleJogo(){
         }
         printf ("Rodada.\n");
         // Iniciando rodada.
+        respostaAumento = 0;
+        valorRodada = 0;
+        // Atualizando o valor da rodada nos jogadores para 2.
+        enviarValorRodada (tentos[valorRodada]);
+        // Iniciando rodada.
         for(turnos = 0; turnos < 3; turnos++){
             printf ("Turno: %d.\n", turnos);
             // Enviando sinais de permissão para os jogadores.
-            for (jogadas = 0; jogadas <= QTDE_JOGADORES; jogadas++){                
+            for (jogadas = 0; jogadas <= QTDE_JOGADORES; jogadas++){            
                 printf ("vezJogador: %d.\n", vezJogador);
                 // Se existir cartas na mesa envie.
                 if (mesaJogo->tamMesa > 0){
@@ -260,19 +243,47 @@ void controleJogo(){
                     mesaJogo->tamMesa++;
                 // Se for solicitação de aumento de aposta.
                 }else if (!strncmp (msg->msg, "01", msg->lenght)){
-                    // TO-DO: Enviar a solicitação para todos jogadores verem.
-                    // TO-DO: Enviar configuração de bloqueio para o jogador para.
-                    // força-lo a responder a solicitação.
-                    // TO-DO: passar o sinal de permissão para o proximo jogador.                                       
+                    // Se for uma resposta a uma solicitação de aumento anterior.
+                    if (respostaAumento){
+                        // Então aumente o valor da rodada para o valor da solicitação anterior.
+                        valorRodada++;
+                        // Atualize o valor de aposta dos jogadores.
+                        enviarValorRodada (tentos[valorRodada]);
+                        // Enviar a solicitação para todos jogadores verem a solicitação
+                        // da mensagem e qual jogador pediu truco.
+                        enviarAnuncioAumentoAposta (vezJogador);
+                        // Enviando resposta com nova solicitação para o solicitante anterior.
+                        int jogadorEsquerda = jogadorAnterior (vezJogador);
+                        enviarStr (jogadores[jogadorEsquerda].socket, "01");
+                        // Retornando a rodada para o jogador a esquerda do que pediu aumento de aposta.
+                        vezJogador = jogadorAnterior (jogadorSolicitante);
+                        //respostaAumento = 0;
+                    }else {
+                        respostaAumento = 1;
+                        // Armazenando qual jogador iniciou aumento de aposta.
+                        jogadorSolicitante = vezJogador;
+                        // Enviar a solicitação para todos jogadores verem a solicitação
+                        // da mensagem e qual jogador pediu truco.
+                        enviarAnuncioAumentoAposta (vezJogador);
+                        // Enviando solicitação de truco para o jogador a direita.
+                        int jogadorDireita = proximoJogador (vezJogador);
+                        enviarStr (jogadores[jogadorDireita].socket, "01");
+                    }
+                    jogadas--;
                 }// Se for uma aceitação de aumento de aposta.
                 else if (!strncmp (msg->msg, "02", msg->lenght)){
-                    // TO-DO: Aumentar a variavael valorRodada.
-                    // Enviar sinal de truco aceito para todos menos para quem
-                    // confirmou.
+                    // TO-DO: Falta testar.
+                    // Enviar sinal de aumento aceito para todos menos para quem confirmou.
+                    enviarAnuncioAceitaAposta (vezJogador);
+                    valorRodada++;
+                    // Atualize o valor de aposta dos jogadores.
+                    enviarValorRodada (tentos[valorRodada]);
+                    respostaAumento = 0;
+                    jogadas--;
                 }// Se for um recuso de aumento de aposta.
                 else if (!strncmp (msg->msg, "03", msg->lenght)){
                     // TO-DO: Aumentar os pontos da dupla vencedora.
-                    
+                    // TO-DO: Sair do loop.
                 }
                 vezJogador = proximoJogador (vezJogador);
                 free (msg);
@@ -321,6 +332,39 @@ int proximoJogador (int vezJogador){
     return vezJogador;
 }
 
+int jogadorAnterior (int vezJogador){
+
+    if (vezJogador == 0){
+        return QTDE_JOGADORES;
+    }
+    vezJogador--;
+    return vezJogador;
+}
+
+void enviarCartas() {
+
+    printf ("Enviando cartas.\n");
+    // Chamando uma função para embaralhar cartas.
+    embaralhar (baralho);
+    // Aplicando função de distribuir cartas.
+    distribuirCartas (jogadores, baralho);
+    int numeroJogador, numeroCarta;
+    // Enquanto todos os jogadores não estiverem com suas cartas.
+    for (numeroJogador = 0; numeroJogador <= QTDE_JOGADORES; numeroJogador++){
+        // Envie o sinal de envio das cartas para os jogadores.
+        enviarStr (jogadores[numeroJogador].socket, "12");
+        // Para cada carta sorteada para mão do jogador.
+        for (numeroCarta = 0; numeroCarta < 3; numeroCarta++){
+            // Enviando o nome da carta.
+            enviarStr (jogadores[numeroJogador].socket,
+                jogadores[numeroJogador].mao[numeroCarta].nome);
+            // Enviando o valor da carta.
+            enviarInt (jogadores[numeroJogador].socket, 
+                jogadores[numeroJogador].mao[numeroCarta].valor);
+        }
+    }
+}
+
 void enviarMesa (){
     
     int carta, jogador;
@@ -336,11 +380,41 @@ void enviarMesa (){
     }
 }
 
-void enviarSinalMesaVazia (){
+void enviarAnuncioAumentoAposta (int jogadorSolicitante){
 
     int jogador;
     for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
-        // Enviando o tamanho da mesa.
-        enviarStr (jogadores[jogador].socket, "10");
+        // Não envie para o jogador que pediu o truco.
+        if (jogador != jogadorSolicitante){
+            // Envie sinal de anúncio de aumento de aposta.
+            enviarStr (jogadores[jogador].socket, "04");
+            // Envie o numero do jogador que pediu o anuncio.
+            enviarInt (jogadores[jogador].socket, jogadorSolicitante);
+        }
+    }
+}
+
+void enviarAnuncioAceitaAposta (int jogadorConfirmante){
+
+    int jogador;
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
+        // Não envie para o jogador que pediu o truco.
+        if (jogador != jogadorConfirmante){
+            // Envie sinal de anúncio de aumento de aposta.
+            enviarStr (jogadores[jogador].socket, "02");
+            // Envie o numero do jogador que aceitou aumento.
+            enviarInt (jogadores[jogador].socket, jogadorConfirmante);
+        }
+    }
+}
+
+void enviarValorRodada (int valorRodada){
+
+    int jogador;
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
+        // Enviando o código de envio de atualização valor da rodada.
+        enviarStr (jogadores[jogador].socket, "13");
+        // Enviando o valor da rodada.
+        enviarInt (jogadores[jogador].socket, valorRodada);
     }
 }

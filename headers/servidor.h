@@ -57,10 +57,16 @@ void fechaConexoes();
 // Envia as cartas dos jogadores do servidor para o cliente.
 void enviarCartas();
 
+void enviarAnuncioAumentoAposta (int jogadorSolicitante);
+
+void enviarAnuncioAceitaAposta (int jogadorConfirmante);
+
 // Envia as cartas que estão na mesa para os jogadores.
 void enviarMesa ();
 
-void enviarSinalMesaVazia ();
+void enviarValorRodada (int valorRodada);
+
+int jogadorAnterior (int vezJogador);
 
 int proximoJogador (int vezJogador);
 
