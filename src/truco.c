@@ -83,7 +83,7 @@ void construirBaralho(Carta *baralho){
 	baralho[32].valor = 10;
 	strncpy(baralho[33].nome, "3o", 3); 
 	baralho[33].valor = 10;
-	strncpy(baralho[34].nome, "3d", 3); 
+	strncpy(baralho[34].nome, "3c", 3); 
 	baralho[34].valor = 10;
 	strncpy(baralho[35].nome, "3e", 3); 
 	//Manilhas
@@ -132,29 +132,26 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 	}
 }
 
-int vencerRodada(Mesa mesa){
+int vencerTurno (Mesa *mesa){
 	
-	int aux=0,aux2,i;
-	for(i = 0; i < 4; i++){
-		
-		if(mesa.cartas[i].valor > aux ){
-			
-			aux = mesa.cartas[i].valor;
-			printf("%i\n",mesa.cartas[i].valor);
-			aux2 = mesa.numeroJogador[i];
-			printf("%i\n",mesa.numeroJogador[i]);
+	int aux = 0, aux2, i;
+	for(i = 0; i < 2; i++){
+		if(mesa->cartas[i].valor > aux){
+			aux = mesa->cartas[i].valor;			
+			aux2 = mesa->numeroJogador[i];			
 		}
-		else if(mesa.cartas[i].valor == aux){
-			
-			if((aux2 % 2) == 0 && (mesa.numeroJogador[i] % 2) != 0 
-				|| (aux2 % 2) != 0 && (mesa.numeroJogador[i] %2) == 0){
+		else if(mesa->cartas[i].valor == aux){			
+			if((aux2 % 2) == 0 && (mesa->numeroJogador[i] % 2) != 0
+				|| (aux2 % 2) != 0 && (mesa->numeroJogador[i] % 2) == 0){
 				aux2 = 5;
 			}
 		}
 	}
 	return aux2;
 }
-int vencerTurno(int placarRodada[2]){
+
+int vencerRodada (int placarRodada[2]){
+	
 	int aux;
 	if(placarRodada[0] == 2 && placarRodada[1] < 2){
 		aux = 1;
@@ -176,8 +173,4 @@ int vencerTurno(int placarRodada[2]){
 		aux = 3;
 		return aux;
 	}
-
-}
-int vencjogo(){
-
 }

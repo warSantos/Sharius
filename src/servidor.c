@@ -178,10 +178,10 @@ void controleJogo(){
 
     // Construindo baralho.
     construirBaralho (baralho);
-    int turnos, vezJogador = 0, jogadas;
-    int valorRodada, resultadoRodada, resultadoTurno;
+    int turnos, vezJogador, jogadas;
+    int valorRodada, resultadoRodada, resultadoTurno, recusoAumento;
     int tentos[5] = {2, 4, 8, 10, 12};
-    int placarTurno[2] = {0,0};
+    int placarTurno[2];
     int placarJogo[2] = {0,0};
     int respostaAumento, jogadoresAumento[2] = {0,0}, jogadorSolicitante;
     Mensagem *msg;
@@ -192,10 +192,8 @@ void controleJogo(){
     }
     vezJogador = 0;
     // Enquanto não houver vencedores.
-    mesaJogo = calloc (1, sizeof(Mesa));
     while (1){
-        
-        sleep (2);
+        sleep (1);
         // Enviando cartas para os jogadores.
         enviarCartas ();
         sleep(1);
@@ -205,17 +203,20 @@ void controleJogo(){
         }else if(placarJogo[1] == 10){
             //TO-DO: Enviar sinal de mao de 10.
         }
-        printf ("Rodada.\n");
         // Iniciando rodada.
         respostaAumento = 0;
         valorRodada = 0;
+        recusoAumento = 0;
+        placarTurno[0] = 0;
+        placarTurno[1] = 0;
         // Atualizando o valor da rodada nos jogadores para 2.
         enviarValorRodada (tentos[valorRodada]);
         // Iniciando rodada.
         for(turnos = 0; turnos < 3; turnos++){
+            mesaJogo = calloc (1, sizeof(Mesa));
             printf ("Turno: %d.\n", turnos);
-            // Enviando sinais de permissão para os jogadores.
-            for (jogadas = 0; jogadas <= QTDE_JOGADORES; jogadas++){            
+            // Enquanto cada jogador não realizar sua jogada.
+            for (jogadas = 0; jogadas <= QTDE_JOGADORES; jogadas++){
                 printf ("vezJogador: %d.\n", vezJogador);
                 // Se existir cartas na mesa envie.
                 if (mesaJogo->tamMesa > 0){
@@ -234,8 +235,8 @@ void controleJogo(){
                     // Adicionando carta a mesa.
                     strncpy (mesaJogo->cartas[mesaJogo->tamMesa].nome, msg->msg, 3);
                     // Recebendo o valor da carta.
-                    mesaJogo->cartas[mesaJogo->tamMesa].valor = recebeInt (jogadores[vezJogador].socket);                    
-                    // Registrando qual jogador jogou qual carta.
+                    mesaJogo->cartas[mesaJogo->tamMesa].valor = recebeInt (jogadores[vezJogador].socket);
+                    // Registrando qual jogador jogou qual carta.            
                     mesaJogo->numeroJogador[mesaJogo->tamMesa] = vezJogador;
                     // Aumentando a quantidade de cartas na mesa.
                     mesaJogo->tamMesa++;
@@ -280,59 +281,88 @@ void controleJogo(){
                     jogadas--;
                 }// Se for uma aceitação de aumento de aposta.
                 else if (!strncmp (msg->msg, "02", msg->lenght)){
-                    // TO-DO: Falta testar.
                     // Enviar sinal de aumento aceito para todos menos para quem confirmou.
                     enviarAnuncioAceitaAposta (vezJogador);
                     valorRodada++;
                     // Atualize o valor de aposta dos jogadores.
                     enviarValorRodada (tentos[valorRodada]);
                     // Se o jogador que respondeu este aumento foi o jogador intimado inicialmente.
-                    if (jogadorSolicitante){
+                    if (vezJogador == jogadoresAumento[1]){
                         // Retorna ao jogador a esquerda do jogador que solicitou incialmente.
-                        vezJogador = jogadorAnterior (vezJogador);
-                        vezJogador = jogadorAnterior (vezJogador);
+                        vezJogador = jogadorAnterior (vezJogador);   
                     }
+                    vezJogador = jogadorAnterior (vezJogador);
                     respostaAumento = 0;
                     jogadas--;
                 }// Se for um recuso de aumento de aposta.
                 else if (!strncmp (msg->msg, "03", msg->lenght)){
-                    // TO-DO: Aumentar os pontos da dupla vencedora.
-                    // TO-DO: Sair do loop.
+                    // Se for a dupla (0 - 2) que desistiu.
+                    if (vezJogador == 0 || vezJogador == 2){
+                        placarJogo[1] += tentos[valorRodada];
+                    }else { // se for a dupla (1 - 3).
+                        placarJogo[0] += tentos[valorRodada];
+                    }
+                    recusoAumento = 1;
+                    break;
                 }
                 vezJogador = proximoJogador (vezJogador);
                 free (msg);
-            }/*
-            resultadoRodada = vencerRodada(mesaJogo);
-            if(resultadoRodada == 1 || resultadoRodada == 3){
-                printf("Dupla 1 ganhou a rodada\n");
-                placarTurno[0] = placarTurno[0] + 1; 
+            // Se a rodada chegou ao fim sem ser por um recuso de aumento de aposta.
+            }if (!recusoAumento){
+                // Identifica qual dupla venceu a rodada.
+                char resultado[75];
+                resultadoRodada = vencerTurno(mesaJogo);
+                if(resultadoRodada == 0 || resultadoRodada == 2){
+                    // Enviando anúncio da dupla que venceu (0 - 2).
+                    sprintf (resultado, "Dupla (0 - 2) ganhou a rodada.\n");
+                    enviarResultado (resultado);
+                    placarTurno[0]++;
+                    // Definindo qual jogador vai inciar a próxima jogada.
+                    vezJogador = resultadoRodada;
+                }
+                else if(resultadoRodada == 1 || resultadoRodada == 3){
+                    // Enviando anúncio da dupla que venceu (1 - 3).
+                    sprintf (resultado, "Dupla (1 - 3) ganhou a rodada.\n");
+                    enviarResultado (resultado);
+                    placarTurno[1]++;
+                    // Definindo qual jogador vai inciar a próxima jogada.
+                    vezJogador = resultadoRodada;
+                }
+                // Se for um empate (valor 5).
+                else {
+                    sprintf (resultado, "Empate.\n");
+                    enviarResultado (resultado);
+                    placarTurno[0]++;
+                    placarTurno[1]++;
+                }                
+                free (mesaJogo);
+                sprintf(resultado ,"Placar Turno.\n Dupla (0 - 2): %d.\n"
+                    "Dupla (1 - 3): %d.\n", placarTurno[0], placarTurno[1]);
+                enviarResultado (resultado);
+                resultadoTurno = vencerRodada (placarTurno);
+                if(resultadoTurno == 1){
+                    placarJogo[0] = placarJogo[0] + tentos[valorRodada];
+                    break;
+                }
+                else if(resultadoTurno == 2){                    
+                    placarJogo[1] = placarJogo[1] + tentos[valorRodada];
+                    break;
+                }
+                else if(resultadoTurno == 3){
+                    break;
+                }                
+            }else { 
+                // Se houve um recuso de aumento de aposta encerre a rodada.
+                break;
             }
-            else if(resultadoRodada == 2 || resultadoRodada == 4){
-                printf("Dupla 2 ganhou a rodada\n");
-                placarTurno[1] = placarTurno[1] + 1;
-            }
-            else if(resultadoRodada == 5 ){
-                printf("Empate : proxima rodada decidira quem ganhará\n");
-                placarTurno[0] = placarTurno[0] + 1;
-                placarTurno[1] = placarTurno[1] + 1;
-            }*/            
-        }/*
-        resultadoTurno = vencerTurno(placarTurno);
-        if(resultadoTurno == 1){
-            printf("Dupla 1 ganhou o Turno\n");
-            placarJogo[0] = placarJogo[0] + valorRodada; 
-
         }
-        else if(resultadoTurno == 2){
-            printf("Dupla 2 ganhou o Turno\n");
-            placarJogo[1] = placarJogo[1] + valorRodada;
-        }
-        else if(resultadoTurno == 3){
-            printf("Empate\n");
-        }
+        char resultadoJogo[75];
+        sprintf(resultadoJogo ,"Pontuação.\n Dupla (0 - 2): %d.\n"
+        "Dupla (1 - 3): %d.\n", placarJogo[0], placarJogo[1]);
+        enviarResultado (resultadoJogo);
         if(placarJogo[0] > 10 || placarJogo[1] > 10){
             break;
-        }*/
+        }
     }
     fechaConexoes();
 }
@@ -430,5 +460,16 @@ void enviarValorRodada (int valorRodada){
         enviarStr (jogadores[jogador].socket, "13");
         // Enviando o valor da rodada.
         enviarInt (jogadores[jogador].socket, valorRodada);
+    }
+}
+
+void enviarResultado (char *msg){
+
+    int jogador;
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
+        // Não envie para o jogador que pediu o truco.        
+        // Envie sinal de anúncio de aumento de aposta.
+        enviarStr (jogadores[jogador].socket, "14");
+        enviarStr (jogadores[jogador].socket, msg);
     }
 }

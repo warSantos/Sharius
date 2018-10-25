@@ -66,6 +66,8 @@ void enviarMesa ();
 
 void enviarValorRodada (int valorRodada);
 
+void enviarResultado (char *msg);
+
 int jogadorAnterior (int vezJogador);
 
 int proximoJogador (int vezJogador);
