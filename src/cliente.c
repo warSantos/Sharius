@@ -189,46 +189,50 @@ void menuOperacao (){
     while(1){        
         sleep(1);
         msg = recebeStr (jogadorCliente.socket);
-        // Se for uma solicitação de aumento de aposta.
-        if(!strncmp(msg->msg, "01", 3)){
-            menuTruco(valorRodada);
-        }// Se for um sinal informando que algum jogador aceitou o aumento.
-        else if (!strncmp(msg->msg, "02", 3)){
-            int jogadorConfirmante =  recebeInt (jogadorCliente.socket);
-            printf ("Jogador: %d, aceitou o aumento da aposta.\n", jogadorConfirmante);
-        }// For um sinal de anúncio de aumento de aposta.
-        else if (!strncmp(msg->msg, "04", 3)){
-            int jogadorSolicitante = recebeInt (jogadorCliente.socket);
-            printf ("Jogador: %d, acaba de solicitar aumento de aposta.\n", jogadorSolicitante);
-        }// Se for um sinal de permissão para jogar.
-        else if(!strncmp(msg->msg, "10",3)){
-            printf ("Sua vez de jogar.\n");
-            // Mostrando quais opções o jogador pode fazer.
-            menu(valorRodada);
-            scanf("%2[^\n]s", buffer);
-            __fpurge(stdin);
-            menuMensagem(buffer);
-        }// Se for um sinal de envio de mesa.
-        else if (!strncmp(msg->msg, "11", 3)){
-            // Recebendo as cartas na mesa do servidor.
-            visualizarMesa ();
-        }// Se for um sinal de envio de cartas.
-        else if (!strncmp(msg->msg, "12", 3)){
-            // Receba as cartas do servidor.
-            printf ("Recebendo cartas.\n");
-            receberCartas ();
-            visualizarCarta ();        
-        }// Se for o envio do novo valor da rodada.
-        else if (!strncmp(msg->msg, "13", 3)){
-            valorRodada = recebeInt (jogadorCliente.socket);
-            printf ("Valor da rodada: %d.\n", valorRodada);
-        }// Se for o anuncio da dupla que venceu a partida.
-        else if (!strncmp(msg->msg, "14", 3)){            
-            msg = recebeStr (jogadorCliente.socket);
-            printf (msg->msg);
-        }else{
-            printf("Vez de outro jogador, espere sua vez.\n");
-            printf ("Mensagem: %s.\n", msg->msg);
+        if (msg->msg[0] == '0'){ // Sinais do cliente.
+
+            // Se for uma solicitação de aumento de aposta.
+            if(!strncmp(msg->msg, "01", 3)){
+                menuTruco(valorRodada);
+            }// Se for um sinal informando que algum jogador aceitou o aumento.
+            else if (!strncmp(msg->msg, "02", 3)){
+                int jogadorConfirmante =  recebeInt (jogadorCliente.socket);
+                printf ("Jogador: %d, aceitou o aumento da aposta.\n", jogadorConfirmante);
+            }// For um sinal de anúncio de aumento de aposta.
+            else if (!strncmp(msg->msg, "04", 3)){
+                int jogadorSolicitante = recebeInt (jogadorCliente.socket);
+                printf ("Jogador: %d, acaba de solicitar aumento de aposta.\n", jogadorSolicitante);
+            }// Se for um sinal de permissão para jogar.
+        }else { // Sinais do servidor. 
+            if(!strncmp(msg->msg, "10",3)){
+                printf ("Sua vez de jogar.\n");
+                // Mostrando quais opções o jogador pode fazer.
+                menu(valorRodada);
+                scanf("%2[^\n]s", buffer);
+                __fpurge(stdin);
+                menuMensagem(buffer);
+            }// Se for um sinal de envio de mesa.
+            else if (!strncmp(msg->msg, "11", 3)){
+                // Recebendo as cartas na mesa do servidor.
+                visualizarMesa ();
+            }// Se for um sinal de envio de cartas.
+            else if (!strncmp(msg->msg, "12", 3)){
+                // Receba as cartas do servidor.
+                printf ("Recebendo cartas.\n");
+                receberCartas ();
+                visualizarCarta ();        
+            }// Se for o envio do novo valor da rodada.
+            else if (!strncmp(msg->msg, "13", 3)){
+                valorRodada = recebeInt (jogadorCliente.socket);
+                printf ("Valor da rodada: %d.\n", valorRodada);
+            }// Se for o anuncio da dupla que venceu a partida.
+            else if (!strncmp(msg->msg, "14", 3)){            
+                msg = recebeStr (jogadorCliente.socket);
+                printf (msg->msg);
+            }else{
+                printf("Vez de outro jogador, espere sua vez.\n");
+                printf ("Mensagem: %s.\n", msg->msg);
+            }
         }
     }
     close(jogadorCliente.socket);

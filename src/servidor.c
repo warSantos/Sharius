@@ -180,7 +180,7 @@ void controleJogo(){
     construirBaralho (baralho);
     // armazena o valor da aposta corrente na mesa.
     // Enviando sinal de partida iniciada (teste).
-    int turnos, vezJogador = 0, jogadas;
+    int turnos, vezJogador, jogadas;
     int valorRodada, resultadoRodada, resultadoTurno;
     int tentos[5] = {2, 4, 8, 10, 12};
     int placarTurno[2] = {0,0};
@@ -318,11 +318,7 @@ void controleJogo(){
                 placarTurno[0]++;
                 placarTurno[1]++;
             }
-            if(resultadoRodada != 5){
-                vezJogador = resultadoRodada;     
-            }else{
-                vezJogador = 
-            }
+            vezJogador = resultadoRodada;
             free (mesaJogo);
             printf("Placar Turno : %d / %d \n",placarTurno[0],placarTurno[1]);
             resultadoTurno = vencerTurno(placarTurno);
@@ -341,7 +337,7 @@ void controleJogo(){
                 printf("Empate\n");
                   printf("placar Jogo: %d / %d \n",placarJogo[0],placarJogo[1]);
                   break;
-        }
+            }
         }
         if(placarJogo[0] > 10 || placarJogo[1] > 10){
             break;

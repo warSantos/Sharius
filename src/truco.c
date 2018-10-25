@@ -153,6 +153,7 @@ int vencerRodada(Mesa *mesa){
 	return aux2;
 }
 int vencerTurno(int placarRodada[2]){
+	
 	int aux;
 	if(placarRodada[0] == 2 && placarRodada[1] < 2){
 		aux = 1;

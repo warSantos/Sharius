@@ -42,4 +42,6 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho);
 
 int vencerRodada(Mesa *mesa);
 
+int vencerTurno(int placarRodada[2]);
+
 #endif
