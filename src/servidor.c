@@ -178,8 +178,6 @@ void controleJogo(){
 
     // Construindo baralho.
     construirBaralho (baralho);
-    // armazena o valor da aposta corrente na mesa.
-    // Enviando sinal de partida iniciada (teste).
     int turnos, vezJogador = 0, jogadas;
     int valorRodada, resultadoRodada, resultadoTurno;
     int tentos[5] = {2, 4, 8, 10, 12};
