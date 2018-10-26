@@ -11,17 +11,12 @@
 
 Jogador jogadorCliente;
 Mesa mesaCliente;
+
 /*
  * 
  * Módulo cliente responsável por enviar mensagens para o servidor.
  *  
  */
-
-// Função ajuda para opções do modo de mensagem.
-void ajudaMenssagem();
-
-// Função ajuda para menu de comando para usuário.
-void ajudaComando();
 
 // Abre conexão inicial com o servidor...
 void abreConexao();

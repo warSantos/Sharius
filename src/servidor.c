@@ -1,33 +1,5 @@
 #include "../headers/servidor.h"
 
-void ajudaMensagem(){
-        
-    printf("\n\tAjuda.\n\n");
-    printf("\n\t!c altera para o modo de comando.\n\n");    
-    printf("\n\tPor padrão ao se conectar a uma sala suas mensagens são enviadas");
-    printf("\n\tpara todos usuários onlines na sala.");
-    printf("\n\n\tPara enviar mensagens em particular adicione @ antes do nick\n");
-    printf("\tdo receptor.");
-    printf("\n\n\t> @FULANO MENSSAGEM...\n\n");    
-    printf("\tTODA mesagem iniciada por @ será comprendido como uma mensagem privada.\n");
-    printf("\tEntão evite iniciar mesagens com @ com destino para broadcast (todos na sala).\n");
-    printf("\n\t-clear - limpa o bufferscreen (tela).");
-    printf("\n\t-list - imprimi lista de usuários ativos.");
-}
-
-void ajudaComando(){
-
-    printf("\n\tAjuda.\n\n");
-    printf("\n\t!m altera para o modo de mensagem.\n\n");    
-    printf("\n\tadd - adiciona logins a sala.");
-    printf("\n\tclear - limpa o bufferscreen (tela).");
-    printf("\n\tlist - imprimi lista de usuários ativos.");
-    printf("\n\thelp - consulta ajuda.");
-    printf("\n\tquit - encerra conexão com logins e deleta sala.");
-    
-    printf("\n\tremove - remove um usuário.\n\n");    
-}
-
 void escutaSolicitacao(){
     
     // Cria conexão inicial com clientes e fornece uma thread de
@@ -185,7 +157,7 @@ void controleJogo(){
     int placarTurno[2];
     int placarJogo[2] = {0,0};
     int respostaAumento, jogadoresAumento[2] = {0,0}, jogadorSolicitante, BloquearTruco[2] = {-1,-1};
-    Mensagem *msg, *mao10[2];
+    Mensagem *msg, *mao10[JOGADORES_POR_DUPLA];
     
     // Enviando mensagem inicial para jogadores (teste da conexão).
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
@@ -201,50 +173,81 @@ void controleJogo(){
         valorRodada = 0;
         maoDe10 = 0;
         vezJogador = jogadorRodada;
-        enviarDesbloqueio();
-        //TO-DO: adaptar o jogo para 4 playes com o "for".
+        // Enviando sinal de desbloquio de aposta (bloqueioAumento).
+        enviarSinal("17");
         if (placarJogo[0] == 10 && placarJogo[1] != 10){
-            // Enviando sinal de mão de 10.
-            enviarStr (jogadores[0].socket, "15");
-            //enviarStr (jogadores[2].socket, "15");
+            // Enviando sinal pergunta se dupla vai aceitar ir na mão de 10.
+            int j, cont = 0;
+            for (j = 0; j <= QTDE_JOGADORES; j += 2){
+                enviarStr (jogadores[j].socket, "15");
+                cont++;
+            }
             // Recebendo resposta dos jogadores.
-            mao10[0] = recebeStr (jogadores[0].socket);
-            jogadorDesistiu (0, mao10[0]->bytes_read);
-            //mao10[1] = recebeStr (jogadores[2].socket);
-            //jogadorDesistiu (2, mao10[1]->bytes_read);
+            cont = 0;
+            for (j = 0; j <= QTDE_JOGADORES; j += 2){
+                mao10[cont] = recebeStr (jogadores[j].socket);
+                cont++;
+            }
+            // Caso algum jogador não responda o servidor.
+            cont = 0;
+            for (j = 0; j <= QTDE_JOGADORES; j += 2){
+                jogadorDesistiu (j, mao10[cont]->bytes_read);
+                cont++;
+            }
             // Se algum dos dois jogadores aceitarem.
-            if (!strncmp (mao10[0]->msg, "02", 3)
-                /*|| !strncmp (mao10[1]->msg, "02", 3)*/){
-                valorRodada++;
-                // Sinalizando que esta na mão de 10.
-                maoDe10 = 1;
-            }else { // Se os dois não aceitarem.
+            for (j = 0; j < JOGADORES_POR_DUPLA; j++){
+                if (!strncmp (mao10[j]->msg, "02", 3)){
+                    maoDe10 = 1;
+                }
+            }
+            if (maoDe10 != 1) { // Se os dois não aceitarem.
                 placarJogo[1] += 2;
                 maoDe10 = -1;
-            }
-            free (mao10[0]);
-            //free (mao10[1]);
-        }else if(placarJogo[1] == 10 && placarJogo[0] != 10){
-            // Enviando sinal de mão de 10.
-            enviarStr (jogadores[1].socket, "15");
-            //enviarStr (jogadores[3].socket, "15");
-            // Recebendo resposta dos jogadores.
-            mao10[0] = recebeStr (jogadores[1].socket);
-            jogadorDesistiu (1, mao10[0]->bytes_read);
-            //mao10[1] = recebeStr (jogadores[3].socket);
-            //jogadorDesistiu (3, mao10[1]->bytes_read);
-            // Se algum dos dois jogadores aceitarem.
-            if (!strncmp (mao10[0]->msg, "02", 3) 
-                /*|| !strncmp (mao10[1]->msg, "02", 3)*/){
+            }else{ // Se algum aceitou.
                 valorRodada++;
-                // Sinalizando que esta na mão de 10.
-                maoDe10 = 1;
-            }else { // Se os dois não aceitarem.
-                placarJogo[0] += 2;
-                maoDe10 = -1;
+                // Enviando sinal de ajuste de variável (valorMao10).
+                enviarSinal ("18");
             }
-            free (mao10[0]);
-            //free (mao10[1]);
+            for (j = 0; j < JOGADORES_POR_DUPLA; j++){
+                free (mao10[j]);
+            }
+
+        }else if(placarJogo[1] == 10 && placarJogo[0] != 10){
+            // Enviando sinal pergunta se dupla vai aceitar ir na mão de 10.
+            int j, cont = 0;
+            for (j = 1; j <= QTDE_JOGADORES; j += 2){
+                enviarStr (jogadores[j].socket, "15");
+                cont++;
+            }
+            // Recebendo resposta dos jogadores.
+            cont = 0;
+            for (j = 1; j <= QTDE_JOGADORES; j += 2){
+                mao10[cont] = recebeStr (jogadores[j].socket);
+                cont++;
+            }
+            // Caso algum jogador não responda o servidor.
+            cont = 0;
+            for (j = 1; j <= QTDE_JOGADORES; j += 2){
+                jogadorDesistiu (j, mao10[cont]->bytes_read);
+                cont++;
+            }
+            // Se algum dos dois jogadores aceitarem.
+            for (j = 0; j < JOGADORES_POR_DUPLA; j++){
+                if (!strncmp (mao10[j]->msg, "02", 3)){
+                    maoDe10 = 1;
+                }
+            }
+            if (maoDe10 != 1) { // Se os dois não aceitarem.
+                placarJogo[1] += 2;
+                maoDe10 = -1;
+            }else{ // Se algum aceitou.
+                valorRodada++;
+                // Enviando sinal de ajuste de variável (valorMao10).
+                enviarSinal ("18");
+            }
+            for (j = 0; j < JOGADORES_POR_DUPLA; j++){
+                free (mao10[j]);
+            }
         }
         // Se os jogadores estiverem e aceitarem mão de 10.
         if (maoDe10 != -1){
@@ -569,11 +572,11 @@ void enviarBloqueio (int vezJogador){
     }
 }
 
-void enviarDesbloqueio (){
+void enviarSinal (char *sinal){
     int jogador;
     for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
         // envia sinal de desbloqueio de aumento de aposta para dupla.
-        enviarStr (jogadores[jogador].socket, "17");
+        enviarStr (jogadores[jogador].socket, sinal);
     }
 }
 

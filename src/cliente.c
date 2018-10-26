@@ -2,23 +2,6 @@
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-void ajudaMensagem(){
-        
-    printf("\n\tAjuda.\n\n");
-    printf("00 - jogar Carta , habilita voce joga sua carta na mesa\n");  
-    printf("01 - truco\n");
-}
-
-void ajudaComando(){
-
-    printf("\n\tAjuda.\n\n");
-    printf("\n\t!m altera para o modo de mensagem.\n\n");        
-    printf("\n\tclear - limpa o bufferscreen (tela).");
-    printf("\n\tlist - imprimi lista de usuários ativos.");
-    printf("\n\thelp - consulta ajuda.");
-    printf("\n\tquit - encerra conexão com logins e deleta sala.\n");        
-}
-
 void abreConexao(){
         
     struct sockaddr_in servidor;
@@ -194,10 +177,8 @@ void menuOperacao (){
     // Setando o valor da rodada para o valor inicial.
     while(1){
         sleep(1);
-        printf ("valorMao10: %d.\n", valorMao10);
         msg = recebeStr (jogadorCliente.socket);
         if (msg->msg[0] == '0'){ // Sinais do cliente.
-
             // Se for uma solicitação de aumento de aposta.
             if(!strncmp(msg->msg, "01", 3)){
                 menuTruco(valorRodada - valorMao10);
@@ -246,9 +227,6 @@ void menuOperacao (){
                     if (!strncmp(buffer, "02", 3)
                         || !strncmp(buffer, "03", 3)){
                         enviarStr (jogadorCliente.socket, buffer);
-                        if (!strncmp (buffer, "02", 3)){
-                            valorMao10 = 2;
-                        }
                         break;
                     }else {
                         printf ("Opção inválida.\n");
@@ -260,10 +238,9 @@ void menuOperacao (){
             }// Se for um sinal de desbloqueio de aumento de aposta.
             else if (!strncmp(msg->msg, "17", 3)){
                 bloqueioAumento = 0;
-            }
-            else{
-                //printf("Vez de outro jogador, espere sua vez.\n");
-                //printf ("Mensagem: %s.\n", msg->msg);
+            }// Se for um sinal de ajuste de variável.
+            else if (!strncmp(msg->msg, "18", 3)){
+                valorMao10 = 2;
             }
         }
         // Se algum jogador desistir da partida.

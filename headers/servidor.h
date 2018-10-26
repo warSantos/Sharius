@@ -24,10 +24,8 @@ Jogador jogadores[4];
 // do baralho.
 Carta baralho[40];
 
-
 // Armazena as cartas de uma rodada.
 Mesa *mesaJogo;
-
 
 /*
  *
@@ -70,7 +68,7 @@ void enviarResultado (char *msg);
 
 void enviarBloqueio (int vezJogador);
 
-void enviarDesbloqueio ();
+void enviarSinal (char *sinal);
 
 void jogadorDesistiu (int vezJogador, u_int32_t bytes);
 
