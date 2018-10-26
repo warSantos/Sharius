@@ -45,12 +45,7 @@ int menuComando(char *buffer);
 // Gerenciamento de conexões externas.
 void escutaSolicitacao();
 
-
 void *autenticaUsuarios (void *args);
-
-// Informa a um jogador que sua conexão com o server não pode ser 
-// estabelecida devido o limite dos jogadores ter sido atingido.
-void *limiteAtingido ();
 
 // Recebe as mensagens de um cliente e repassa elas aos demais 
 // logados no chat.
@@ -61,6 +56,21 @@ void fechaConexoes();
 
 // Envia as cartas dos jogadores do servidor para o cliente.
 void enviarCartas();
+
+void enviarAnuncioAumentoAposta (int jogadorSolicitante);
+
+void enviarAnuncioAceitaAposta (int jogadorConfirmante);
+
+// Envia as cartas que estão na mesa para os jogadores.
+void enviarMesa ();
+
+void enviarValorRodada (int valorRodada);
+
+void enviarResultado (char *msg);
+
+int jogadorAnterior (int vezJogador);
+
+int proximoJogador (int vezJogador);
 
 // A partir desta função o fluxo do jogo é controlado.
 // Os sinais de bloqueio e de permissão para jogar são 

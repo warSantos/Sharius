@@ -29,17 +29,19 @@ typedef struct{
 typedef struct{
 	int numeroJogador[4];
 	int tamMesa;
-	Carta cartas[4 ];
+	Carta cartas[4];
 } Mesa;
 
 #define QTDE_JOGADORES 1
 
-void construirBaralho(Carta *baralho);
+void construirBaralho (Carta *baralho);
 
-void embaralhar(Carta *baralho);
+void embaralhar (Carta *baralho);
 
-void distribuirCartas(Jogador *jogadores, Carta *baralho);
+void distribuirCartas (Jogador *jogadores, Carta *baralho);
 
-int vencerRodada();
+int vencerTurno (Mesa *mesa);
+
+int vencerRodada (int *placarRodada,int primeiroTurno,int turno);
 
 #endif

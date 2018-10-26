@@ -23,31 +23,22 @@ void ajudaMenssagem();
 // Função ajuda para menu de comando para usuário.
 void ajudaComando();
 
-// Função para recember os comandos inseridos pelo usuário no modo "Comando". 
-int menuComando(char *buffer);
-
-// Função para delegar o buffer a função de estraiMenssagem para processamento
-// e delegação dos dados processados para a função de enviar mesagem.
-void menuMenssagem(char *buffer, char *userNick, int idSocket);
-
 // Abre conexão inicial com o servidor...
 void abreConexao();
 
+void menuOperacao ();
+
 void menu(int valorRodada);
 
-void menuMensagem(char *buffer, int valorRodada);
+void menuMensagem();
 
-void menuTruco(char *comando);
+void menuTruco(int valorRodada);
 
 void receberCartas ();
 
 void jogar();
 
 void aumentoValor();
-
-void jogo();
-
-void receberMesa();
 
 void visualizarMesa();
 

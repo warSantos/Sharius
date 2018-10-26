@@ -44,7 +44,8 @@ int main(){
 		if(placarJogo[0] == 10 || placarJogo[1] == 10){
 			if(placarJogo[0] == 10){
 				printf("Mao de 10 do time 1 , jogador 1 e 3 \n");
-				scanf("%s",resposta);
+				scanf("%s", resposta);
+				__fpurge(stdin);
 				if(strcmp(resposta,"sim") == 0){
 					valorRodada = 4;
 				}
