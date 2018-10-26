@@ -30,7 +30,7 @@ void menuOperacao ();
 
 void menu(int valorRodada);
 
-void menuMensagem(char *buffer);
+void menuMensagem();
 
 void menuTruco(int valorRodada);
 

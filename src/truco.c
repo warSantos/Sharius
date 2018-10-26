@@ -135,7 +135,8 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 int vencerTurno (Mesa *mesa){
 	
 	int aux = 0, aux2, i;
-	for(i = 0; i < 2; i++){
+	//TO-DO: alterar valor do for para 2.
+	for(i = 0; i <= QTDE_JOGADORES; i++){
 		if(mesa->cartas[i].valor > aux){
 			aux = mesa->cartas[i].valor;			
 			aux2 = mesa->numeroJogador[i];			
@@ -150,27 +151,22 @@ int vencerTurno (Mesa *mesa){
 	return aux2;
 }
 
-int vencerRodada (int placarRodada[2]){
+int vencerRodada (int *placarRodada){
 	
-	int aux;
 	if(placarRodada[0] == 2 && placarRodada[1] < 2){
-		aux = 1;
-		return aux;
+		return 1;
 	}
 	else if(placarRodada[0] < 2 && placarRodada[1] == 2){
-		aux = 2;
-		return aux;
+		return 2;
 	}
 	else if(placarRodada[0] == 3 && placarRodada[1] == 2 ){
-		aux = 1;
-		return aux;
+		return 1;
 	}
 	else if(placarRodada[0] == 2 && placarRodada[1] == 3){
-		aux = 2;
-		return aux;
+		return 2;
 	}
 	else if(placarRodada[0] == 3 && placarRodada[1] == 3){
-		aux = 3;
-		return aux;
+		return 3;
 	}
+	return 0;
 }

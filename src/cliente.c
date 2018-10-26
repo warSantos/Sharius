@@ -34,6 +34,7 @@ void abreConexao(){
      * do endereço ip ja informado.
     */
     Mensagem *msg = malloc (sizeof(Mensagem));
+    //TO-D0: Descomentar autenticação no servidor e no cliente.
     /*msg->msg = malloc(sizeof(char)*16);
     while(1){
         
@@ -116,9 +117,12 @@ void menu(int valorRodada){
 }
 
 //opções jogador pode fazer
-void menuMensagem(char *buffer){
+void menuMensagem(){
     
+    char buffer[3];    
     while (1){
+        scanf("%2[^\n]s", buffer);
+        __fpurge(stdin);
         // jogar a carta comando 00
         if(!strncmp(buffer,"00" , 3)){
             enviarStr(jogadorCliente.socket, "00");
@@ -174,7 +178,6 @@ void menuTruco(int valorRodada){
 
 void menuOperacao (){
     
-    char buffer[3];
     Mensagem *msg;
     int valorRodada;
     // Recebendo mensagem inicial de inicio de partida.
@@ -207,10 +210,8 @@ void menuOperacao (){
             if(!strncmp(msg->msg, "10",3)){
                 printf ("Sua vez de jogar.\n");
                 // Mostrando quais opções o jogador pode fazer.
-                menu(valorRodada);
-                scanf("%2[^\n]s", buffer);
-                __fpurge(stdin);
-                menuMensagem(buffer);
+                menu(valorRodada);                
+                menuMensagem();
             }// Se for um sinal de envio de mesa.
             else if (!strncmp(msg->msg, "11", 3)){
                 // Recebendo as cartas na mesa do servidor.
@@ -229,7 +230,24 @@ void menuOperacao (){
             else if (!strncmp(msg->msg, "14", 3)){            
                 msg = recebeStr (jogadorCliente.socket);
                 printf (msg->msg);
-            }else{
+            } // Se for um sinal de mao de 10.
+            else if (!strncmp(msg->msg, "15", 3)){            
+                char buffer[3];
+                while (1){
+                    printf ("02 - Aceitar mao de 10.\n");
+                    printf ("03 - Recusar mao de 10.\n");
+                    scanf ("%2[^\n]s", buffer);
+                    __fpurge (stdin);
+                    if (!strncmp(buffer, "02", 3)
+                        || !strncmp(buffer, "03", 3)){
+                        enviarStr (jogadorCliente.socket, buffer);
+                        break;
+                    }else {
+                        printf ("Opção inválida.\n");
+                    }
+                }
+            }
+            else{
                 printf("Vez de outro jogador, espere sua vez.\n");
                 printf ("Mensagem: %s.\n", msg->msg);
             }
