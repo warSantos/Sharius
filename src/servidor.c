@@ -190,6 +190,7 @@ void controleJogo(){
     for (vezJogador = 0; vezJogador <= QTDE_JOGADORES; vezJogador++){
         enviarStr (jogadores[vezJogador].socket, "Partida iniciada.\n");
     }
+
     // Enquanto não houver vencedores.
     while (1){
         sleep (1);
@@ -199,6 +200,7 @@ void controleJogo(){
         valorRodada = 0;
         maoDe10 = 0;
         vezJogador = jogadorRodada;
+
         //TO-DO: adaptar o jogo para 4 playes com o "for".
         if (placarJogo[0] == 10){
             // Enviando sinal de mão de 10.
