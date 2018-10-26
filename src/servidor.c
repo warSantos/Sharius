@@ -514,12 +514,12 @@ void enviarAnuncioAceitaAposta (int jogadorConfirmante){
     int jogador;
     for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
         // Não envie para o jogador que pediu o truco.
-        if (jogador != jogadorConfirmante){
+        //if (jogador != jogadorConfirmante){
             // Envie sinal de anúncio de aumento de aposta.
             enviarStr (jogadores[jogador].socket, "02");
             // Envie o numero do jogador que aceitou aumento.
             enviarInt (jogadores[jogador].socket, jogadorConfirmante);
-        }
+        //}
     }
 }
 

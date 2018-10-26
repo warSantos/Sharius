@@ -190,7 +190,7 @@ void menuOperacao (){
     printf (msg->msg);
     free(msg);
     // Setando o valor da rodada para o valor inicial.
-    while(1){        
+    while(1){
         sleep(1);
         msg = recebeStr (jogadorCliente.socket);
         if (msg->msg[0] == '0'){ // Sinais do cliente.
@@ -256,6 +256,7 @@ void menuOperacao (){
                 printf ("Mensagem: %s.\n", msg->msg);
             }
         }
+        free(msg);
     }
     close(jogadorCliente.socket);
 }
