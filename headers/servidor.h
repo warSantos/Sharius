@@ -68,6 +68,10 @@ void enviarValorRodada (int valorRodada);
 
 void enviarResultado (char *msg);
 
+void enviarBloqueio (int vezJogador);
+
+void enviarDesbloqueio ();
+
 int jogadorAnterior (int vezJogador);
 
 int proximoJogador (int vezJogador);

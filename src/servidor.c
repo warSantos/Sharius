@@ -200,7 +200,7 @@ void controleJogo(){
         valorRodada = 0;
         maoDe10 = 0;
         vezJogador = jogadorRodada;
-
+        enviarDesbloqueio();
         //TO-DO: adaptar o jogo para 4 playes com o "for".
         if (placarJogo[0] == 10){
             // Enviando sinal de mão de 10.
@@ -336,6 +336,8 @@ void controleJogo(){
                                 jogadorSolicitante = 1;
                             }
                         }
+                        // Enviando sinal de bloqueio de aumento de aposta.
+                        enviarBloqueio (vezJogador);
                         jogadas--;
                     }// Se for uma aceitação de aumento de aposta.
                     else if (!strncmp (msg->msg, "02", msg->lenght)){
@@ -488,7 +490,7 @@ void enviarMesa (){
         enviarStr (jogadores[jogador].socket, "11");
         // Enviando o tamanho da mesa.
         enviarInt (jogadores[jogador].socket, mesaJogo->tamMesa);
-        for (carta = 0; carta < mesaJogo->tamMesa; carta++){           
+        for (carta = 0; carta < mesaJogo->tamMesa; carta++){
             // Enviando o nome da carta para os jogadores.
             enviarStr (jogadores[jogador].socket, mesaJogo->cartas[carta].nome);
         }
@@ -543,5 +545,27 @@ void enviarResultado (char *msg){
         enviarStr (jogadores[jogador].socket, "14");
         // Enviando mensagem com resultado.
         enviarStr (jogadores[jogador].socket, msg);
+    }
+}
+
+void enviarBloqueio (int vezJogador){
+    // Enviando sinal de bloqueio de aumento aposta.
+    int jogador, bloqueioAposta = 1;
+    if (vezJogador % 2 == 0){
+        jogador = 0;
+    }else {
+        jogador = 1;
+    }
+    for (; jogador <= QTDE_JOGADORES; jogador += 2){
+        // envia sinal de bloqueio de aumento de aposta para dupla.
+        enviarStr (jogadores[jogador].socket, "16");
+    }
+}
+
+void enviarDesbloqueio (){
+    int jogador;
+    for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
+        // envia sinal de desbloqueio de aumento de aposta para dupla.
+        enviarStr (jogadores[jogador].socket, "17");
     }
 }

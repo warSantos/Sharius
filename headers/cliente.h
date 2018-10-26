@@ -28,9 +28,9 @@ void abreConexao();
 
 void menuOperacao ();
 
-void menu(int valorRodada);
+void menu(int valorRodada, int bloqueioAumento);
 
-void menuMensagem();
+void menuMensagem(int bloqueioAumento);
 
 void menuTruco(int valorRodada);
 

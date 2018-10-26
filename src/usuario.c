@@ -43,13 +43,21 @@ void enviarInt (int idSocket, int valor){
 
     // convertendo o valor do inteiro para rede.
     u_int32_t v = htonl (valor);
-    write (idSocket, &v, sizeof(u_int32_t));
+    int bytes_write = write (idSocket, &v, sizeof(u_int32_t));
+    if (bytes_write == 0){
+        printf ("Erro: nenhum byte foi escritno no socket.\n");
+    }else if (bytes_write < 0){
+        printf ("Erro: falha ao escrever inteiro no socket.\n");
+    }
 }
 
 u_int32_t recebeInt (int idSocket){
 
     u_int32_t v;
-    if(recv(idSocket, &v, sizeof(u_int32_t), 0) < 0){
+    int bytes_read = recv(idSocket, &v, sizeof(u_int32_t), 0);
+    // Se nenhum byte for lido (cliente fez uma interrupção de teclado por exemplo).
+    if (bytes_read <= 0){
+        printf ("Erro: falha ao ler inteiro no socket.\n");
         return -1;
     }
     return ntohl (v);
@@ -64,7 +72,12 @@ void enviarStr(int idSocket, char *str){
     enviarInt (idSocket, lenght);
     
     // enviando a string.
-    write(idSocket, str, lenght);
+    int bytes_write = write(idSocket, str, lenght);
+    if (bytes_write == 0){
+        printf ("Erro: nenhum byte foi escritno no socket.\n");
+    }else if (bytes_write < 0){
+        printf ("Erro: falha ao escrever string no socket.\n");
+    }
 }
 
 Mensagem *recebeStr(int idSocket){
@@ -78,7 +91,7 @@ Mensagem *recebeStr(int idSocket){
         msg->msg = NULL;
         msg->lenght = 0;
         return msg;
-    }    
+    }
     // recebendo a string.
     msg->msg = malloc(msg->lenght);
     msg->bytes_read = recv(idSocket, msg->msg, msg->lenght, 0);
