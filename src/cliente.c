@@ -180,7 +180,7 @@ void menuTruco(int valorRodada){
 void menuOperacao (){
     
     Mensagem *msg;
-    int valorRodada;
+    int valorRodada, valorMao10 = 0;
     // Recebendo mensagem inicial de inicio de partida.
     msg = recebeStr(jogadorCliente.socket);
     if(msg->bytes_read < 0){
@@ -197,10 +197,10 @@ void menuOperacao (){
 
             // Se for uma solicitação de aumento de aposta.
             if(!strncmp(msg->msg, "01", 3)){
-                menuTruco(valorRodada);
+                menuTruco(valorRodada - valorMao10);
             }// Se for um sinal informando que algum jogador aceitou o aumento.
             else if (!strncmp(msg->msg, "02", 3)){
-                int jogadorConfirmante =  recebeInt (jogadorCliente.socket);
+                int jogadorConfirmante = recebeInt (jogadorCliente.socket);
                 printf ("Jogador: %d, aceitou o aumento da aposta.\n", jogadorConfirmante);
             }// For um sinal de anúncio de aumento de aposta.
             else if (!strncmp(msg->msg, "04", 3)){
@@ -211,7 +211,7 @@ void menuOperacao (){
             if(!strncmp(msg->msg, "10",3)){
                 printf ("Sua vez de jogar.\n");
                 // Mostrando quais opções o jogador pode fazer.
-                menu(valorRodada);                
+                menu(valorRodada - valorMao10);                
                 menuMensagem();
             }// Se for um sinal de envio de mesa.
             else if (!strncmp(msg->msg, "11", 3)){
@@ -242,6 +242,9 @@ void menuOperacao (){
                     if (!strncmp(buffer, "02", 3)
                         || !strncmp(buffer, "03", 3)){
                         enviarStr (jogadorCliente.socket, buffer);
+                        if (!strncmp (buffer, "02", 3)){
+                            valorMao10 = 2;
+                        }
                         break;
                     }else {
                         printf ("Opção inválida.\n");

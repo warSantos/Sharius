@@ -183,7 +183,7 @@ void controleJogo(){
     int tentos[5] = {2, 4, 8, 10, 12};
     int placarTurno[2];
     int placarJogo[2] = {0,0};
-    int respostaAumento, jogadoresAumento[2] = {0,0}, jogadorSolicitante,BloquearTruco[2] = {-1,-1};
+    int respostaAumento, jogadoresAumento[2] = {0,0}, jogadorSolicitante, BloquearTruco[2] = {-1,-1};
     Mensagem *msg, *mao10[2];
     
     // Enviando mensagem inicial para jogadores (teste da conexão).
