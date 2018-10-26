@@ -32,6 +32,7 @@ typedef struct{
 	Carta cartas[4];
 } Mesa;
 
+// 4 players (0 a 3).
 #define QTDE_JOGADORES 1
 
 void construirBaralho (Carta *baralho);

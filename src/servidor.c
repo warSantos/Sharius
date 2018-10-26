@@ -67,7 +67,6 @@ void escutaSolicitacao(){
     if(bind(socketLocal, (struct sockaddr *) &servidor, sizeof(servidor)) < 0){
         
         printf("Erro no bind.\n");
-        fechaConexoes();
         close(socketLocal);       
         exit(1);
     }
@@ -169,7 +168,9 @@ void *autenticaUsuarios (void *args){
 void fechaConexoes(){
 
     int i;
-    for (i = 0; i < QTDE_JOGADORES; ++i){
+    for (i = 0; i <= QTDE_JOGADORES; ++i){
+        enviarStr (jogadores[i].socket, "31");
+        sleep (0.5);
         close(jogadores[i].socket);
     }
 }
@@ -179,7 +180,7 @@ void controleJogo(){
     // Construindo baralho.
     construirBaralho (baralho);
     int turnos, vezJogador, jogadas, maoDe10, trucoMao10;
-    int valorRodada, resultadoRodada, resultadoTurno, recusoAumento,primeiroTurno,jogadorRodada = 0 ;
+    u_int32_t valorRodada, resultadoRodada, resultadoTurno, recusoAumento,primeiroTurno,jogadorRodada = 0 ;
     int tentos[5] = {2, 4, 8, 10, 12};
     int placarTurno[2];
     int placarJogo[2] = {0,0};
@@ -202,13 +203,15 @@ void controleJogo(){
         vezJogador = jogadorRodada;
         enviarDesbloqueio();
         //TO-DO: adaptar o jogo para 4 playes com o "for".
-        if (placarJogo[0] == 10){
+        if (placarJogo[0] == 10 && placarJogo[1] != 10){
             // Enviando sinal de mão de 10.
             enviarStr (jogadores[0].socket, "15");
             //enviarStr (jogadores[2].socket, "15");
             // Recebendo resposta dos jogadores.
             mao10[0] = recebeStr (jogadores[0].socket);
+            jogadorDesistiu (0, mao10[0]->bytes_read);
             //mao10[1] = recebeStr (jogadores[2].socket);
+            //jogadorDesistiu (2, mao10[1]->bytes_read);
             // Se algum dos dois jogadores aceitarem.
             if (!strncmp (mao10[0]->msg, "02", 3)
                 /*|| !strncmp (mao10[1]->msg, "02", 3)*/){
@@ -221,13 +224,15 @@ void controleJogo(){
             }
             free (mao10[0]);
             //free (mao10[1]);
-        }else if(placarJogo[1] == 10){
+        }else if(placarJogo[1] == 10 && placarJogo[0] != 10){
             // Enviando sinal de mão de 10.
             enviarStr (jogadores[1].socket, "15");
-            enviarStr (jogadores[3].socket, "15");
+            //enviarStr (jogadores[3].socket, "15");
             // Recebendo resposta dos jogadores.
             mao10[0] = recebeStr (jogadores[1].socket);
+            jogadorDesistiu (1, mao10[0]->bytes_read);
             //mao10[1] = recebeStr (jogadores[3].socket);
+            //jogadorDesistiu (3, mao10[1]->bytes_read);
             // Se algum dos dois jogadores aceitarem.
             if (!strncmp (mao10[0]->msg, "02", 3) 
                 /*|| !strncmp (mao10[1]->msg, "02", 3)*/){
@@ -241,7 +246,7 @@ void controleJogo(){
             free (mao10[0]);
             //free (mao10[1]);
         }
-        // Se os jogadores recusaram de uma mão de 10.
+        // Se os jogadores estiverem e aceitarem mão de 10.
         if (maoDe10 != -1){
             // Iniciando rodada.
             trucoMao10 = 0;
@@ -268,11 +273,13 @@ void controleJogo(){
                     enviarStr (jogadores[vezJogador].socket, "10");
                     // Recebe resposta do jogador da vez.
                     msg = recebeStr (jogadores[vezJogador].socket);
+                    jogadorDesistiu (vezJogador, msg->bytes_read);
                     // Se for a solicitacao de jogar uma carta.
                     if (!strncmp (msg->msg, "00", msg->lenght)){
                         // TO-DO: Falta testar.
                         // Recebendo o nome da carta.
                         msg = recebeStr (jogadores[vezJogador].socket);
+                        jogadorDesistiu (vezJogador, msg->bytes_read);
                         // Adicionando carta a mesa.
                         strncpy (mesaJogo->cartas[mesaJogo->tamMesa].nome, msg->msg, 3);
                         // Recebendo o valor da carta.
@@ -367,6 +374,7 @@ void controleJogo(){
                     }
                     vezJogador = proximoJogador (vezJogador);
                     free (msg);
+                    printf ("Servidor: valor da rodada: %d.\n", tentos[valorRodada]);
                 } // Todos os jogadores fizeram suas jogadas.
                 // Se a rodada chegou ao fim sem ser por um recuso de aumento de aposta.
                 if (!recusoAumento){
@@ -404,7 +412,7 @@ void controleJogo(){
                             placarTurno[1]++;
                         }
                     }
-                    free (mesaJogo);
+                    free (mesaJogo);                    
                     sprintf(resultado ,"Placar Turno.\nDupla (0 - 2): %d.\n"
                         "Dupla (1 - 3): %d.\n", placarTurno[0], placarTurno[1]);
                     enviarResultado (resultado);
@@ -436,7 +444,6 @@ void controleJogo(){
             break;
         }
     }
-    //TO-DO: Enviar sinal de fechar conexão.
     fechaConexoes();
 }
 
@@ -567,5 +574,23 @@ void enviarDesbloqueio (){
     for (jogador = 0; jogador <= QTDE_JOGADORES; jogador++){
         // envia sinal de desbloqueio de aumento de aposta para dupla.
         enviarStr (jogadores[jogador].socket, "17");
+    }
+}
+
+void jogadorDesistiu (int vezJogador, u_int32_t bytes){
+
+    if (bytes <= 0){
+        int jogador;
+        for (jogador = 0; jogador < QTDE_JOGADORES; jogador++){
+            if (jogador != vezJogador){
+                // Enviando sinal de que jogador desistiu.
+                enviarStr (jogadores[jogador].socket, "30");
+                // Enviando número do joagdor que desistiu.
+                enviarInt (jogadores[jogador].socket, vezJogador);
+                // Fechando conexão com servidor.
+                close (jogadores[jogador].socket);
+            }
+        }
+        exit (1);
     }
 }

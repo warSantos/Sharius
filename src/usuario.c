@@ -56,7 +56,7 @@ u_int32_t recebeInt (int idSocket){
     u_int32_t v;
     int bytes_read = recv(idSocket, &v, sizeof(u_int32_t), 0);
     // Se nenhum byte for lido (cliente fez uma interrupção de teclado por exemplo).
-    if (bytes_read <= 0){
+    if (bytes_read < 0){
         printf ("Erro: falha ao ler inteiro no socket.\n");
         return -1;
     }
@@ -87,7 +87,7 @@ Mensagem *recebeStr(int idSocket){
     // recebendo o tamanho da string.
     msg->lenght = recebeInt (idSocket);
     if(msg->bytes_read < 0){
-
+        printf ("Erro: erro ao ler string.\n");
         msg->msg = NULL;
         msg->lenght = 0;
         return msg;

@@ -72,6 +72,8 @@ void enviarBloqueio (int vezJogador);
 
 void enviarDesbloqueio ();
 
+void jogadorDesistiu (int vezJogador, u_int32_t bytes);
+
 int jogadorAnterior (int vezJogador);
 
 int proximoJogador (int vezJogador);

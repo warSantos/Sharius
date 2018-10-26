@@ -103,7 +103,6 @@ void abreConexao(){
 
 void menu(int valorRodada, int bloqueioAumento){
     
-    printf ("ValorRodada %d.\n", valorRodada);
     printf("00 - Jogar Carta\n");
     // Se o puder pedir aumento de aposta, mostre o menu.
     if (!bloqueioAumento){
@@ -195,6 +194,7 @@ void menuOperacao (){
     // Setando o valor da rodada para o valor inicial.
     while(1){
         sleep(1);
+        printf ("valorMao10: %d.\n", valorMao10);
         msg = recebeStr (jogadorCliente.socket);
         if (msg->msg[0] == '0'){ // Sinais do cliente.
 
@@ -262,9 +262,20 @@ void menuOperacao (){
                 bloqueioAumento = 0;
             }
             else{
-                printf("Vez de outro jogador, espere sua vez.\n");
-                printf ("Mensagem: %s.\n", msg->msg);
+                //printf("Vez de outro jogador, espere sua vez.\n");
+                //printf ("Mensagem: %s.\n", msg->msg);
             }
+        }
+        // Se algum jogador desistir da partida.
+        if (!strncmp(msg->msg, "30", 3)){
+            // Recebendo o número do jogador que desistiu.
+            u_int32_t jogadorDesistiu = recebeInt (jogadorCliente.socket);
+            printf ("Jogador % desistiu.\n", jogadorDesistiu);
+            exit(1);
+        }// Partida finalizada.
+        else if (!strncmp(msg->msg, "31", 3)){
+            printf ("Partida finalizada.\n");
+            exit(1);
         }
         free(msg);
     }
