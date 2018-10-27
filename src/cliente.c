@@ -269,6 +269,7 @@ void receberCartas (){
             printf ("Erro: falha ao receber as cartas.\n");
             return;
         }
+        printf("deu\n");
         memcpy (jogadorCliente.mao[numeroCarta].nome, msg->msg, msg->lenght);
         // Recebendo o valor da carta.
         jogadorCliente.mao[numeroCarta].valor = recebeInt (jogadorCliente.socket);

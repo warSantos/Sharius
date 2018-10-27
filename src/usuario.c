@@ -59,10 +59,8 @@ void enviarStr(int idSocket, char *str){
 
     // Obtendo o tamanho da string.
     u_int32_t lenght = strlen(str) + 1;
-
     // enviando o tamanho da string.
     enviarInt (idSocket, lenght);
-    
     // enviando a string.
     write(idSocket, str, lenght);
 }

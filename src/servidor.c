@@ -268,7 +268,7 @@ void controleJogo(){
                     enviarStr (jogadores[vezJogador].socket, "10");
                     // Recebe resposta do jogador da vez.
                     msg = recebeStr (jogadores[vezJogador].socket);
-                    // Se for a solicitacao de jogar uma carta.
+                    //Se for a solicitacao de jogar uma carta.
                     if (!strncmp (msg->msg, "00", msg->lenght)){
                         // TO-DO: Falta testar.
                         // Recebendo o nome da carta.
