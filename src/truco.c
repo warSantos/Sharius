@@ -122,7 +122,7 @@ void distribuirCartas (Jogador *jogadores, Carta *baralho){
 	
 	int i,j,k = 0;
 	// Para cada jogador.
-	for(i = 0; i <= QTDE_JOGADORES; i++){
+	for(i = 0; i < QTDE_JOGADORES; i++){
 		// Para cada carta do jogador i.
 		for(j = 0; j < 3; j++){
 			strncpy(jogadores[i].mao[j].nome, baralho[k].nome, 3);
@@ -135,8 +135,7 @@ void distribuirCartas (Jogador *jogadores, Carta *baralho){
 int vencerTurno (Mesa *mesa){
 	
 	int aux = 0, aux2, i;
-	//TO-DO: alterar valor do for para 2.
-	for(i = 0; i <= QTDE_JOGADORES; i++){
+	for(i = 0; i < QTDE_JOGADORES; i++){
 		if(mesa->cartas[i].valor > aux){
 			aux = mesa->cartas[i].valor;			
 			aux2 = mesa->numeroJogador[i];			

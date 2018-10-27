@@ -50,28 +50,54 @@ void *escutaCliente(void *idSocket);
 // Encerra os socket quando o servidor é terminado...
 void fechaConexoes();
 
-// Envia as cartas dos jogadores do servidor para o cliente.
+// Envia as cartas dos jogadores do servidor para o cliente (Sinal 12)..
 void enviarCartas();
 
+// Envia uma mensagem para todos os jogadores avisando que
+// um jogador solicitou aumento de aposta (pediu, truco, meia,
+// nove etc...). A mensagem não é enviada para o jogador que 
+// solicitou (Sinal 04).
 void enviarAnuncioAumentoAposta (int jogadorSolicitante);
 
+// Envia uma mensagem para todos os jogadores avisando que
+// um jogador aceitou aumento de aposta (pediu, truco, meia,
+// nove etc...). A mensagem não é enviada para o jogador que 
+// aceitou (Sinal 02).
 void enviarAnuncioAceitaAposta (int jogadorConfirmante);
 
-// Envia as cartas que estão na mesa para os jogadores.
+// Envia as cartas que estão na mesa para os jogadores (Sinal 11)..
 void enviarMesa ();
 
+// Atualiza o valor da rodada dos jogadores após uma alteração
+// ocorrer no valor de aposta (alguém pedir um truco por exemplo).
+// (Sinal 13).
 void enviarValorRodada (int valorRodada);
 
+// Recebe uma mensagem por parâmtro (msg) e envia aos jogadores.
+// É utilizada para envio de resultado de turno e rodada (qual
+// dupla ganhou ou se ocorreu um empate). (Sinal 14)
 void enviarResultado (char *msg);
 
+// Configura variávle nos clientes para impedir que os mesmos
+// solicitem pedidos dois pedidos de aposta concecutivos.
 void enviarBloqueio (int vezJogador);
 
+// Envia um sinal para todos os clientes. utilizando quando so
+// se necessita enviar um sinal e nenhum dado a mais.
 void enviarSinal (char *sinal);
 
+// Se um jogador desistir da partida esta função tenta verificar
+// através dos bytes lidos verifica posso motivo (interrupção de 
+// teclado por exemplo) e fecha conexões com os demais jogadores
+// avisando que um jogador saiu da partida.
 void jogadorDesistiu (int vezJogador, u_int32_t bytes);
 
+// Retorna o di do jogador "a esquerda" de um jogador do parâmetro
+// (vezJogador).
 int jogadorAnterior (int vezJogador);
 
+// Retorna o id do jogador "a esquerda" de um jogador do parâmetro
+// (vezJogador).
 int proximoJogador (int vezJogador);
 
 // A partir desta função o fluxo do jogo é controlado.

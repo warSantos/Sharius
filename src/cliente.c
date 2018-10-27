@@ -60,8 +60,6 @@ void abreConexao (void){
         // enviando senha.
         enviarStr(jogadorCliente.socket, resposta);
         // Recebendo confiramção.
-        // TO-DO: padronizar tudo para (read, write) ou (send, recv).
-        // TO-DO: utilizar somente recebeStr e enviarStr.
         recv(jogadorCliente.socket, &ok, sizeof (char), 0);
         
         // Se o acesso for permitido receba a nova porta para o 
@@ -83,7 +81,7 @@ void abreConexao (void){
     //return msg;
 }
 
-void menu (int valorRodada, int bloqueioAumento){
+void menuAposta (int valorRodada, int bloqueioAumento){
     
     printf("00 - Jogar Carta\n");
     // Se o puder pedir aumento de aposta, mostre o menu de acordo.
@@ -102,7 +100,7 @@ void menu (int valorRodada, int bloqueioAumento){
 }
 
 // Menu com opções de jogada.
-void menuMensagem (int bloqueioAumento){
+void menuJogadas (int bloqueioAumento){
     
     char buffer[3];    
     while (1){
@@ -124,7 +122,7 @@ void menuMensagem (int bloqueioAumento){
 }
 
 //menuTruco se caso o jogar for trucado caira aki
-void menuTruco (int valorRodada){
+void respostaAumentoAposta (int valorRodada){
     
     char resposta[3];
     // Aguardando permissão para jogar (10).
@@ -149,10 +147,12 @@ void menuTruco (int valorRodada){
             enviarStr(jogadorCliente.socket, resposta);
             return;
         }else if(!strncmp(resposta, "02", 3)){
+            // Enviando sinal de confirmação de aumento (aceitar).
             enviarStr(jogadorCliente.socket, resposta);
             return;
         }
         else if(!strncmp(resposta, "03", 3)){
+            // Enviando sinal de recusa de aumento de aposta.
             enviarStr(jogadorCliente.socket, resposta);
             return;
         }else{
@@ -180,7 +180,7 @@ void decodificador (void){
         if (msg->msg[0] == '0'){ // Sinais do cliente.
             // Se for uma solicitação de aumento de aposta.
             if(!strncmp(msg->msg, "01", 3)){
-                menuTruco(valorRodada - valorMao10);
+                respostaAumentoAposta (valorRodada - valorMao10);
                 bloqueioAumento = 0;
             }// Se for um sinal informando que algum jogador aceitou o aumento.
             else if (!strncmp(msg->msg, "02", 3)){
@@ -195,8 +195,8 @@ void decodificador (void){
             if(!strncmp(msg->msg, "10",3)){
                 printf ("Sua vez de jogar.\n");
                 // Mostrando quais opções o jogador pode fazer.
-                menu(valorRodada - valorMao10, bloqueioAumento);
-                menuMensagem(bloqueioAumento);
+                menuAposta (valorRodada - valorMao10, bloqueioAumento);
+                menuJogadas (bloqueioAumento);
             }// Se for um sinal de envio de mesa.
             else if (!strncmp(msg->msg, "11", 3)){
                 // Recebendo as cartas na mesa do servidor.
@@ -306,7 +306,7 @@ void jogar (void){
 void visualizarCarta (void){
     
     int i;
-    printf("Cartas\n");
+    printf("Suas cartas: \n");
     for(i = 0; i < 3; i++){
         if(jogadorCliente.mao[i].nome[0] != 0){
             printf("%s\t",jogadorCliente.mao[i].nome);
@@ -320,7 +320,7 @@ void visualizarMesa (void){
     int i;
     u_int32_t tamanhoMesa;
     Mensagem *msg;
-    printf("Mesa: \n");
+    printf("Cartas na Mesa: \n");
     tamanhoMesa = recebeInt (jogadorCliente.socket);
     for(i = 0; i < tamanhoMesa; i++){
         msg = recebeStr(jogadorCliente.socket);

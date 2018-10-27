@@ -27,21 +27,34 @@ void abreConexao (void);
 // -vindas do servidor direcionando as jogadas do cliente.
 void decodificador (void);
 
-// 
-void menu (int valorRodada, int bloqueioAumento);
+// Identifica qual opção de aumento de aposta esta disponível para o
+// o jogador baseado no valor do jogo no momento e se o jogador foi
+// o último a solicitar aumento de aposta ou não.
+void menuAposta (int valorRodada, int bloqueioAumento);
 
-void menuMensagem (int bloqueioAumento);
+// Informa ao jogador quais movimentos este pode realizar e também
+// trata os dados inseridos pelo mesmo.
+void menuJogadas (int bloqueioAumento);
 
-void menuTruco (int valorRodada);
+// Informa ao jogador quais movimentos este pode realizar ao ser
+// intimado em um aumento de aposta.
+void respostaAumentoAposta (int valorRodada);
 
+// Recebe as cartas enviadas para o jogador pelo server e as armazena
+// na estrutura jogadorCliente.
 void receberCartas (void);
 
+// Verifica quais cartas o jogador possui e oferece interface necessária
+// para que o jogador possa escolher uma carta e enviar a mesma ao servidor.
 void jogar (void);
 
-void aumentoValor (void);
-
+// Ao servidor enviar as cartas existentes na mesa para os jogadores esta
+// função recebe o fluxo de dados e trata os de foma que a visualização 
+// das cartas fique mais harmoniosa.
 void visualizarMesa (void);
 
+// Ao receber as cartas do servidor esta função imprime as cartas de forma
+// mais harmoniosa na tela.
 void visualizarCarta (void);
 
 #endif

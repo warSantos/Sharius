@@ -33,9 +33,10 @@ typedef struct{
 } Mesa;
 
 // 4 players (0 a 3).
-#define QTDE_JOGADORES 1
+#define QTDE_JOGADORES 4
 
-#define JOGADORES_POR_DUPLA 1
+// Aconselhável ter duas duplas (2 jogadores cada).
+#define JOGADORES_POR_DUPLA 2
 
 // Configura o valor e o nome das cartas na estrutura baralho.
 void construirBaralho (Carta *baralho);
