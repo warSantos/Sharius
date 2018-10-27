@@ -4,7 +4,7 @@
 #include <string.h>
 #include "../headers/truco.h"
 
-void construirBaralho(Carta *baralho){
+void construirBaralho (Carta *baralho){
 	// 4
 	strncpy(baralho[0].nome, "4o", 3);
 	baralho[0].valor = 1;
@@ -98,7 +98,7 @@ void construirBaralho(Carta *baralho){
 	baralho[39].valor = 14;
 }
 //Função para embaralhar o baralho randomicamente
-void embaralhar(Carta *baralho){
+void embaralhar (Carta *baralho){
 	int i=0,j,k,auxValor;
 	char auxNome[3];
 	srand(time(NULL));
@@ -118,7 +118,7 @@ void embaralhar(Carta *baralho){
 	}
 }
 //Função para distribuir cartas para os jogadores
-void distribuirCartas(Jogador *jogadores, Carta *baralho){
+void distribuirCartas (Jogador *jogadores, Carta *baralho){
 	
 	int i,j,k = 0;
 	// Para cada jogador.
@@ -152,7 +152,7 @@ int vencerTurno (Mesa *mesa){
 }
 
 //Função que verifica quem venceu a rodada .
-int vencerRodada (int *placarRodada,int primeiroTurno, int turno){
+int vencerRodada (int *placarRodada, int primeiroTurno, int turno){
 	// Se casa alguem chegue a vencer duas rodadas , se for a segunda dupla return 1
 	if(placarRodada[0] == 2 && placarRodada[1] < 2){
 		return 1;

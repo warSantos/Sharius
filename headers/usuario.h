@@ -12,8 +12,8 @@
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr
 #include <netinet/in.h> //inet_addr
-#include<unistd.h>    //write
 #include <pthread.h>
+#include <unistd.h>
 
 // Estrutura destinada a comportar os dados referentes a uma mensagem
 // enviada a partir do protocolo tcp. Todo o texto enviado é armazenado
@@ -39,7 +39,7 @@ typedef struct mensagem {
  */
 
 // Retorna string "ip" no formato exigido pelo padrão do endereço.
-char *criaIp();
+char *criaIp (void);
 
 void enviarInt (int idSocket, int valor);
 
@@ -51,6 +51,6 @@ void enviarStr(int idSocket, char *str);
 // Realiza leitura de um socket definido pelo inteiro idSocket
 // e retorna os dados escritos neste socket e metadados sobre 
 // os dados escritos através da estrutura Mensagem.
-Mensagem *recebeStr(int idSocket);
+Mensagem *recebeStr (int idSocket);
 
 #endif

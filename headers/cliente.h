@@ -18,25 +18,30 @@ Mesa mesaCliente;
  *  
  */
 
-// Abre conexão inicial com o servidor...
-void abreConexao();
+// Abre conexão inicial com o servidor e realizado todo processo de
+// autenticação, inserção de jogador em duplas e estabelecimento de
+// conexão.
+void abreConexao (void);
 
-void menuOperacao ();
+// Coordena o fluxo do jogo no cliente e decodifica as mensagens pro-
+// -vindas do servidor direcionando as jogadas do cliente.
+void decodificador (void);
 
-void menu(int valorRodada, int bloqueioAumento);
+// 
+void menu (int valorRodada, int bloqueioAumento);
 
-void menuMensagem(int bloqueioAumento);
+void menuMensagem (int bloqueioAumento);
 
-void menuTruco(int valorRodada);
+void menuTruco (int valorRodada);
 
-void receberCartas ();
+void receberCartas (void);
 
-void jogar();
+void jogar (void);
 
-void aumentoValor();
+void aumentoValor (void);
 
-void visualizarMesa();
+void visualizarMesa (void);
 
-void visualizarCarta();
+void visualizarCarta (void);
 
 #endif

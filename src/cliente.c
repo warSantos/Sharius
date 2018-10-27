@@ -2,7 +2,7 @@
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-void abreConexao(){
+void abreConexao (void){
         
     struct sockaddr_in servidor;
     //Create socket
@@ -17,8 +17,8 @@ void abreConexao(){
      * do endereço ip ja informado.
     */
     Mensagem *msg = malloc (sizeof(Mensagem));
-    //TO-D0: Descomentar autenticação no servidor e no cliente.
-    /*msg->msg = malloc(sizeof(char)*16);
+    
+    msg->msg = malloc(sizeof(char)*16);
     while(1){
         
         printf("Digite o ip do servidor: ");
@@ -28,8 +28,8 @@ void abreConexao(){
             
             break;
         }
-    }*/
-    msg->msg = "127.0.0.1";
+    }
+
     // Definindo IP do servidor...
     servidor.sin_addr.s_addr = inet_addr(msg->msg);
     // Definindo o tipo de protocolo...
@@ -49,16 +49,15 @@ void abreConexao(){
     int tentativas = 0;
     char ok;
     while(tentativas < 3){                
-        /*
+
         //Recebendo senha.
         char *resposta = malloc(sizeof(char)*16);
         printf("Senha de acesso: ");
         
         scanf("%15[^\n]s", resposta);
         __fpurge(stdin);                                
-        */
+        
         // enviando senha.
-        char *resposta = "123";
         enviarStr(jogadorCliente.socket, resposta);
         // Recebendo confiramção.
         // TO-DO: padronizar tudo para (read, write) ou (send, recv).
@@ -84,10 +83,10 @@ void abreConexao(){
     //return msg;
 }
 
-void menu(int valorRodada, int bloqueioAumento){
+void menu (int valorRodada, int bloqueioAumento){
     
     printf("00 - Jogar Carta\n");
-    // Se o puder pedir aumento de aposta, mostre o menu.
+    // Se o puder pedir aumento de aposta, mostre o menu de acordo.
     if (!bloqueioAumento){
         if(valorRodada == 2 ){
             printf("01 - Pedir truco\n");
@@ -102,14 +101,14 @@ void menu(int valorRodada, int bloqueioAumento){
 
 }
 
-//opções jogador pode fazer
-void menuMensagem(int bloqueioAumento){
+// Menu com opções de jogada.
+void menuMensagem (int bloqueioAumento){
     
     char buffer[3];    
     while (1){
         scanf("%2[^\n]s", buffer);
         __fpurge(stdin);
-        // jogar a carta comando 00
+        // jogar uma carta comando 00.
         if(!strncmp(buffer,"00" , 3)){
             enviarStr(jogadorCliente.socket, "00");
             jogar();
@@ -125,7 +124,7 @@ void menuMensagem(int bloqueioAumento){
 }
 
 //menuTruco se caso o jogar for trucado caira aki
-void menuTruco(int valorRodada){
+void menuTruco (int valorRodada){
     
     char resposta[3];
     // Aguardando permissão para jogar (10).
@@ -162,7 +161,7 @@ void menuTruco(int valorRodada){
     }
 }
 
-void menuOperacao (){
+void decodificador (void){
     
     Mensagem *msg;
     int valorRodada, valorMao10 = 0, bloqueioAumento = 0;
@@ -259,7 +258,7 @@ void menuOperacao (){
     close(jogadorCliente.socket);
 }
 
-void receberCartas (){
+void receberCartas (void){
 
     int numeroCarta;
     Mensagem *msg;
@@ -277,7 +276,7 @@ void receberCartas (){
     }
 }
 
-void jogar(){
+void jogar (void){
 
     while (1){ // Enquanto o jogador não jogar um carta certa.
         
@@ -304,7 +303,7 @@ void jogar(){
     }
 }
 
-void visualizarCarta(){
+void visualizarCarta (void){
     
     int i;
     printf("Cartas\n");
@@ -316,7 +315,7 @@ void visualizarCarta(){
     printf("\n");
 }
 
-void visualizarMesa(){
+void visualizarMesa (void){
     
     int i;
     u_int32_t tamanhoMesa;

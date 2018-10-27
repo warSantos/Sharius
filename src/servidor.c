@@ -4,11 +4,10 @@ void escutaSolicitacao(){
     
     // Cria conexão inicial com clientes e fornece uma thread de
     // recebimento de menagem para o cliente.
-    char *senha = "123";
-    /*char *senha = malloc(sizeof(char)*16);
+    char *senha = malloc(sizeof(char)*16);
     printf("Digite a senha de gerenciamento: ");
     scanf("%15[^\n]s", senha);
-    __fpurge(stdin);*/
+    __fpurge(stdin);
 
     int socketLocal, socketCliente, sizeSockaddr, i;
     struct sockaddr_in servidor, cliente;
@@ -152,7 +151,8 @@ void controleJogo(){
     // Construindo baralho.
     construirBaralho (baralho);
     int turnos, vezJogador, jogadas, maoDe10, trucoMao10;
-    u_int32_t valorRodada, resultadoRodada, resultadoTurno, recusoAumento,primeiroTurno,jogadorRodada = 0 ;
+    u_int32_t valorRodada, resultadoRodada, resultadoTurno;
+    u_int32_t recusoAumento, primeiroTurno, jogadorRodada = 0;
     int tentos[5] = {2, 4, 8, 10, 12};
     int placarTurno[2];
     int placarJogo[2] = {0,0};

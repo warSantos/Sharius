@@ -28,10 +28,8 @@ Carta baralho[40];
 Mesa *mesaJogo;
 
 /*
- *
  * Menu de comandos do Servidor.
  * Modulo de gerenciamento de conexões.
- * 
  */
 
 // Função para recember os comandos inseridos pelo usuário no modo "Comando". 

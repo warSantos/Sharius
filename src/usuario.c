@@ -5,7 +5,7 @@
 
 /* FUNÇÕES PARA TRABALHO DE GERENCIAMENTO DE USUÁRIO! */
 
-char *criaIp(){
+char *criaIp (void){
     
     //char *ip = (char *) malloc(sizeof(char) * 16);    
     char *ip = "127.0.0.1";
@@ -63,7 +63,7 @@ u_int32_t recebeInt (int idSocket){
     return ntohl (v);
 }
 
-void enviarStr(int idSocket, char *str){
+void enviarStr (int idSocket, char *str){
 
     // Obtendo o tamanho da string.
     u_int32_t lenght = strlen(str) + 1;
@@ -80,7 +80,7 @@ void enviarStr(int idSocket, char *str){
     }
 }
 
-Mensagem *recebeStr(int idSocket){
+Mensagem *recebeStr (int idSocket){
         
     Mensagem *msg = malloc (sizeof(Mensagem));
     

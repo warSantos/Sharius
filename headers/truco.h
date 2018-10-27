@@ -33,18 +33,28 @@ typedef struct{
 } Mesa;
 
 // 4 players (0 a 3).
-#define QTDE_JOGADORES 3
+#define QTDE_JOGADORES 1
 
-#define JOGADORES_POR_DUPLA 2
+#define JOGADORES_POR_DUPLA 1
 
+// Configura o valor e o nome das cartas na estrutura baralho.
 void construirBaralho (Carta *baralho);
 
+// Recebe um baralho configurado e altera a posição das cartas
+// de forma aleatória.
 void embaralhar (Carta *baralho);
 
+// Seleciona as primeiras cartas do baralho e distribui entre os
+// jogadores.
 void distribuirCartas (Jogador *jogadores, Carta *baralho);
 
+// Recebe a mesa do jogo (com cartas dos participantes) e verifica
+// se alguma das equipes ganhou o turno e retorna a informação atra-
+// -vés de um valor inteiro.
 int vencerTurno (Mesa *mesa);
 
-int vencerRodada (int *placarRodada,int primeiroTurno,int turno);
+// Verifica se alguma das duplas venceu a rodada (3 turnos) ou se 
+// houve empate e retorna a informação através de um inteiro.
+int vencerRodada (int *placarRodada, int primeiroTurno, int turno);
 
 #endif
