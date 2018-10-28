@@ -4,7 +4,7 @@
 #include <string.h>
 #include "../headers/truco.h"
 
-void construirBaralho(Carta *baralho){
+void construirBaralho (Carta *baralho){
 	// 4
 	strncpy(baralho[0].nome, "4o", 3);
 	baralho[0].valor = 1;
@@ -98,7 +98,7 @@ void construirBaralho(Carta *baralho){
 	baralho[39].valor = 14;
 }
 //Função para embaralhar o baralho randomicamente
-void embaralhar(Carta *baralho){
+void embaralhar (Carta *baralho){
 	int i=0,j,k,auxValor;
 	char auxNome[3];
 	srand(time(NULL));
@@ -118,11 +118,11 @@ void embaralhar(Carta *baralho){
 	}
 }
 //Função para distribuir cartas para os jogadores
-void distribuirCartas(Jogador *jogadores, Carta *baralho){
+void distribuirCartas (Jogador *jogadores, Carta *baralho){
 	
 	int i,j,k = 0;
 	// Para cada jogador.
-	for(i = 0; i <= QTDE_JOGADORES; i++){
+	for(i = 0; i < QTDE_JOGADORES; i++){
 		// Para cada carta do jogador i.
 		for(j = 0; j < 3; j++){
 			strncpy(jogadores[i].mao[j].nome, baralho[k].nome, 3);
@@ -135,8 +135,7 @@ void distribuirCartas(Jogador *jogadores, Carta *baralho){
 int vencerTurno (Mesa *mesa){
 	
 	int aux = 0, aux2, i;
-	//TO-DO: alterar valor do for para 2.
-	for(i = 0; i <= QTDE_JOGADORES; i++){
+	for(i = 0; i < QTDE_JOGADORES; i++){
 		if(mesa->cartas[i].valor > aux){
 			aux = mesa->cartas[i].valor;			
 			aux2 = mesa->numeroJogador[i];			
@@ -152,29 +151,29 @@ int vencerTurno (Mesa *mesa){
 }
 
 //Função que verifica quem venceu a rodada .
-int vencerRodada (int *placarRodada,int primeiroTurno, int turno){
-	//se casa alguem chegue a vencer duas rodadas , se for a segunda dupla return 1
+int vencerRodada (int *placarRodada, int primeiroTurno, int turno){
+	// Se casa alguem chegue a vencer duas rodadas , se for a segunda dupla return 1
 	if(placarRodada[0] == 2 && placarRodada[1] < 2){
 		return 1;
 	}
-	//se casa alguem chegue a vencer duas rodadas , se for a segunda dupla return 2
+	// Se casa alguem chegue a vencer duas rodadas , se for a segunda dupla return 2
 	else if(placarRodada[0] < 2 && placarRodada[1] == 2){
 		return 2;
 	}
-	//se caso empate o primeiro e o sengunto turno o ultimo turno decidirá, se for primeiro dupla return 1
+	// Se caso empate o primeiro e o sengunto turno o ultimo turno decidirá, se for primeiro dupla return 1
 	else if(placarRodada[0] == 3 && placarRodada[1] == 2 ){
 		return 1;
 	}
-	//se caso empate o primeiro e o sengunto turno o ultimo turno decidirá, se for a segunda dupla return 2
+	// Se caso empate o primeiro e o sengunto turno o ultimo turno decidirá, se for a segunda dupla return 2
 	else if(placarRodada[0] == 2 && placarRodada[1] == 3){
 		return 2;
 	}
-	//se caso empate as 3 rodadas , não haverá vencedor
+	// Se caso empate as 3 rodadas , não haverá vencedor
 	else if(placarRodada[0] == 3 && placarRodada[1] == 3){
 		return 3;
 	}
-
-	//Se caso 1 vença a primeira o outro vença a sengunda e a terceira acabe empatada , então o vencedor da rodada sera o que ganhou o primeiro turno
+	// Se caso 1 vença a primeira o outro vença a sengunda e a terceira acabe empatada, 
+	// então o vencedor da rodada sera o que ganhou o primeiro turno
 	else if(placarRodada[0] == 2 && placarRodada[1] == 2 && turno == 2){
 		if(primeiroTurno == 0 || primeiroTurno == 2){
 			return 1;

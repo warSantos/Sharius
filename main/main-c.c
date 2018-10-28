@@ -11,8 +11,8 @@ int main(){
         return 1;
     }
     
-    // Mantendo conexão ativa e controlando o  fluxo do jogo.
-    menuOperacao(2);
+    // Mantendo conexão ativa e controlando o fluxo do jogo.
+    decodificador ();
     
     return 0;
 }
