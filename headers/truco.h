@@ -33,7 +33,7 @@ typedef struct{
 } Mesa;
 
 // 4 players (0 a 3).
-#define QTDE_JOGADORES 2
+#define QTDE_JOGADORES 4
 
 // Aconselhável ter duas duplas (2 jogadores cada).
 #define JOGADORES_POR_DUPLA 2

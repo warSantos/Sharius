@@ -166,6 +166,7 @@ void controleJogo(){
     while (1){
         sleep (1);
         // Enviando cartas para os jogadores.
+        JogadorNumero();
         enviarCartas ();
         sleep(1);
         valorRodada = 0;
@@ -595,5 +596,14 @@ void jogadorDesistiu (int vezJogador, u_int32_t bytes){
             }
         }
         exit (1);
+    }
+}
+void JogadorNumero(){
+    char numeroJogador[75];
+    int jogador;
+    for (jogador = 0; jogador < QTDE_JOGADORES; ++jogador){
+        enviarStr (jogadores[jogador].socket,"14");
+        sprintf(numeroJogador,"Jogador %i \n",jogador);
+        enviarStr(jogadores[jogador].socket,numeroJogador);
     }
 }

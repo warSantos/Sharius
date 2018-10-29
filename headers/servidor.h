@@ -105,4 +105,6 @@ int proximoJogador (int vezJogador);
 // enviados para os players. Além de toda contabilização
 // de pontos e também do exercimento das regras do jogo.
 void controleJogo();
+// envia os numeros do jogadores
+void JogadorNumero();
 #endif

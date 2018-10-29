@@ -6,6 +6,7 @@ void abreConexao (void){
         
     struct sockaddr_in servidor;
     //Create socket
+    
     jogadorCliente.socket = socket(AF_INET , SOCK_STREAM , 0);
     if (jogadorCliente.socket == -1){
         
@@ -193,7 +194,7 @@ void decodificador (void){
             }// Se for um sinal de permissão para jogar.
         }else { // Sinais do servidor. 
             if(!strncmp(msg->msg, "10",3)){
-                printf ("Sua vez de jogar.\n");
+                printf ("Sua vez de jogar jogador.\n");
                 // Mostrando quais opções o jogador pode fazer.
                 menuAposta (valorRodada - valorMao10, bloqueioAumento);
                 menuJogadas (bloqueioAumento);
